@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nice · KUN.BLOG — 水墨卷册</title>
+<style>
+:root{
+  --paper:#F5F1E8;
+  --ink:#1A1A18;
+  --ink-soft:#3A3A36;
+  --ink-mid:#5A5952;
+  --ink-faint:#8C8A80;
+  --cinnabar:#B03A2E;
+  --cinnabar-dark:#C4553F;
+  --rule:#D9D2C2;
+  --rule-fine:#E3DDCE;
+  --sumi:#232320;
+  --sumi-line:#4A4842;
+  --serif:"Noto Serif SC","Source Han Serif CN","Songti SC",serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+
+/* 顶栏 —— 右上角纯页面导航 */
+.topbar{position:sticky;top:0;z-index:20;height:88px;padding:0 88px;display:flex;align-items:center;justify-content:space-between;background:var(--paper);border-bottom:1px solid var(--rule)}
+.brand{font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.08em}
+.vol-nav{display:flex;gap:28px;align-items:center}
+.vol-nav a{font-size:14px;color:var(--ink-mid);transition:color .2s;white-space:nowrap}
+.vol-nav a:hover{color:var(--ink)}
+.vol-nav a.on{color:var(--cinnabar);font-family:var(--serif);font-weight:700}
+
+/* 卷册容器 —— 一次只展一卷，page 式跳转 */
+.volume{display:none;min-height:calc(100vh - 88px);animation:unfold .38s ease both}
+.volume.on{display:block}
+@keyframes unfold{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.wrap{padding:96px 88px 100px}
+.eyebrow{font-size:14px;letter-spacing:.22em;color:var(--ink-faint);margin:0 0 28px}
+.vol-tag{font-size:14px;letter-spacing:.18em;color:var(--cinnabar);margin:0 0 32px}
+h1{font-family:var(--serif);font-weight:700;font-size:60px;line-height:1.45;margin:0 0 28px;letter-spacing:.01em}
+.lead{font-family:var(--serif);font-size:18px;line-height:1.9;color:var(--ink-mid);max-width:720px;margin:0}
+.rule{height:1px;background:var(--rule);border:0;margin:0}
+
+/* 卷首 */
+.hero-title{font-size:68px;line-height:1.44}
+.mountains{display:block;width:100%;max-width:1000px;height:240px;margin:44px 0 0}
+.meta-row{display:flex;gap:64px;padding:40px 88px 56px;font-size:13px;color:var(--ink-faint)}
+.meta-row .on{color:var(--cinnabar);font-family:var(--serif);font-weight:700}
+.foot{display:flex;align-items:center;justify-content:space-between;padding:24px 88px 32px;font-size:12px;color:var(--ink-faint)}
+.seal{width:44px;height:44px;border-radius:3px;background:var(--cinnabar);color:var(--paper);display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:22px;flex:none}
+
+/* 联络两列 */
+.cols{display:grid;grid-template-columns:repeat(2,1fr);gap:48px}
+.col-label{font-size:13px;letter-spacing:.12em;color:var(--ink-faint);margin:0 0 10px}
+.col-value{font-family:var(--serif);font-weight:700;font-size:24px;margin:0}
+
+/* 目录 —— 标题入卷四，右侧原文直达 CSDN */
+.notes{margin:0}
+.note{display:flex;align-items:center;gap:24px;font-family:var(--serif);font-weight:500;font-size:20px;line-height:1.7;padding:12px 0;border-bottom:1px solid var(--rule-fine)}
+.note-title{flex:1;transition:color .2s,padding-left .2s}
+.note:hover .note-title{color:var(--cinnabar);padding-left:8px}
+.note-ext{font-family:var(--sans);font-size:12px;color:var(--ink-faint);white-space:nowrap;letter-spacing:.05em;flex:none}
+.note-ext:hover{color:var(--cinnabar)}
+.hint{display:inline-block;margin-top:28px;font-family:var(--serif);font-weight:700;font-size:14px;color:var(--cinnabar);transition:opacity .2s}
+.hint:hover{opacity:.7}
+
+/* 文章 */
+.article{display:grid;grid-template-columns:1fr 260px;gap:72px}
+.article h2{font-family:var(--serif);font-weight:700;font-size:52px;line-height:1.4;margin:0 0 12px;white-space:pre-line}
+.article .meta{font-size:14px;color:var(--ink-faint);margin:0 0 32px}
+.article p{font-family:var(--serif);font-size:17px;line-height:2;color:var(--ink-soft);margin:0 0 24px}
+.side{padding:8px 0 0 24px}
+.side h3{font-family:var(--serif);font-size:13px;color:var(--cinnabar);margin:0 0 20px;letter-spacing:.1em}
+.side-item{display:block;font-size:15px;color:var(--ink-mid);margin:0 0 20px}
+.source{display:inline-block;margin-top:4px;font-family:var(--sans);font-size:13px;letter-spacing:.04em}
+.vol-links{margin-top:24px}
+.vol-links .hint{margin:0 32px 0 0}
+
+/* 卷尾 · 深墨反白 */
+.volume.sumi{background:var(--sumi);color:var(--paper)}
+.volume.sumi .vol-tag{color:var(--cinnabar-dark)}
+.volume.sumi .lead{color:#A8A69C}
+.volume.sumi .rule{background:var(--sumi-line)}
+.volume.sumi .col-value{color:var(--paper)}
+.volume.sumi .col-value a:hover{color:var(--cinnabar-dark)}
+.volume.sumi .hint{color:var(--cinnabar-dark)}
+.volume.sumi .foot{color:var(--ink-faint)}
+.watermark{font-family:var(--serif);font-weight:900;font-size:clamp(64px,9vw,120px);line-height:1.2;color:#3A3A36;margin:36px 0 0;letter-spacing:.01em}
+
+@media (max-width:900px){
+  .topbar{height:auto;min-height:72px;padding:16px 24px;flex-wrap:wrap;gap:12px}
+  .vol-nav{gap:16px;flex-wrap:wrap}
+  .wrap{padding:56px 24px 64px}
+  .foot,.meta-row{padding-left:24px;padding-right:24px}
+  .meta-row{gap:24px;flex-wrap:wrap}
+  h1{font-size:40px}
+  .hero-title{font-size:42px}
+  .mountains{height:160px}
+  .cols{grid-template-columns:1fr;gap:24px}
+  .article{grid-template-columns:1fr;gap:32px}
+  .side{padding-left:0}
+  .article h2{font-size:32px}
+  .note{font-size:16px;gap:12px}
+  .vol-links .hint{margin:0 20px 0 0}
+  .bgm-btn{right:16px;bottom:16px;width:44px;height:44px;font-size:18px}
+  .bgm-tip{right:16px;bottom:68px;font-size:11px}
+}
+
+/* 琴钮 —— 背景乐开关 */
+.bgm-btn{
+  position:fixed;right:28px;bottom:28px;z-index:40;
+  width:48px;height:48px;border:1px solid var(--rule);border-radius:3px;
+  background:var(--paper);color:var(--ink-mid);
+  font-family:var(--serif);font-size:21px;line-height:1;cursor:pointer;
+  display:grid;place-items:center;user-select:none;
+  transition:background .25s,color .25s,border-color .25s;
+}
+.bgm-btn:hover{border-color:var(--cinnabar);color:var(--cinnabar)}
+.bgm-btn.on{background:var(--cinnabar);border-color:var(--cinnabar);color:var(--paper)}
+.bgm-btn.on .qin-glyph{animation:qin-sway 7s ease-in-out infinite}
+.bgm-btn .qin-glyph{display:block;transform-origin:50% 54%}
+@keyframes qin-sway{
+  0%,100%{transform:rotate(-7deg)}
+  50%{transform:rotate(7deg)}
+}
+.bgm-tip{
+  position:fixed;right:28px;bottom:84px;z-index:40;
+  font-family:var(--serif);font-size:12px;letter-spacing:.14em;
+  color:var(--ink-faint);pointer-events:none;
+  opacity:0;transition:opacity .4s;
+}
+.bgm-tip.show{opacity:1}
+@media (prefers-reduced-motion:reduce){
+  .bgm-btn.on .qin-glyph{animation:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#/1">nice · KUN.BLOG</a>
+  <nav class="vol-nav" id="volNav">
+    <a href="#/1" data-vol="1">卷首 · 序</a>
+    <a href="#/2" data-vol="2">卷二 · 言志</a>
+    <a href="#/3" data-vol="3">卷三 · 札记</a>
+    <a href="#/4" data-vol="4">卷四 · 文章</a>
+    <a href="#/5" data-vol="5">卷尾 · 音问</a>
+  </nav>
+</header>
+
+<main id="stage">
+
+  <!-- 卷首 · 序 -->
+  <section class="volume" data-vol="1">
+    <div class="wrap">
+      <p class="eyebrow">全 栈 工 匠 &nbsp;·&nbsp; 翰 墨 为 伴</p>
+      <h1 class="hero-title">以代码写生活，<br>以生活成代码。</h1>
+      <p class="lead">后端习 Java 与 Python，前端修 React 与 Vue。此卷所载，皆实战得失，与事后所悟。</p>
+      <svg class="mountains" viewBox="0 0 1000 240" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-label="远山墨影">
+        <path d="M0 200 C120 150 190 175 280 120 C350 80 400 130 480 105 C560 80 620 140 700 118 C790 92 860 160 1000 130 L1000 240 L0 240 Z" fill="#C9C6BA" opacity="0.55"/>
+        <path d="M0 220 C150 190 230 205 330 168 C420 136 480 180 580 160 C680 140 760 195 880 170 C930 160 970 175 1000 168 L1000 240 L0 240 Z" fill="#8C8A80" opacity="0.5"/>
+        <path d="M0 238 C180 222 300 230 420 205 C540 180 620 220 760 200 C860 185 940 215 1000 205 L1000 240 L0 240 Z" fill="#3A3A36" opacity="0.75"/>
+        <circle cx="820" cy="60" r="26" fill="#B03A2E" opacity="0.85"/>
+      </svg>
+      <a class="hint" href="#/2">展卷　→　卷二 · 言志</a>
+    </div>
+    <div class="meta-row">
+      <span class="on">卷首 · 序</span>
+    </div>
+    <div class="foot"><span>2026 KUN.BLOG · nice　墨与代码</span><span class="seal">N</span></div>
+  </section>
+
+  <!-- 卷二 · 言志 -->
+  <section class="volume" data-vol="2">
+    <div class="wrap">
+      <p class="vol-tag">卷 二 &nbsp;·&nbsp; 言 志</p>
+      <h1>习码经年，<br>犹在纸上推演。</h1>
+      <p class="lead">所历之坎，皆记为札；所悟之理，皆书于纸。</p>
+      <hr class="rule" style="margin:44px 0 40px">
+      <div class="cols">
+        <div><p class="col-label">所 习 语 言</p><p class="col-value">Java · Python</p></div>
+        <div><p class="col-label">所 用 架 构</p><p class="col-value">Spring Cloud · FastAPI</p></div>
+        <div><p class="col-label">所 治 数 据</p><p class="col-value">MySQL · Redis · DM</p></div>
+      </div>
+      <a class="hint" href="#/3">续卷　→　卷三 · 札记</a>
+    </div>
+    <div class="foot"><span>卷二 · 言志　／　KUN.BLOG</span><span class="seal">N</span></div>
+  </section>
+
+  <!-- 卷三 · 札记 -->
+  <section class="volume" data-vol="3">
+    <div class="wrap">
+      <p class="vol-tag">卷 三 &nbsp;·&nbsp; 札 记</p>
+      <h1>拾篇札记，<br>皆身历之坎。</h1>
+      <p class="lead" style="margin-bottom:36px">以年月为序，信手可翻。择一则展卷入卷四，原文附于卷末。</p>
+      <div class="notes">
+        <div class="note"><a class="note-title" href="#/4/1">壹　微信小程序多设备登录：多端共存、同端互斥完整方案　·　鉴权之道</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/167390328" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/2">贰　JDK 新特性详解　·　语言之记</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/167668600" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/3">叁　游标分页和偏移量详解　·　数据之学</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/167386677" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/4">肆　四千万级别的 MySQL 插入和查询的性能优化　·　性能之法</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/167362562" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/5">伍　LangGraph 框架简单解析　·　智体之思</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/164742441" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/6">陆　Shiro 框架简单解析　·　权限之制</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/160253124" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/7">柒　TCP 和 UDP 的区别　·　网络之基</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/164575559" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/8">捌　Python 装饰器是什么　·　语言之记</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/164332676" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/9">玖　多数据源切换与多数据库适配　·　存储之法</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/164109415" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+        <div class="note"><a class="note-title" href="#/4/10">拾　Get 请求和 Post 请求的区别　·　网络之基</a><a class="note-ext" href="https://blog.csdn.net/m0_68970560/article/details/163942173" target="_blank" rel="noopener">览 原 文 ↗</a></div>
+      </div>
+      <a class="hint" href="#/4/1">展卷读全文　→　卷四 · 文章</a>
+    </div>
+    <div class="foot"><span>卷三 · 札记　／　KUN.BLOG</span><span class="seal">N</span></div>
+  </section>
+
+  <!-- 卷四 · 文章详情：十篇共用一个版式，由 hash 第二段决定篇目 -->
+  <section class="volume" data-vol="4">
+    <div class="wrap">
+      <p class="vol-tag">卷 四 &nbsp;·&nbsp; 文 章</p>
+      <div class="article">
+        <div class="article-body">
+          <h2 id="aTitle">微信小程序多设备登录：多端共存、同端互斥完整方案</h2>
+          <p class="meta" id="aMeta">鉴权之道　·　2026-10-13　·　十篇同此版式</p>
+          <hr class="rule" style="margin:0 0 36px">
+          <div id="aParas">
+            <p>场景是同一用户要在 iPad、手机、电脑三端小程序同时在线：多端共存，同类型设备后登录踢掉先登录的。技术栈 Spring Security + JWT + Redis，前提是把设备码 deviceType 写进 JWT payload。</p>
+            <p>小程序端用 wx.getDeviceInfo 拿 platform 与 model，映射成 IPHONE、IPAD、PC。有个边界要注意：platform 为 ios 时 iPhone 和 iPad 不分家，只能靠 model 判断；新机型 model 返回 unknown 会回落到 IPHONE，小概率误踢。</p>
+            <p>双 Token 方案里 Redis 只存 RefreshToken，按 login:IPHONE:123 这样的 key 分端覆盖。同端再登录会覆盖旧的 RefreshToken，但旧设备还能撑到 AccessToken 过期，最长三十分钟，这就是俗称的假在线。</p>
+            <p>单 Token 把 Token 本身存 Redis、每次请求比对，覆盖即踢，下一次请求就 401，代价是 Redis 成了强依赖。选型结论：要瞬间踢人用单 Token，要高安全能接受延迟用双 Token，两者都要就双 Token 加 WebSocket 推送。</p>
+          </div>
+          <a class="source hint" id="aSource" href="https://blog.csdn.net/m0_68970560/article/details/167390328" target="_blank" rel="noopener">览原文于 CSDN　↗</a>
+          <div class="vol-links">
+            <a class="hint back" href="#/3">收卷　返卷三 · 札记</a>
+            <a class="hint" href="#/5">终卷　→　卷尾 · 音问</a>
+          </div>
+        </div>
+        <aside class="side">
+          <h3>本 卷 目 次</h3>
+          <div id="aToc">
+            <span class="side-item">一　场景与设备识别</span>
+            <span class="side-item">二　双 Token 与 Redis</span>
+            <span class="side-item">三　单 Token 瞬间剔除</span>
+            <span class="side-item">四　选型与结论</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div class="foot"><span>卷四 · 文章详情　／　KUN.BLOG</span><span class="seal">N</span></div>
+  </section>
+
+  <!-- 卷尾 · 音问 -->
+  <section class="volume sumi" data-vol="5">
+    <div class="wrap">
+      <p class="vol-tag">卷 尾 &nbsp;·&nbsp; 音 问</p>
+      <h1>卷至此，<br>聊寄数语。</h1>
+      <p class="lead">谈码论道，皆可修书相叙。</p>
+      <hr class="rule" style="margin:44px 0 40px">
+      <div class="cols">
+        <div><p class="col-label">鸿 雁</p><p class="col-value">iceio@outlook.com</p></div>
+        <div><p class="col-label">简 牍</p><p class="col-value"><a href="https://blog.csdn.net/m0_68970560" target="_blank" rel="noopener">blog.csdn.net/m0_68970560 ↗</a></p></div>
+      </div>
+      <div class="watermark">KUN.BLOG</div>
+    </div>
+    <div class="foot"><span>卷尾 · 音问　／　KUN.BLOG</span><span class="seal">N</span></div>
+  </section>
+
+</main>
+
+<!-- 背景乐：古琴散板，点击「琴」钮启奏 -->
+<audio id="bgm" loop preload="auto"></audio>
+<div class="bgm-tip" id="bgmTip">轻 触 奏 乐</div>
+<button class="bgm-btn" id="bgmBtn" type="button" aria-label="背景音乐开关" aria-pressed="false"><span class="qin-glyph">琴</span></button>
+
+<script>
+(function(){
+  var MAX = 5;
+  var BASE = 'https://blog.csdn.net/m0_68970560/article/details/';
+
+  // 十篇札记：内容据 CSDN 原文摘录，标题与链接由用户提供
+  var ARTICLES = [
+    {
+      title: '微信小程序多设备登录：多端共存、同端互斥完整方案',
+      cat: '鉴权之道', date: '2026-10-10', url: BASE + '167390328',
+      toc: ['一　场景与设备识别', '二　双 Token 与 Redis', '三　单 Token 瞬间剔除', '四　选型与结论'],
+      paras: [
+        '场景是同一用户要在 iPad、手机、电脑三端小程序同时在线：多端共存，同类型设备后登录踢掉先登录的。技术栈 Spring Security + JWT + Redis，前提是把设备码 deviceType 写进 JWT payload。',
+        '小程序端用 wx.getDeviceInfo 拿 platform 与 model，映射成 IPHONE、IPAD、PC。有个边界要注意：platform 为 ios 时 iPhone 和 iPad 不分家，只能靠 model 判断；新机型 model 返回 unknown 会回落到 IPHONE，小概率误踢。',
+        '双 Token 方案里 Redis 只存 RefreshToken，按 login:IPHONE:123 这样的 key 分端覆盖。同端再登录会覆盖旧的 RefreshToken，但旧设备还能撑到 AccessToken 过期，最长三十分钟，这就是俗称的假在线。',
+        '单 Token 把 Token 本身存 Redis、每次请求比对，覆盖即踢，下一次请求就 401，代价是 Redis 成了强依赖。选型结论：要瞬间踢人用单 Token，要高安全能接受延迟用双 Token，两者都要就双 Token 加 WebSocket 推送。'
+      ]
+    },
+    {
+      title: 'JDK 新特性详解',
+      cat: '语言之记', date: '2026-10-12', url: BASE + '167668600',
+      toc: ['一　Record 记录类', '二　密封类 Sealed', '三　模式匹配', '四　版本特性脉络'],
+      paras: [
+        '这篇按语言特性梳理 JDK 8 到 21 的演进，重点讲 Record、密封类与模式匹配三块，而不是罗列版本号。',
+        'Record 解决 DTO、VO 手写 getter、equals、hashCode、toString 的样板代码；它是 final、字段 private final，天然不可变，适合做值对象。需要可变性或继承时，Lombok 的 @Data 仍是实用选择。',
+        '密封类用 sealed 加 permits 明确允许哪些子类，子类只能是 final、sealed、non-sealed 三者之一。配合 JDK 21 的 switch 模式匹配，编译器能做穷尽性检查，漏一个分支直接编译报错。',
+        'instanceof 模式匹配在 JDK 16 正式，switch 模式匹配与 record 模式在 JDK 21 正式；JDK 17 上后两者仍要加 --enable-preview。虚拟线程虽是 JDK 21 的重点，多数企业还没开始用。'
+      ]
+    },
+    {
+      title: '游标分页和偏移量详解',
+      cat: '数据之学', date: '2026-10-09', url: BASE + '167386677',
+      toc: ['一　偏移量分页', '二　游标分页', '三　对比与选型', '四　MyBatis-Plus 落地'],
+      paras: [
+        '分页要解决的只有一个问题：下一页从哪里开始。偏移量用 LIMIT 加 OFFSET 回答「跳过多少条」，游标用「上一页最后一条的排序值」回答「从哪条之后」。',
+        'OFFSET 一百万时，MySQL 必须先扫到第一百万零十行再丢掉前一百万行，页码越深越慢；翻页过程中有插入删除，还会出现重复或漏数据，也就是数据漂移。',
+        '游标写成 WHERE id 小于上一页末值、ORDER BY id DESC、LIMIT 10，靠索引直接定位，扫描量恒定为每页条数，也不会漂移。代价是不能随机跳页、不能算总页数，排序字段要唯一且有序。',
+        '选型很实际：后台管理表格要跳页用偏移量，信息流、无限滚动、开放 API 用游标。折中做法是前几页偏移量、超过一定深度改游标；MyBatis-Plus 默认走偏移量，要用游标得手写 QueryWrapper 并绕开分页插件。'
+      ]
+    },
+    {
+      title: '四千万级别的 MySQL 插入和查询的性能优化',
+      cat: '性能之法', date: '2026-10-09', url: BASE + '167362562',
+      toc: ['一　业务场景与 EXPLAIN', '二　隐式转换根因', '三　不走索引清单', '四　修复与沉淀'],
+      paras: [
+        '桥梁日常巡查每天新增记录，还要实时算巡查率；评估表建记录时得回查千万级桥梁主表。先跑 EXPLAIN 看扫描行数和实际用的索引，发现 SQL 根本没按预期走索引。',
+        '用 USE INDEX 强制指定索引后，耗时从五分钟降到三分钟，只快一半——说明瓶颈不在优化器选错索引，而在查询结构本身。最终定位是隐式类型转换：索引列是 varchar，传入的却是 int。',
+        'MySQL 比较时倾向把两边都转成数字，等于在索引列上套了 CAST，B+ 树有序性失效，只能全索引扫描再回表。修法很朴素：参数传字符串，或把字段类型改成与业务语义一致的 BIGINT，从源头消除转换。',
+        '真正的慢点还在巡查率：要扫当天全部巡查记录再 join 桥梁主表算比值。沉淀下来的经验是索引存在不等于索引可用，先查类型一致，再看查询结构，这两条比调参数管用。'
+      ]
+    },
+    {
+      title: 'LangGraph 框架简单解析',
+      cat: '智体之思', date: '2026-09-09', url: BASE + '164742441',
+      toc: ['一　State / Node / Edge', '二　StateGraph 与编译', '三　检查点与 HITL', '四　多智能体与总结'],
+      paras: [
+        'LangGraph 是 LangChain 团队的底层编排框架，把 Agent 工作流抽象成有向图：State 是共享状态快照，Node 是干活的节点函数，Edge 决定下一步往哪走。',
+        '用 StateGraph 定义 schema、注册节点、连普通边与条件边，最后 compile 之后才能运行。执行模型受 Pregel 启发，按超步推进，并行节点落在同一个超步里。',
+        '生产级能力靠持久化层：Checkpointer 按 thread_id 保存每一步检查点，撑起容错与记忆；interrupt_before 与 interrupt_after 实现人工介入，时间旅行允许重放或分叉历史状态。',
+        '多智能体用 Supervisor 模式与子图机制组织。相对线性链，核心变化是控制流支持分支、循环、并行，状态显式定义、可观测，而不是一个黑盒。'
+      ]
+    },
+    {
+      title: 'Shiro 框架简单解析',
+      cat: '权限之制', date: '2026-09-08', url: BASE + '160253124',
+      toc: ['一　Shiro 是什么', '二　三大组件', '三　Realm 数据源', '四　登录与授权流程'],
+      paras: [
+        'Shiro 是轻量级 Java 安全框架：简单、易上手、不依赖 Spring，可独立运行，提供认证、授权、加密与会话管理。它没有默认的 CSRF、OAuth2、OIDC，需要自己集成，换来的是可以嵌进任何程序。',
+        '核心是三大组件一条链：Subject 承载当前用户的全部信息，SecurityManager 是全局唯一的调度中心，认证、授权、会话、缓存全由它转发；Realm 是 Shiro 与安全数据之间的通道。',
+        'Realm 不永久存数据，只负责搬：doGetAuthenticationInfo 取认证信息（用户名加凭证），doGetAuthorizationInfo 取授权信息（角色与细粒度权限）。密码建议哈希加盐后用 HashedCredentialsMatcher 比对。',
+        '登录走 Subject.login(token) → SecurityManager → Authenticator 遍历 Realm → 比对密码 → 生成上下文存 Session；授权同理走 Authorizer。在养护平台里管会话与菜单权限，踩过最大的坑是缓存：基础数据可进 EhCache 与 Redis，业务数据必须回库。'
+      ]
+    },
+    {
+      title: 'TCP 和 UDP 的区别',
+      cat: '网络之基', date: '2026-09-08', url: BASE + '164575559',
+      toc: ['一　三次握手四次挥手', '二　全双工与可靠性', '三　丢包与延迟', '四　业务选型'],
+      paras: [
+        'TCP 有连接、UDP 无连接，这在协议文本里写得明明白白：RFC 793 专设 Connection Establishment 与 Termination 两章，规定 SYN、ACK、FIN 与十一种状态变迁；RFC 768 全文三页，通篇没有 Connection 一词。',
+        '三次握手交换 SYN 与 ACK，四次挥手交换 FIN 与 ACK；UDP 头部连这些标志位都没有，硬件上就不支持握手。TCP 全双工，两个方向各有独立序列号与窗口通知，速率互不影响。',
+        'TCP 靠校验和、序列号、确认应答与重传保证可靠，代价是头部开销与拥塞降速；面向字节流没有边界，接收端一次读到多少不确定。UDP 不保证顺序与重传，头部小、支持广播组播，拥堵时绝不降速。',
+        '一句话总结：TCP 把物理丢包转化成延迟剧增，UDP 把丢包转化成数据缺失，延迟几乎不受丢包影响。业务上网页与文件传输怕丢包用 TCP，实时游戏、直播怕延迟用 UDP。'
+      ]
+    },
+    {
+      title: 'Python 装饰器是什么',
+      cat: '语言之记', date: '2026-09-07', url: BASE + '164332676',
+      toc: ['一　装饰器是什么', '二　闭包与语法糖', '三　带参数装饰器', '四　工程要点'],
+      paras: [
+        'Java 的装饰器是设计模式：用类包装对象，运行时动态组合功能；Python 装饰器走另一条路——用函数包装函数，定义时静态替换功能，本质是语法糖。一句话：不修改原函数和调用方式，给函数额外加一层功能。',
+        '从加日志说起：直接改函数会侵入原逻辑，抽成接收函数、嵌套 wrapper、返回 wrapper 的高阶函数就干净了。@cat 语法糖只是省掉 say = cat(say) 这步赋值。',
+        '写法三件事：wrapper 用 *args、**kwargs 通吃参数，有返回值必须 return；@functools.wraps 保留原函数的 __name__ 与 __doc__；带参数的装饰器要三层嵌套，多个装饰器叠加时离函数最近的先执行。',
+        '工程里常用来做路由、权限校验、日志、计时、缓存，作用类似 Java 的 AOP 切面。记一句就够：装饰器 = 闭包 + @ 语法糖。'
+      ]
+    },
+    {
+      title: '多数据源切换与多数据库适配',
+      cat: '存储之法', date: '2026-08-27', url: BASE + '164109415',
+      toc: ['一　两个问题的边界', '二　方案对比', '三　DatabaseIdProvider', '四　@DS 落地'],
+      paras: [
+        '两个问题常被混谈：项目要同时连多个数据库，是多数据源切换；一套代码要部署到 MySQL、达梦、SQL Server 等不同环境，是多数据库适配。前者选连接，后者选方言。',
+        '多数据源主流是 mybatis-plus 的 dynamic-datasource：AOP 加 @DS 注解运行时切库，配置清晰、侵入小，适合读写分离与多租户分库。Spring 原生 AbstractRoutingDataSource 灵活但实现繁琐；静态多源配置适合模块完全隔离的简单项目。',
+        '多数据库适配用 DatabaseIdProvider：VendorDatabaseIdProvider 把 MySQL、DM、SQL Server 映射成 mysql、dm、sqlserver 标识，XML 里同名 SQL 片段配不同 databaseId，或用 if 判断 _databaseId 写方言，没写 databaseId 的默认当 MySQL。',
+        '落地经验：连多个库用 @DS（比如权限过滤连 SYS 库），换数据库品牌用 DatabaseIdProvider。LIKE 拼接这类方言差异写成同名片段最稳。'
+      ]
+    },
+    {
+      title: 'Get 请求和 Post 请求的区别',
+      cat: '网络之基', date: '2026-08-21', url: BASE + '163942173',
+      toc: ['一　语义与差异', '二　HTTP/1.1 六车道', '三　选型原则', '四　OPTIONS 预检'],
+      paras: [
+        '后端前端联调常因不按规范来而拿不到正确信息，这在 HTTP/1.1 下尤其明显。浏览器层面：GET 拿资源，参数在 URL、可缓存、可收藏、幂等安全；POST 提交资源，参数在 Body、不缓存、不留历史。',
+        'HTTP/1.1 同一域名最多六个 TCP 连接，四十个请求来的时候前六个占道、其余排队，谁先完成谁的车道立刻补位。所以页面卡往往不是服务器慢，是排队；HTTP/2 的多路复用才解开这个结。',
+        '取舍原则：用 GET 拿数据，用 POST 改数据。查询搜索、幂等无副作用、参数短、要缓存的用 GET；数据量大、带敏感信息、有副作用、传 JSON 或文件的用 POST。',
+        'POST 带 JSON 会触发 OPTIONS 预检，请求直接翻倍，还吃连接、线程与带宽。最实用的优化是 Access-Control-Max-Age 缓存预检结果；预检虽不执行业务，也防 CSRF 与数据泄露。'
+      ]
+    }
+  ];
+
+  function parseHash(){
+    var m = location.hash.match(/^#\/([1-5])(?:\/([1-9]|10))?$/);
+    if(!m) return null;
+    return { v: m[1], a: m[2] ? parseInt(m[2], 10) : 1 };
+  }
+
+  function fillArticle(n){
+    var a = ARTICLES[n - 1] || ARTICLES[0];
+    // 中文长标题在冒号处断行，避免把「完整方案」这类词拆到两行
+    document.getElementById('aTitle').textContent = a.title.replace('：', '：\n');
+    document.getElementById('aMeta').textContent = a.cat + '　·　' + a.date + '　·　十篇同此版式';
+    document.getElementById('aSource').href = a.url;
+
+    var box = document.getElementById('aParas');
+    box.textContent = '';
+    for(var i = 0; i < a.paras.length; i++){
+      var p = document.createElement('p');
+      p.textContent = a.paras[i];
+      box.appendChild(p);
+    }
+    var toc = document.getElementById('aToc');
+    toc.textContent = '';
+    for(var j = 0; j < a.toc.length; j++){
+      var s = document.createElement('span');
+      s.className = 'side-item';
+      s.textContent = a.toc[j];
+      toc.appendChild(s);
+    }
+  }
+
+  function render(){
+    var s = parseHash();
+    if(!s){
+      history.replaceState(null, '', location.pathname + location.search + '#/1');
+      s = { v: '1', a: 1 };
+    }
+    var sections = document.querySelectorAll('.volume');
+    for(var i = 0; i < sections.length; i++){
+      sections[i].classList.toggle('on', sections[i].getAttribute('data-vol') === s.v);
+    }
+    var links = document.querySelectorAll('.vol-nav a');
+    for(var j = 0; j < links.length; j++){
+      links[j].classList.toggle('on', links[j].getAttribute('data-vol') === s.v);
+    }
+    if(s.v === '4'){ fillArticle(s.a); }
+    var a = s.v === '4' ? (ARTICLES[s.a - 1] || ARTICLES[0]) : null;
+    document.title = (a ? a.title : '第 ' + s.v + ' 卷') + ' · nice KUN.BLOG — 水墨卷册';
+    window.scrollTo(0, 0);
+  }
+
+  window.addEventListener('hashchange', render);
+  document.addEventListener('keydown', function(e){
+    var s = parseHash() || { v: '1', a: 1 };
+    var v = parseInt(s.v, 10);
+    if(e.key === 'ArrowRight' && v < MAX){ location.hash = '#/' + (v + 1); }
+    if(e.key === 'ArrowLeft'  && v > 1)  { location.hash = '#/' + (v - 1); }
+  });
+  render();
+
+  // —— 背景乐：稻香优先（放入 assets/daoxiang.mp3 即用），否则古琴散板兜底 ——
+  var bgm = document.getElementById('bgm');
+  var bgmBtn = document.getElementById('bgmBtn');
+  var bgmTip = document.getElementById('bgmTip');
+  bgm.volume = 0.42;
+  var BGM_KEY = 'kun-bgm';
+  var BGM_TRACKS = [
+    { src: '../assets/daoxiang.mp3', name: '稻香' },
+    { src: 'assets/qin-bg.wav', name: '古琴散板' }
+  ];
+  var bgmIdx = 0;
+  function bgmLoad(){
+    if(bgmIdx >= BGM_TRACKS.length) return;
+    bgm.src = BGM_TRACKS[bgmIdx].src;
+    bgm.load();
+  }
+  bgm.addEventListener('error', function(){ bgmIdx++; bgmLoad(); });
+  bgmLoad();
+
+  function setBgmUI(on){
+    bgmBtn.classList.toggle('on', on);
+    bgmBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    bgmBtn.setAttribute('aria-label', on ? '止乐' : '奏乐');
+    if(on){ bgmTip.classList.remove('show'); }
+  }
+  function playBgm(){
+    var p = bgm.play();
+    if(p && p.then){ p.then(function(){ setBgmUI(true); }).catch(function(){ setBgmUI(false); }); }
+    else { setBgmUI(true); }
+    try{ localStorage.setItem(BGM_KEY, '1'); }catch(e){}
+  }
+  function pauseBgm(){
+    bgm.pause();
+    setBgmUI(false);
+    try{ localStorage.setItem(BGM_KEY, '0'); }catch(e){}
+  }
+  bgmBtn.addEventListener('click', function(){
+    if(bgm.paused){ playBgm(); } else { pauseBgm(); }
+  });
+
+  // 初次进入：提示轻触奏乐；若上次开启了，则在首次手势时续奏
+  var wantBgm = false;
+  try{ wantBgm = localStorage.getItem(BGM_KEY) === '1'; }catch(e){}
+  if(wantBgm){
+    var resume = function(){
+      playBgm();
+      document.removeEventListener('pointerdown', resume);
+      document.removeEventListener('keydown', resume);
+    };
+    document.addEventListener('pointerdown', resume);
+    document.addEventListener('keydown', resume);
+  }else{
+    setTimeout(function(){ bgmTip.classList.add('show'); }, 900);
+    setTimeout(function(){ bgmTip.classList.remove('show'); }, 5200);
+  }
+})();
+</script>
+</body>
+</html>
