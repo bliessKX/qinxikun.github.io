@@ -322,31 +322,43 @@ var NOTES = [
     label.textContent = on ? ('播放中 · ' + TRACKS[idx].name) : '背景音乐';
     btn.setAttribute('aria-label', on ? '暂停背景音乐' : '播放背景音乐');
   }
+  function remember(on){ try{ localStorage.setItem(BG_KEY, on ? '1' : '0'); }catch(e){} }
   function play(){
     var p = audio.play();
-    if(p && p.then){ p.then(function(){ setUI(true); }).catch(function(){ setUI(false); }); }
-    else { setUI(true); }
-    try{ localStorage.setItem(BG_KEY,'1'); }catch(e){}
+    if(p && p.then){
+      p.then(function(){ setUI(true); remember(true); })
+       .catch(function(){ setUI(false); });
+    } else { setUI(true); remember(true); }
   }
   function pause(){
     audio.pause();
     setUI(false);
-    try{ localStorage.setItem(BG_KEY,'0'); }catch(e){}
+    remember(false);
+  }
+  function armFallback(){
+    var events = ['pointerdown','keydown','touchstart','wheel','scroll'];
+    var once = function(){
+      var p = audio.play();
+      if(p && p.then){ p.then(function(){ setUI(true); remember(true); }); }
+      else { setUI(true); remember(true); }
+      events.forEach(function(e){ document.removeEventListener(e, once); });
+    };
+    events.forEach(function(e){ document.addEventListener(e, once, {once:true, passive:true}); });
   }
   btn.addEventListener('click', function(){
     if(audio.paused){ play(); } else { pause(); }
   });
 
-  var want = false;
-  try{ want = localStorage.getItem(BG_KEY) === '1'; }catch(e){}
-  if(want){
-    var resume = function(){
-      play();
-      document.removeEventListener('pointerdown', resume);
-      document.removeEventListener('keydown', resume);
-    };
-    document.addEventListener('pointerdown', resume);
-    document.addEventListener('keydown', resume);
+  /* 自动播放：进页面立即尝试；被浏览器拦截则首次任意交互时自动起播 */
+  var dismissed = false;
+  try{ dismissed = localStorage.getItem(BG_KEY) === '0'; }catch(e){}
+  if(!dismissed){ tryAutoPlay(); }
+  function tryAutoPlay(){
+    var p = audio.play();
+    if(p && p.then){
+      p.then(function(){ setUI(true); remember(true); })
+       .catch(function(){ armFallback(); });
+    }
   }
 })();
 </script>
