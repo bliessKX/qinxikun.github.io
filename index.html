@@ -163,7 +163,7 @@ footer{
 </div>
 
 <!-- 背景乐：稻香优先（放入 assets/daoxiang.mp3 即用），否则夏夜稻田底乐 -->
-<audio id="bgm" loop preload="none"></audio>
+<audio id="bgm" loop preload="auto" autoplay muted></audio>
 
 <script>
 var BASE = 'https://blog.csdn.net/m0_68970560/article/details/';
@@ -338,6 +338,7 @@ var NOTES = [
   function armFallback(){
     var events = ['pointerdown','keydown','touchstart','wheel','scroll'];
     var once = function(){
+      audio.muted = false;
       var p = audio.play();
       if(p && p.then){ p.then(function(){ setUI(true); remember(true); }); }
       else { setUI(true); remember(true); }
@@ -349,17 +350,21 @@ var NOTES = [
     if(audio.paused){ play(); } else { pause(); }
   });
 
-  /* 自动播放：进页面立即尝试；被浏览器拦截则首次任意交互时自动起播 */
+  /* 自动播放：进页面立即尝试出声；被浏览器拦截时先静音保住播放态，首次任意交互再出声 */
   var dismissed = false;
   try{ dismissed = localStorage.getItem(BG_KEY) === '0'; }catch(e){}
-  if(!dismissed){ tryAutoPlay(); }
   function tryAutoPlay(){
+    audio.muted = false;
     var p = audio.play();
     if(p && p.then){
       p.then(function(){ setUI(true); remember(true); })
-       .catch(function(){ armFallback(); });
+       .catch(function(){
+          audio.muted = true;
+          armFallback();
+       });
     }
   }
+  if(!dismissed){ tryAutoPlay(); }
 })();
 </script>
 </body>
