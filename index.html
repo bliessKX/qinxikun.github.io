@@ -324,7 +324,7 @@ footer{
 <script>
 var BASE = 'https://blog.csdn.net/m0_68970560/article/details/';
 var NOTES = [
-  {id:'170422770', title:'Java 后端做 Agent 智能体选型实战：Spring AI Alibaba 与 Spring AI + LangChain4j/LangGraph 对比', short:'Java 后端做 Agent 智能体选型实战', cat:'智体之思', date:'2026-11-10',
+  {id:'170422770', title:'Java 后端做 Agent 智能体选型实战：Spring AI Alibaba 与 Spring AI + LangChain4j/LangGraph 对比', short:'Java 后端做 Agent 智能体选型实战', cat:'智能体', date:'2026-11-10',
     toc:['为什么 Java 侧做 Agent','两条路线对比','Spring AI Alibaba 解析','Spring AI + LangChain4j/LangGraph 解析','两个落地场景','选型判断标准'],
     paras:[
       '做 Agent 智能体，框架选型比写业务代码更让人纠结。Python 生态有天然优势，但 Java 后端团队把智能体硬塞进 Python 服务，意味着多一套技术栈、多一套部署运维、多一次跨语言调用。文中结合两个真实项目，从 Java 微服务视角对比 Spring AI Alibaba 与 Spring AI 结合 LangChain4j、LangGraph 两条路线。',
@@ -335,7 +335,7 @@ var NOTES = [
       '场景二是道路交通桥梁信息查询智能体，问题类型多、要多步推理、需组合多个微服务结果，用 Spring AI + LangGraph 更合适：意图分类、工具调用、结果聚合拆成节点，靠检查点支持中断恢复与回溯。坑在路况数据时效性要定缓存策略、道路通行与桥梁限高必须标注来源和时间、微服务超时要有降级提示、节点执行情况要接链路追踪。',
       '选型判断标准：意图固定工具少求快用 Spring AI Alibaba，多模型混用或私有化部署用 Spring AI + LangChain4j，多步推理条件分支人工介入用 Spring AI + LangGraph，团队 Spring 经验强而 AI 经验少从 Alibaba 起步，已有 Python LangChain 经验想迁移就走 LangChain 系。实际做法是简单场景先用 Alibaba 跑通闭环，复杂流程再引入 LangGraph，两者可共存于同一套微服务体系。'
     ]},
-  {id:'167390328', title:'微信小程序多设备登录：多端共存、同端互斥完整方案', cat:'鉴权之道', date:'2026-10-10',
+  {id:'167390328', title:'微信小程序多设备登录：多端共存、同端互斥完整方案', cat:'鉴权', date:'2026-10-10',
     toc:['场景与设备识别','双 Token 与 Redis','单 Token 瞬间剔除','选型与结论'],
     paras:[
       '场景是同一用户要在 iPad、手机、电脑三端小程序同时在线：多端共存，同类型设备后登录踢掉先登录的。技术栈 Spring Security + JWT + Redis，前提是把设备码 deviceType 写进 JWT payload。',
@@ -343,7 +343,7 @@ var NOTES = [
       '双 Token 方案里 Redis 只存 RefreshToken，按 login:IPHONE:123 这样的 key 分端覆盖。同端再登录会覆盖旧的 RefreshToken，但旧设备还能撑到 AccessToken 过期，最长三十分钟，这就是俗称的假在线。',
       '单 Token 把 Token 本身存 Redis、每次请求比对，覆盖即踢，下一次请求就 401，代价是 Redis 成了强依赖。选型结论：要瞬间踢人用单 Token，要高安全能接受延迟用双 Token，两者都要就双 Token 加 WebSocket 推送。'
     ]},
-  {id:'167668600', title:'JDK 新特性详解', cat:'语言之记', date:'2026-10-12',
+  {id:'167668600', title:'JDK 新特性详解', cat:'Java', date:'2026-10-12',
     toc:['Record 记录类','密封类 Sealed','模式匹配','版本特性脉络'],
     paras:[
       '这篇按语言特性梳理 JDK 8 到 21 的演进，重点讲 Record、密封类与模式匹配三块，而不是罗列版本号。',
@@ -351,7 +351,7 @@ var NOTES = [
       '密封类用 sealed 加 permits 明确允许哪些子类，子类只能是 final、sealed、non-sealed 三者之一。配合 JDK 21 的 switch 模式匹配，编译器能做穷尽性检查，漏一个分支直接编译报错。',
       'instanceof 模式匹配在 JDK 16 正式，switch 模式匹配与 record 模式在 JDK 21 正式；JDK 17 上后两者仍要加 --enable-preview。虚拟线程虽是 JDK 21 的重点，多数企业还没开始用。'
     ]},
-  {id:'167386677', title:'游标分页和偏移量详解', cat:'数据之学', date:'2026-10-09',
+  {id:'167386677', title:'游标分页和偏移量详解', cat:'数据库', date:'2026-10-09',
     toc:['偏移量分页','游标分页','对比与选型','MyBatis-Plus 落地'],
     paras:[
       '分页要解决的只有一个问题：下一页从哪里开始。偏移量用 LIMIT 加 OFFSET 回答「跳过多少条」，游标用「上一页最后一条的排序值」回答「从哪条之后」。',
@@ -359,7 +359,7 @@ var NOTES = [
       '游标写成 WHERE id 小于上一页末值、ORDER BY id DESC、LIMIT 10，靠索引直接定位，扫描量恒定为每页条数，也不会漂移。代价是不能随机跳页、不能算总页数，排序字段要唯一且有序。',
       '选型很实际：后台管理表格要跳页用偏移量，信息流、无限滚动、开放 API 用游标。折中做法是前几页偏移量、超过一定深度改游标；MyBatis-Plus 默认走偏移量，要用游标得手写 QueryWrapper 并绕开分页插件。'
     ]},
-  {id:'167362562', title:'四千万级别的 MySQL 插入和查询的性能优化', cat:'性能之法', date:'2026-10-09',
+  {id:'167362562', title:'四千万级别的 MySQL 插入和查询的性能优化', cat:'性能优化', date:'2026-10-09',
     toc:['业务场景与 EXPLAIN','隐式转换根因','不走索引清单','修复与沉淀'],
     paras:[
       '桥梁日常巡查每天新增记录，还要实时算巡查率；评估表建记录时得回查千万级桥梁主表。先跑 EXPLAIN 看扫描行数和实际用的索引，发现 SQL 根本没按预期走索引。',
@@ -367,7 +367,7 @@ var NOTES = [
       'MySQL 比较时倾向把两边都转成数字，等于在索引列上套了 CAST，B+ 树有序性失效，只能全索引扫描再回表。修法很朴素：参数传字符串，或把字段类型改成与业务语义一致的 BIGINT，从源头消除转换。',
       '真正的慢点还在巡查率：要扫当天全部巡查记录再 join 桥梁主表算比值。沉淀下来的经验是索引存在不等于索引可用，先查类型一致，再看查询结构，这两条比调参数管用。'
     ]},
-  {id:'164742441', title:'LangGraph 框架简单解析', cat:'智体之思', date:'2026-09-09',
+  {id:'164742441', title:'LangGraph 框架简单解析', cat:'智能体', date:'2026-09-09',
     toc:['State / Node / Edge','StateGraph 与编译','检查点与 HITL','多智能体与总结'],
     paras:[
       'LangGraph 是 LangChain 团队的底层编排框架，把 Agent 工作流抽象成有向图：State 是共享状态快照，Node 是干活的节点函数，Edge 决定下一步往哪走。',
@@ -375,7 +375,7 @@ var NOTES = [
       '生产级能力靠持久化层：Checkpointer 按 thread_id 保存每一步检查点，撑起容错与记忆；interrupt_before 与 interrupt_after 实现人工介入，时间旅行允许重放或分叉历史状态。',
       '多智能体用 Supervisor 模式与子图机制组织。相对线性链，核心变化是控制流支持分支、循环、并行，状态显式定义、可观测，而不是一个黑盒。'
     ]},
-  {id:'160253124', title:'Shiro 框架简单解析', cat:'权限之制', date:'2026-09-08',
+  {id:'160253124', title:'Shiro 框架简单解析', cat:'权限', date:'2026-09-08',
     toc:['Shiro 是什么','三大组件','Realm 数据源','登录与授权流程'],
     paras:[
       'Shiro 是轻量级 Java 安全框架：简单、易上手、不依赖 Spring，可独立运行，提供认证、授权、加密与会话管理。它没有默认的 CSRF、OAuth2、OIDC，需要自己集成，换来的是可以嵌进任何程序。',
@@ -383,7 +383,7 @@ var NOTES = [
       'Realm 不永久存数据，只负责搬：doGetAuthenticationInfo 取认证信息（用户名加凭证），doGetAuthorizationInfo 取授权信息（角色与细粒度权限）。密码建议哈希加盐后用 HashedCredentialsMatcher 比对。',
       '登录走 Subject.login(token) → SecurityManager → Authenticator 遍历 Realm → 比对密码 → 生成上下文存 Session；授权同理走 Authorizer。在养护平台里管会话与菜单权限，踩过最大的坑是缓存：基础数据可进 EhCache 与 Redis，业务数据必须回库。'
     ]},
-  {id:'164575559', title:'TCP 和 UDP 的区别', cat:'网络之基', date:'2026-09-08',
+  {id:'164575559', title:'TCP 和 UDP 的区别', cat:'网络', date:'2026-09-08',
     toc:['三次握手四次挥手','全双工与可靠性','丢包与延迟','业务选型'],
     paras:[
       'TCP 有连接、UDP 无连接，这在协议文本里写得明明白白：RFC 793 专设 Connection Establishment 与 Termination 两章，规定 SYN、ACK、FIN 与十一种状态变迁；RFC 768 全文三页，通篇没有 Connection 一词。',
@@ -391,7 +391,7 @@ var NOTES = [
       'TCP 靠校验和、序列号、确认应答与重传保证可靠，代价是头部开销与拥塞降速；面向字节流没有边界，接收端一次读到多少不确定。UDP 不保证顺序与重传，头部小、支持广播组播，拥堵时绝不降速。',
       '一句话总结：TCP 把物理丢包转化成延迟剧增，UDP 把丢包转化成数据缺失，延迟几乎不受丢包影响。业务上网页与文件传输怕丢包用 TCP，实时游戏、直播怕延迟用 UDP。'
     ]},
-  {id:'164332676', title:'Python 装饰器是什么', cat:'语言之记', date:'2026-09-07',
+  {id:'164332676', title:'Python 装饰器是什么', cat:'Java', date:'2026-09-07',
     toc:['装饰器是什么','闭包与语法糖','带参数装饰器','工程要点'],
     paras:[
       'Java 的装饰器是设计模式：用类包装对象，运行时动态组合功能；Python 装饰器走另一条路——用函数包装函数，定义时静态替换功能，本质是语法糖。一句话：不修改原函数和调用方式，给函数额外加一层功能。',
@@ -399,7 +399,7 @@ var NOTES = [
       '写法三件事：wrapper 用 *args、**kwargs 通吃参数，有返回值必须 return；@functools.wraps 保留原函数的 __name__ 与 __doc__；带参数的装饰器要三层嵌套，多个装饰器叠加时离函数最近的先执行。',
       '工程里常用来做路由、权限校验、日志、计时、缓存，作用类似 Java 的 AOP 切面。记一句就够：装饰器 = 闭包 + @ 语法糖。'
     ]},
-  {id:'164109415', title:'多数据源切换与多数据库适配', cat:'存储之法', date:'2026-08-27',
+  {id:'164109415', title:'多数据源切换与多数据库适配', cat:'存储', date:'2026-08-27',
     toc:['两个问题的边界','方案对比','DatabaseIdProvider','@DS 落地'],
     paras:[
       '两个问题常被混谈：项目要同时连多个数据库，是多数据源切换；一套代码要部署到 MySQL、达梦、SQL Server 等不同环境，是多数据库适配。前者选连接，后者选方言。',
@@ -407,7 +407,7 @@ var NOTES = [
       '多数据库适配用 DatabaseIdProvider：VendorDatabaseIdProvider 把 MySQL、DM、SQL Server 映射成 mysql、dm、sqlserver 标识，XML 里同名 SQL 片段配不同 databaseId，或用 if 判断 _databaseId 写方言，没写 databaseId 的默认当 MySQL。',
       '落地经验：连多个库用 @DS（比如权限过滤连 SYS 库），换数据库品牌用 DatabaseIdProvider。LIKE 拼接这类方言差异写成同名片段最稳。'
     ]},
-  {id:'163942173', title:'Get 请求和 Post 请求的区别', cat:'网络之基', date:'2026-08-21',
+  {id:'163942173', title:'Get 请求和 Post 请求的区别', cat:'网络', date:'2026-08-21',
     toc:['语义与差异','HTTP/1.1 六车道','选型原则','OPTIONS 预检'],
     paras:[
       '后端前端联调常因不按规范来而拿不到正确信息，这在 HTTP/1.1 下尤其明显。浏览器层面：GET 拿资源，参数在 URL、可缓存、可收藏、幂等安全；POST 提交资源，参数在 Body、不缓存、不留历史。',
