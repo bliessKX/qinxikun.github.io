@@ -240,7 +240,7 @@ footer{
   <main class="main">
     <div class="page-head">
       <h1>笔记</h1>
-      <p>10 篇公开笔记，点左侧任一篇展开；点开可直达 CSDN 原文。右侧「工具」栏里是日常用的在线小工具。</p>
+      <p>11 篇公开笔记，点左侧任一篇展开；点开可直达 CSDN 原文。右侧「工具」栏里是日常用的在线小工具。</p>
     </div>
 
     <article id="note"><!-- 由脚本渲染 --></article>
@@ -250,7 +250,7 @@ footer{
       <p>写代码，也写笔记。这里只放真正动手验证过的内容——每个结论都来自实际项目里踩过的坑。合作或交流请来信 <a class="mail" href="mailto:iceio@outlook.com">iceio@outlook.com</a>。</p>
     </section>
 
-    <footer>© 2026 NICE.BLOG · 10 篇公开笔记 · 持续更新</footer>
+    <footer>© 2026 NICE.BLOG · 11 篇公开笔记 · 持续更新</footer>
   </main>
 
   <!-- 右侧：工具一级目录（每个工具一个独立页面） -->
@@ -283,6 +283,17 @@ footer{
 <script>
 var BASE = 'https://blog.csdn.net/m0_68970560/article/details/';
 var NOTES = [
+  {id:'170422770', title:'Java 后端做 Agent 智能体选型实战：Spring AI Alibaba 与 Spring AI + LangChain4j/LangGraph 对比', short:'Java 后端做 Agent 智能体选型实战', cat:'智体之思', date:'2026-11-10',
+    toc:['为什么 Java 侧做 Agent','两条路线对比','Spring AI Alibaba 解析','Spring AI + LangChain4j/LangGraph 解析','两个落地场景','选型判断标准'],
+    paras:[
+      '做 Agent 智能体，框架选型比写业务代码更让人纠结。Python 生态有天然优势，但 Java 后端团队把智能体硬塞进 Python 服务，意味着多一套技术栈、多一套部署运维、多一次跨语言调用。文中结合两个真实项目，从 Java 微服务视角对比 Spring AI Alibaba 与 Spring AI 结合 LangChain4j、LangGraph 两条路线。',
+      'Java 侧优先落地有三个理由：技术栈统一，注册中心、配置中心、网关、链路追踪、监控、鉴权直接复用；调用成本低，运单、车队、桥梁、路况这些数据本就在 Java 微服务里；交付可控，权限、审计、数据合规更容易接入现有体系。但 Python 在模型实验与复杂编排上仍更强，关键不是哪个更好，而是哪个适合当前团队。',
+      '两条路线的分水岭很清楚：Spring AI Alibaba 是阿里云生态的增强实现，Spring Boot Starter 接入、模型接入省心、内置 Graph 与 RAG、中文文档友好，适合企业内部助手与快速落地；代价是版本迭代快、生态相对集中，复杂多分支编排不如 LangGraph 灵活。',
+      'Spring AI + LangChain4j / LangGraph 走的是模型抽象统一加编排能力强：ChatClient、Embedding、VectorStore 抽象切模型只改配置，状态图能表达节点、边、条件分支、循环、人工中断，天然带检查点可回滚。缺点是三套概念叠加学习曲线陡、Java 版资料偏少、版本依赖需整体验证，单轮问答场景属于过度设计。',
+      '场景一是企业微信群聊智能助手，入口为微信小程序客服，查运单与车队。意图固定、工具有限、要求响应快，用 Spring AI Alibaba 快速落地更合适：查询封装成工具函数、鉴权限流日志复用现有网关。坑在身份与运单归属必须校验、手机号地址回复前脱敏、识别不了意图要转人工、企微回调要做幂等去重。',
+      '场景二是道路交通桥梁信息查询智能体，问题类型多、要多步推理、需组合多个微服务结果，用 Spring AI + LangGraph 更合适：意图分类、工具调用、结果聚合拆成节点，靠检查点支持中断恢复与回溯。坑在路况数据时效性要定缓存策略、道路通行与桥梁限高必须标注来源和时间、微服务超时要有降级提示、节点执行情况要接链路追踪。',
+      '选型判断标准：意图固定工具少求快用 Spring AI Alibaba，多模型混用或私有化部署用 Spring AI + LangChain4j，多步推理条件分支人工介入用 Spring AI + LangGraph，团队 Spring 经验强而 AI 经验少从 Alibaba 起步，已有 Python LangChain 经验想迁移就走 LangChain 系。实际做法是简单场景先用 Alibaba 跑通闭环，复杂流程再引入 LangGraph，两者可共存于同一套微服务体系。'
+    ]},
   {id:'167390328', title:'微信小程序多设备登录：多端共存、同端互斥完整方案', cat:'鉴权之道', date:'2026-10-10',
     toc:['场景与设备识别','双 Token 与 Redis','单 Token 瞬间剔除','选型与结论'],
     paras:[
@@ -374,7 +385,7 @@ var NOTES = [
     a.href = '#/' + (i+1);
     a.dataset.i = i+1;
     a.innerHTML = '<span class="t-idx">' + String(i+1).padStart(2,'0') + '</span>' +
-                  n.title + '<span class="t-cat">' + n.cat + '</span>';
+                  (n.short || n.title) + '<span class="t-cat">' + n.cat + '</span>';
     li.appendChild(a);
     list.appendChild(li);
   });
