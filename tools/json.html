@@ -210,6 +210,87 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   padding:1px 5px;border-radius:3px;
 }
 
+/* ---------- 常用命令速查 ---------- */
+.cheat{
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  margin-bottom:14px;overflow:hidden;scroll-margin-top:64px;
+}
+.cheat-head{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:9px 12px;border-bottom:1px solid var(--line);
+}
+.cheat-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.cheat-sub{font-size:12px;color:var(--muted)}
+.cheat-search{
+  margin-left:auto;flex:0 1 320px;min-width:200px;
+  padding:6px 10px;font-family:var(--sans);font-size:13px;color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:4px;background:var(--bg);
+}
+.cheat-search:focus{outline:none;border-color:var(--accent);background:#fff}
+.cheat-search::placeholder{color:#b3aca0}
+
+.cheat-tabs{
+  display:flex;gap:4px;flex-wrap:wrap;padding:8px 12px;
+  border-bottom:1px solid var(--line);background:rgba(0,0,0,.014);
+}
+.ctab{
+  all:unset;cursor:pointer;padding:4px 10px;border-radius:4px;
+  font-size:12.5px;color:var(--muted);border:1px solid transparent;
+}
+.ctab:hover{color:var(--accent);background:rgba(156,59,42,.06)}
+.ctab.on{
+  background:rgba(156,59,42,.1);color:var(--accent);font-weight:600;
+  border-color:rgba(156,59,42,.28);
+}
+.ctab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ctab .n{font-family:var(--mono);font-size:11px;opacity:.6;margin-left:5px}
+
+.cheat-body{
+  max-height:392px;overflow:auto;padding:14px 12px;
+  background:
+    linear-gradient(#fff 30%, rgba(255,255,255,0)) center top,
+    linear-gradient(rgba(255,255,255,0), #fff 70%) center bottom,
+    radial-gradient(farthest-side at 50% 0, rgba(45,38,30,.11), rgba(45,38,30,0)) center top,
+    radial-gradient(farthest-side at 50% 100%, rgba(45,38,30,.11), rgba(45,38,30,0)) center bottom;
+  background-repeat:no-repeat;
+  background-size:100% 26px, 100% 26px, 100% 11px, 100% 11px;
+  background-attachment:local, local, scroll, scroll;
+}
+.cheat-body::-webkit-scrollbar{width:9px;height:9px}
+.cheat-body::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:5px}
+.cheat-body::-webkit-scrollbar-track{background:transparent}
+
+.cgroup{margin-bottom:16px}
+.cgroup:last-child{margin-bottom:0}
+.cgroup-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.cgroup-title{margin:0;font-family:var(--serif);font-size:14px;font-weight:700;letter-spacing:.02em}
+.cgroup-title .n{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted);margin-left:7px}
+.cgroup-head .sp{margin-left:auto}
+
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:8px}
+.ccard{
+  border:1px solid var(--line);border-radius:5px;padding:8px 10px;
+  background:var(--bg);transition:border-color .15s,background .15s;
+}
+.ccard:hover{border-color:var(--line-strong);background:#fff}
+.ccard-top{display:flex;align-items:flex-start;gap:8px}
+.cdesc{flex:1;font-size:12.5px;line-height:1.45;color:var(--ink)}
+.ccopy{
+  all:unset;cursor:pointer;flex:0 0 auto;
+  padding:2px 8px;border:1px solid var(--line-strong);border-radius:4px;
+  font-size:11.5px;color:var(--muted);
+}
+.ccopy:hover{color:var(--accent);border-color:var(--accent);background:rgba(156,59,42,.06)}
+.ccopy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ccopy.done{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d;font-weight:600}
+.ccmd{
+  display:block;margin-top:6px;padding:6px 8px;
+  background:rgba(0,0,0,.04);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;
+  font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--ink);
+  white-space:pre-wrap;word-break:break-all;
+}
+.cheat-empty{padding:30px 10px;text-align:center;color:var(--muted);font-size:13px}
+
 /* ---------- 浮层提示 Toast ---------- */
 .toast-wrap{
   position:fixed;right:20px;bottom:20px;z-index:200;
@@ -285,6 +366,9 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   .out-area{min-height:240px}
   main{padding:18px 16px 34px}
   .topbar{padding:12px 16px}
+  .cheat-search{margin-left:0;flex:1 1 100%}
+  .cheat-body{max-height:330px;padding:12px 10px}
+  .cgrid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -362,6 +446,17 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     <button class="tb-btn" type="button" data-act="collapse">折叠</button>
     <button class="tb-btn danger" type="button" data-act="clear">清空</button>
   </div>
+
+  <!-- 常用命令速查 -->
+  <section class="cheat" id="cheat">
+    <div class="cheat-head">
+      <span class="cheat-title">常用命令速查</span>
+      <span class="cheat-sub">点「复制」直接取走命令，可按分类浏览或搜索关键词</span>
+      <input class="cheat-search" id="cheatSearch" type="search" autocomplete="off" placeholder="搜索命令或用途，如 port、docker、提交">
+    </div>
+    <div class="cheat-tabs" id="cheatTabs" role="tablist" aria-label="命令分类"></div>
+    <div class="cheat-body" id="cheatBody"></div>
+  </section>
 
   <!-- 工作区 -->
   <div class="workspace" id="workspace">
@@ -1019,6 +1114,21 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     sampleArray:function(){ loadSample('array'); },
     sampleDirty:function(){ loadSample('dirty'); },
     sampleUni:  function(){ loadSample('unicode'); },
+    copyCmd: function(btn){
+      var it = btn ? CMD_BY_ID[btn.getAttribute('data-cmd-id')] : null;
+      if(!it) return;
+      copyText(it.c, btn);
+    },
+    copyGroup: function(btn){
+      var cat = btn ? btn.getAttribute('data-cat') : '';
+      var list = cheatMap[cat] || [];
+      if(!list.length){ toast('该分组当前没有可复制的命令', 'warn'); return; }
+      var script = '';
+      for(var i = 0; i < list.length; i++){
+        script += '# ' + list[i].d + '\n' + list[i].c + '\n\n';
+      }
+      copyText(script.replace(/\n+$/, '\n'), btn);
+    },
     all: function(){
       input.focus(); input.select();
       setStatus('ok', '已全选输入内容。');
@@ -1049,16 +1159,17 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     toast('已按键名' + (dir === 'asc' ? '升序' : '降序') + '排序', 'ok');
   }
 
-  function copyText(text){
+  function copyText(text, btn){
+    var target = btn || document.getElementById('btnCopy');
     var done = function(){
       setStatus('ok', '已复制到剪贴板（' + text.length + ' 字符）。');
       toast('已复制到剪贴板 · ' + text.length + ' 字符', 'ok');
-      flashBtn(document.getElementById('btnCopy'), '已复制 ✓');
+      flashBtn(target, '已复制 ✓');
     };
     var failed = function(){
-      setStatus('err', '复制失败，请手动选中输出区内容后按 Ctrl+C。');
+      setStatus('err', '复制失败，请手动选中内容后按 Ctrl+C。');
       toast('复制失败，请手动选中后按 Ctrl+C', 'err');
-      flashBtn(document.getElementById('btnCopy'), '复制失败');
+      flashBtn(target, '复制失败');
     };
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(done, function(){
@@ -1130,6 +1241,221 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       '}'
   };
 
+  /* ============ 常用命令速查 ============ */
+  var COMMANDS = [
+    { cat:'Git', items:[
+      { d:'查看当前分支与工作区状态', c:'git status' },
+      { d:'一行式提交历史（带分支图）', c:'git log --oneline --graph --decorate --all' },
+      { d:'拉取远端并变基合并', c:'git pull --rebase origin main' },
+      { d:'推送当前分支到远端', c:'git push origin HEAD' },
+      { d:'强推但保护远端新提交', c:'git push --force-with-lease' },
+      { d:'暂存当前改动并加备注', c:'git stash push -m "wip: 临时改动"' },
+      { d:'恢复最近一次暂存', c:'git stash pop' },
+      { d:'查看本地分支及上游追踪', c:'git branch -vv' },
+      { d:'新建并切换分支', c:'git switch -c feature/xxx' },
+      { d:'丢弃工作区未提交改动', c:'git restore .' },
+      { d:'取消已暂存但未提交的改动', c:'git restore --staged .' },
+      { d:'修改上一次提交的信息', c:'git commit --amend' },
+      { d:'交互式整理最近 5 次提交', c:'git rebase -i HEAD~5' },
+      { d:'带说明提交已跟踪文件', c:'git commit -am "fix: 修复审批驳回状态覆盖问题"' },
+      { d:'查看某文件的逐行改动', c:'git log -p -- src/main/java/App.java' },
+      { d:'查某几行代码是谁改的', c:'git blame -L 20,40 src/main/java/App.java' },
+      { d:'解决冲突后标记完成', c:'git add . && git commit' },
+      { d:'把本地提交推到远端指定分支', c:'git push origin HEAD:refs/heads/main' }
+    ]},
+    { cat:'SVN', items:[
+      { d:'更新到最新版本', c:'svn update' },
+      { d:'查看仓库或文件版本信息', c:'svn info' },
+      { d:'提交全部改动', c:'svn commit -m "fix: 修复统计接口 NPE"' },
+      { d:'查看本地改动差异', c:'svn diff' },
+      { d:'把差异存成补丁文件', c:'svn diff > fix.patch' },
+      { d:'查看某文件的提交历史', c:'svn log -v src/main/java/App.java' },
+      { d:'查看指定版本的改动', c:'svn diff -c 12345' },
+      { d:'回退到指定版本', c:'svn update -r 12345' },
+      { d:'撤销某文件的本地修改', c:'svn revert src/main/java/App.java' },
+      { d:'解决冲突后标记已解决', c:'svn resolve --accept=working src/main/java/App.java' },
+      { d:'新增文件并纳入版本控制', c:'svn add newfile.java' },
+      { d:'删除文件并纳入版本控制', c:'svn rm oldfile.java' },
+      { d:'导出干净代码（不含 .svn）', c:'svn export ^/trunk ./release' },
+      { d:'查看仓库目录结构', c:'svn list ^/' },
+      { d:'切换到分支', c:'svn switch ^/branches/release-v2' }
+    ]},
+    { cat:'Linux', items:[
+      { d:'查看各磁盘使用情况', c:'df -h' },
+      { d:'查看当前目录各项大小', c:'du -sh * | sort -h' },
+      { d:'查找占用某端口的进程', c:'lsof -i:8080' },
+      { d:'实时跟踪日志并过滤', c:'tail -f app.log | grep -i error' },
+      { d:'统计文件行数', c:'wc -l access.log' },
+      { d:'按文件名查找文件', c:'find /var/log -name "*.log"' },
+      { d:'按内容查找文件', c:'grep -rn "TODO" src/' },
+      { d:'统计访问 IP 排行', c:"awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -20" },
+      { d:'批量重命名文件', c:'for f in *.txt; do mv "$f" "${f%.txt}.md"; done' },
+      { d:'查看 Java 进程完整命令', c:'ps -ef | grep java' },
+      { d:'结束指定进程', c:'kill -9 12345' },
+      { d:'查看内存与系统负载', c:'free -h && uptime' },
+      { d:'测试端口连通性', c:'nc -zv 127.0.0.1 3306' },
+      { d:'按时间查看文件', c:'ls -lhtr' },
+      { d:'同步大文件到远程', c:'rsync -avz --progress ./dist/ root@host:/data/app/' },
+      { d:'就地替换文本', c:"sed -i 's/old/new/g' config.properties" },
+      { d:'打包并解压目录', c:'tar -zcvf backup.tar.gz dist/ && tar -zxvf backup.tar.gz' },
+      { d:'查看定时任务', c:'crontab -l' }
+    ]},
+    { cat:'Docker', items:[
+      { d:'查看运行中的容器', c:'docker ps' },
+      { d:'查看全部容器（含已停止）', c:'docker ps -a' },
+      { d:'拉取镜像', c:'docker pull nginx:1.25-alpine' },
+      { d:'构建镜像', c:'docker build -t myapp:1.0 .' },
+      { d:'后台启动容器并映射端口', c:'docker run -d --name web -p 8080:8080 myapp:1.0' },
+      { d:'进入容器执行命令', c:'docker exec -it web bash' },
+      { d:'跟踪查看容器日志', c:'docker logs -f --tail 100 web' },
+      { d:'停止并删除容器', c:'docker stop web && docker rm web' },
+      { d:'查看本地镜像', c:'docker images' },
+      { d:'清理无用镜像与构建缓存', c:'docker system prune -f' },
+      { d:'导出与导入镜像', c:'docker save -o myapp.tar myapp:1.0 && docker load -i myapp.tar' },
+      { d:'实时查看容器资源占用', c:'docker stats' },
+      { d:'查看容器端口映射', c:'docker port web' },
+      { d:'查看 Docker 网络', c:'docker network ls' },
+      { d:'带环境变量运行一次性容器', c:'docker run --rm -e TZ=Asia/Shanghai alpine date' }
+    ]},
+    { cat:'Maven', items:[
+      { d:'清理并打包（跳过测试）', c:'mvn clean package -DskipTests' },
+      { d:'仅编译', c:'mvn clean compile' },
+      { d:'运行单元测试', c:'mvn test' },
+      { d:'安装到本地仓库', c:'mvn clean install' },
+      { d:'指定 profile 打包', c:'mvn clean package -Pprod' },
+      { d:'离线构建', c:'mvn clean package -o' },
+      { d:'查看依赖树', c:'mvn dependency:tree' },
+      { d:'强制更新 SNAPSHOT 依赖', c:'mvn clean install -U' },
+      { d:'本地启动 Spring Boot', c:'mvn spring-boot:run' }
+    ]},
+    { cat:'MySQL', items:[
+      { d:'连接数据库', c:'mysql -h 127.0.0.1 -P 3306 -uroot -p' },
+      { d:'导出整个库', c:'mysqldump -uroot -p db > backup.sql' },
+      { d:'导入数据库', c:'mysql -uroot -p db < backup.sql' },
+      { d:'只导出表结构', c:'mysqldump -uroot -p --no-data db > schema.sql' },
+      { d:'导出单张表', c:'mysqldump -uroot -p db table_name > table.sql' },
+      { d:'导出查询结果为 CSV', c:'mysql -uroot -p db -e "SELECT * FROM table_name" > out.csv' },
+      { d:'查看所有数据库', c:'SHOW DATABASES;' },
+      { d:'查看所有表', c:'SHOW TABLES;' },
+      { d:'查看建表语句', c:'SHOW CREATE TABLE table_name\\G' },
+      { d:'查看表索引', c:'SHOW INDEX FROM table_name;' },
+      { d:'查看各表数据行数', c:"SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = 'db';" },
+      { d:'查看慢查询开关', c:"SHOW VARIABLES LIKE 'slow_query_log';" }
+    ]},
+    { cat:'Redis', items:[
+      { d:'启动 Redis 服务', c:'redis-server --port 6379 --daemonize yes' },
+      { d:'连接 Redis', c:'redis-cli -h 127.0.0.1 -p 6379' },
+      { d:'查看服务器信息', c:'redis-cli info' },
+      { d:'查看内存占用', c:'redis-cli info memory' },
+      { d:'查看键数量', c:'redis-cli dbsize' },
+      { d:'列出键名（生产慎用）', c:'redis-cli keys "*"' },
+      { d:'查看键的过期时间', c:'redis-cli ttl user:1001' },
+      { d:'查看慢日志', c:'redis-cli slowlog get 10' },
+      { d:'查看内存淘汰策略', c:'redis-cli config get maxmemory-policy' },
+      { d:'后台生成 RDB 快照', c:'redis-cli bgsave' }
+    ]},
+    { cat:'Nginx', items:[
+      { d:'检查配置文件语法', c:'nginx -t' },
+      { d:'重载配置（不中断服务）', c:'nginx -s reload' },
+      { d:'停止 Nginx', c:'nginx -s stop' },
+      { d:'查看实际生效的完整配置', c:'nginx -T | grep -n "server_name"' },
+      { d:'查看监听端口', c:'netstat -tlnp | grep nginx' },
+      { d:'跟踪访问日志', c:'tail -f /var/log/nginx/access.log' },
+      { d:'统计 IP 访问量 TOP', c:"awk '{print $1}' access.log | sort | uniq -c | sort -rn | head" },
+      { d:'统计状态码分布', c:"awk '{print $9}' access.log | sort | uniq -c | sort -rn" },
+      { d:'平滑重启服务', c:'systemctl restart nginx' },
+      { d:'设置开机自启', c:'systemctl enable nginx' }
+    ]},
+    { cat:'Java', items:[
+      { d:'查看 Java 版本', c:'java -version' },
+      { d:'查看进程与主类', c:'jps -l' },
+      { d:'导出堆快照', c:'jmap -dump:live,format=b,file=heap.hprof 12345' },
+      { d:'查看对象数量排行（OOM 排查）', c:'jmap -histo:live 12345 | head -30' },
+      { d:'导出线程栈', c:'jstack 12345 > thread.txt' },
+      { d:'观察 GC 情况', c:'jstat -gcutil 12345 1000' },
+      { d:'打印进程内线程', c:'jcmd 12345 Thread.print' },
+      { d:'带堆内存限制启动', c:'java -Xms512m -Xmx1g -Xmn256m -XX:+HeapDumpOnOutOfMemoryError -jar app.jar' },
+      { d:'开启 GC 日志', c:'java -XX:+PrintGCDetails -Xlog:gc*:file=gc.log:time,uptime,level,tags -jar app.jar' }
+    ]}
+  ];
+
+  var CMD_LIST = [];      /* 扁平化后的命令表 */
+  var CMD_BY_ID = {};     /* id → 命令条目 */
+  var cheatCat = '全部';
+  var cheatKey = '';
+  var cheatMap = {};      /* 当前筛选结果：分类 → 列表 */
+
+  (function(){
+    var id = 0;
+    for(var g = 0; g < COMMANDS.length; g++){
+      var items = COMMANDS[g].items;
+      for(var i = 0; i < items.length; i++){
+        var key = 'cmd' + (id++);
+        var it = { id:key, cat:COMMANDS[g].cat, d:items[i].d, c:items[i].c };
+        CMD_LIST.push(it);
+        CMD_BY_ID[key] = it;
+      }
+    }
+  })();
+
+  function renderCheatTabs(){
+    var wrap = document.getElementById('cheatTabs');
+    var cats = ['全部'], seen = {};
+    for(var i = 0; i < CMD_LIST.length; i++){
+      if(!seen[CMD_LIST[i].cat]){ seen[CMD_LIST[i].cat] = 1; cats.push(CMD_LIST[i].cat); }
+    }
+    var html = '';
+    for(var j = 0; j < cats.length; j++){
+      var c = cats[j];
+      var n = 0;
+      if(c === '全部'){
+        n = CMD_LIST.length;
+      }else{
+        for(var k = 0; k < CMD_LIST.length; k++) if(CMD_LIST[k].cat === c) n++;
+      }
+      html += '<button class="ctab' + (c === cheatCat ? ' on' : '') + '" type="button" role="tab" ' +
+              'aria-selected="' + (c === cheatCat) + '" data-cat="' + esc(c) + '">' + esc(c) +
+              '<span class="n">' + n + '</span></button>';
+    }
+    wrap.innerHTML = html;
+  }
+
+  function renderCheat(){
+    var body = document.getElementById('cheatBody');
+    var key = cheatKey.trim().toLowerCase();
+    cheatMap = {};
+    var order = [];
+    for(var i = 0; i < CMD_LIST.length; i++){
+      var it = CMD_LIST[i];
+      if(cheatCat !== '全部' && it.cat !== cheatCat) continue;
+      if(key && it.d.toLowerCase().indexOf(key) < 0 && it.c.toLowerCase().indexOf(key) < 0) continue;
+      if(!cheatMap[it.cat]){ cheatMap[it.cat] = []; order.push(it.cat); }
+      cheatMap[it.cat].push(it);
+    }
+    if(!order.length){
+      body.innerHTML = '<div class="cheat-empty">没有匹配的命令，换个关键词试试。</div>';
+      return;
+    }
+    var html = '';
+    for(var g = 0; g < order.length; g++){
+      var cat = order[g], list = cheatMap[cat];
+      html += '<section class="cgroup">';
+      html += '<div class="cgroup-head"><h3 class="cgroup-title">' + esc(cat) +
+              '<span class="n">' + list.length + ' 条</span></h3>' +
+              '<span class="sp"><button class="mini" type="button" data-act="copyGroup" data-cat="' + esc(cat) + '">复制本组</button></span></div>';
+      html += '<div class="cgrid">';
+      for(var k = 0; k < list.length; k++){
+        html += '<article class="ccard">' +
+                  '<div class="ccard-top"><span class="cdesc">' + esc(list[k].d) + '</span>' +
+                  '<button class="ccopy" type="button" data-act="copyCmd" data-cmd-id="' + list[k].id + '">复制</button></div>' +
+                  '<code class="ccmd">' + esc(list[k].c) + '</code>' +
+                '</article>';
+      }
+      html += '</div></section>';
+    }
+    body.innerHTML = html;
+  }
+
   function loadSample(key){
     var text = SAMPLES[key];
     if(!text) return;
@@ -1184,7 +1510,28 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     var btn = e.target.closest('[data-act]');
     if(!btn) return;
     var act = btn.getAttribute('data-act');
-    if(actions[act]){ e.preventDefault(); actions[act](); }
+    if(actions[act]){ e.preventDefault(); actions[act](btn); }
+  });
+
+  /* ============ 命令速查：分类切换与搜索 ============ */
+  document.addEventListener('click', function(e){
+    var tab = e.target.closest('.ctab');
+    if(!tab) return;
+    cheatCat = tab.getAttribute('data-cat');
+    renderCheatTabs();
+    renderCheat();
+  });
+  document.getElementById('cheatSearch').addEventListener('input', function(e){
+    cheatKey = e.target.value;
+    renderCheat();
+  });
+  /* 搜索框里按 Esc 清空关键词 */
+  document.getElementById('cheatSearch').addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      e.target.value = '';
+      cheatKey = '';
+      renderCheat();
+    }
   });
 
   /* ============ 全屏 ============ */
@@ -1322,6 +1669,10 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   tryParse(input.value);
   renderData(JSON.parse(input.value));
   setStatus('', '已载入示例数据，可直接点「格式化」，或粘贴你自己的 JSON。');
+
+  /* 命令速查首屏渲染 */
+  renderCheatTabs();
+  renderCheat();
 })();
 </script>
 </body>
