@@ -2,3 +2,4 @@
 .workbuddy/
 app/node_modules/
 app/dist/
+app/.vite/
