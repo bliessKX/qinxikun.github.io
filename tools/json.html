@@ -70,6 +70,10 @@ main{padding:22px 26px 40px;max-width:1400px;margin:0 auto}
 .tb-btn.primary:hover{background:#8a3324;border-color:#8a3324}
 .tb-btn.danger{color:var(--err);border-color:#e6c3bd}
 .tb-btn.danger:hover{background:#fdf3f1;border-color:var(--err)}
+.tb-btn.done{
+  background:#eaf5ee;border-color:var(--ok);color:#2f7a4d;font-weight:600;
+}
+.tb-btn.done:hover{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d}
 .tb-btn i{font-style:normal;font-size:10px;opacity:.65;margin-left:4px}
 .tb-sepv{width:1px;height:20px;background:var(--line);margin:0 3px}
 
@@ -106,7 +110,7 @@ select.tb-sel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   align-items:stretch;
 }
 .workspace.full{
-  position:fixed;inset:0;z-index:80;gap:0;padding:0;background:var(--bg);
+  position:fixed;inset:0;z-index:80;gap:0;padding:52px 0 0;background:var(--bg);
 }
 .workspace.full .pane{border-radius:0;border-top:none;border-bottom:none;border-left:none;border-right:none}
 .workspace.full .pane:first-child{border-left:1px solid var(--line)}
@@ -205,6 +209,69 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.045);
   padding:1px 5px;border-radius:3px;
 }
+
+/* ---------- 浮层提示 Toast ---------- */
+.toast-wrap{
+  position:fixed;right:20px;bottom:20px;z-index:200;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+  pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:9px;
+  max-width:min(78vw,360px);
+  padding:9px 14px 9px 12px;
+  background:#26221c;color:#f6f2e9;
+  border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--muted);
+  border-radius:6px;font-size:13px;line-height:1.5;
+  box-shadow:0 8px 24px rgba(35,32,27,.22);
+  animation:toastIn .18s ease-out;
+}
+.toast.out{animation:toastOut .18s ease-in forwards}
+.toast.ok{border-left-color:#4f9d6b}
+.toast.err{border-left-color:#d0563f}
+.toast.warn{border-left-color:#d5902f}
+.toast .ti{
+  flex:0 0 auto;width:15px;height:15px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;line-height:1;
+  background:rgba(255,255,255,.12);
+}
+.toast.ok .ti{background:#4f9d6b;color:#fff}
+.toast.err .ti{background:#d0563f;color:#fff}
+.toast.warn .ti{background:#d5902f;color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px)}}
+
+/* ---------- 全屏浮层条 ---------- */
+.fs-bar{
+  position:fixed;top:9px;left:50%;transform:translateX(-50%);
+  z-index:120;display:none;align-items:center;gap:12px;
+  padding:6px 8px 6px 14px;
+  background:rgba(38,34,28,.94);color:#f6f2e9;
+  border:1px solid rgba(255,255,255,.1);border-radius:7px;
+  font-size:12.5px;box-shadow:0 8px 26px rgba(35,32,27,.3);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.fs-bar.on{display:flex}
+.fs-bar .fs-tag{
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:#c9c0ae;
+}
+.fs-bar .fs-msg{
+  max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#f6f2e9;
+}
+.fs-bar .fs-hint{color:#a99f8c}
+.fs-bar kbd{
+  font-family:var(--mono);font-size:11px;border:1px solid rgba(255,255,255,.22);
+  border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:rgba(255,255,255,.06);
+}
+.fs-bar .fs-exit{
+  all:unset;cursor:pointer;padding:4px 11px;border-radius:4px;
+  background:rgba(255,255,255,.1);color:#f6f2e9;font-size:12.5px;font-weight:600;
+}
+.fs-bar .fs-exit:hover{background:rgba(255,255,255,.2)}
+.fs-bar .fs-exit:focus-visible{outline:2px solid #f6f2e9;outline-offset:2px}
 .tips{margin-top:22px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
 .tips kbd{
   font-family:var(--mono);font-size:11px;border:1px solid var(--line-strong);
@@ -278,15 +345,25 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
 
     <span class="tb-sepv"></span>
 
-    <button class="tb-btn" type="button" data-act="copy">复制</button>
+    <button class="tb-btn" type="button" data-act="copy" id="btnCopy">复制</button>
     <button class="tb-btn" type="button" data-act="download">下载</button>
-    <button class="tb-btn" type="button" data-act="full">全屏</button>
+    <button class="tb-btn" type="button" data-act="full" id="btnFull">全屏</button>
     <button class="tb-btn" type="button" data-act="collapse">折叠</button>
     <button class="tb-btn danger" type="button" data-act="clear">清空</button>
   </div>
 
   <!-- 工作区 -->
   <div class="workspace" id="workspace">
+    <!-- 全屏浮层条：进入全屏时给出明确出口（置于工作区内，原生全屏下同样可见） -->
+    <div class="fs-bar" id="fsBar" role="status" aria-live="polite">
+      <span class="fs-tag">全屏</span>
+      <span class="fs-msg" id="fsMsg">按 Esc 或点右侧按钮退出</span>
+      <button class="fs-exit" type="button" id="fsExit">退出全屏</button>
+    </div>
+
+    <!-- 浮层提示 -->
+    <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="false"></div>
+
     <section class="pane">
       <div class="pane-head">
         输入
@@ -377,6 +454,37 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     var tx = statusEl.querySelector('.tx');
     st.textContent = kind === 'ok' ? '成功' : (kind === 'err' ? '失败' : (kind === 'warn' ? '提示' : '就绪'));
     tx.innerHTML = esc(text) + (detail ? ' ' + detail : '');
+  }
+
+  /* ============ 浮层提示 Toast ============ */
+  var toastWrap = document.getElementById('toastWrap');
+  function toast(text, kind){
+    kind = kind || 'ok';
+    var el = document.createElement('div');
+    el.className = 'toast ' + kind;
+    var mark = kind === 'err' ? '!' : (kind === 'warn' ? '!' : '✓');
+    el.innerHTML = '<span class="ti">' + mark + '</span><span>' + esc(text) + '</span>';
+    toastWrap.appendChild(el);
+    /* 最多同时保留 3 条 */
+    while(toastWrap.children.length > 3) toastWrap.removeChild(toastWrap.firstChild);
+    setTimeout(function(){
+      el.classList.add('out');
+      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 200);
+    }, 2600);
+  }
+
+  /* 按钮内联反馈：文案短暂变成「已复制」等 */
+  function flashBtn(btn, label, ms){
+    if(!btn) return;
+    if(btn._flashTimer) clearTimeout(btn._flashTimer);
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = label;
+    btn.classList.add('done');
+    btn._flashTimer = setTimeout(function(){
+      btn.textContent = btn.getAttribute('data-label') || old;
+      btn.classList.remove('done');
+    }, ms || 1600);
   }
 
   /* ============ 解析与错误定位 ============ */
@@ -740,71 +848,95 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   var actions = {
     format: function(){
       var raw = input.value;
-      if(!raw.trim()){ setStatus('warn', '输入为空。'); return; }
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var r = tryParse(raw);
-      if(!r.ok){ setStatus('err', 'JSON 解析失败。', errDetail(r.err, raw)); return; }
+      if(!r.ok){
+        setStatus('err', 'JSON 解析失败。', errDetail(r.err, raw));
+        toast('JSON 解析失败，请检查语法', 'err');
+        return;
+      }
       renderData(r.data);
       setStatus('ok', '格式化成功：' + countKeys(r.data) + ' 个键 · ' + countNodes(r.data) + ' 个节点。');
+      toast('格式化成功 · ' + countKeys(r.data) + ' 个键', 'ok');
     },
     validate: function(){
       var raw = input.value;
-      if(!raw.trim()){ setStatus('warn', '输入为空，无法校验。'); return; }
+      if(!raw.trim()){ setStatus('warn', '输入为空，无法校验。'); toast('输入为空，无法校验', 'warn'); return; }
       var r = tryParse(raw);
-      if(r.ok){ setStatus('ok', '校验通过，是合法的 JSON。共 ' + countKeys(r.data) + ' 个键。'); }
-      else{ setStatus('err', '校验不通过。', errDetail(r.err, raw)); }
+      if(r.ok){
+        setStatus('ok', '校验通过，是合法的 JSON。共 ' + countKeys(r.data) + ' 个键。');
+        toast('校验通过 · 是合法的 JSON', 'ok');
+      }else{
+        setStatus('err', '校验不通过。', errDetail(r.err, raw));
+        toast('校验不通过 · ' + ((r.err && r.err.msg) ? r.err.msg : 'JSON 非法'), 'err');
+      }
     },
     repair: function(){
       var raw = input.value;
-      if(!raw.trim()){ setStatus('warn', '输入为空。'); return; }
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var fixed = repairJson(raw);
       var r = tryParse(fixed);
       if(r.ok){
         renderData(r.data, fixed.length + ' 字符 · ' + countKeys(r.data) + ' 个键');
         setStatus('ok', '修复成功，已输出修复并格式化后的结果。');
+        toast('修复成功 · 已输出修复后的结果', 'ok');
       }else{
         renderText(fixed, fixed.length + ' 字符（修复后仍不合法）');
         setStatus('warn', '已尽力修复，但仍不是合法 JSON，请手动检查。', errDetail(r.err, fixed));
+        toast('已尽力修复，但仍不合法，请手动检查', 'warn');
       }
     },
     minify: function(){
       var raw = input.value;
-      if(!raw.trim()){ setStatus('warn', '输入为空。'); return; }
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var r = tryParse(raw);
-      if(!r.ok){ setStatus('err', 'JSON 解析失败，无法压缩。', errDetail(r.err, raw)); return; }
+      if(!r.ok){
+        setStatus('err', 'JSON 解析失败，无法压缩。', errDetail(r.err, raw));
+        toast('JSON 解析失败，无法压缩', 'err');
+        return;
+      }
       renderText(JSON.stringify(r.data), JSON.stringify(r.data).length + ' 字符 · 已压缩');
       setStatus('ok', '压缩完成。');
+      toast('压缩完成', 'ok');
     },
     asc: function(){ sortAction('asc'); },
     desc: function(){ sortAction('desc'); },
     unicode: function(){
       var raw = input.value;
-      if(!raw){ setStatus('warn', '输入为空。'); return; }
+      if(!raw){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var out = raw.replace(/[^\x00-\x7F]/g, function(ch){
         return '\\u' + ('0000' + ch.charCodeAt(0).toString(16)).slice(-4);
       });
       renderText(out, out.length + ' 字符 · 非 ASCII 已转义');
       setStatus('ok', '已把中文与非 ASCII 字符转成 \\uXXXX。');
+      toast('非 ASCII 字符已转成 \\uXXXX', 'ok');
     },
     ununicode: function(){
       var raw = input.value;
-      if(!raw){ setStatus('warn', '输入为空。'); return; }
+      if(!raw){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var out = raw.replace(/\\u([0-9a-fA-F]{4})/g, function(m,h){
         return String.fromCharCode(parseInt(h,16));
       }).replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\r/g,'\r');
       renderText(out, out.length + ' 字符 · 已还原');
       setStatus('ok', '已把 \\uXXXX 还原为原字符。');
+      toast('\\uXXXX 已还原为原字符', 'ok');
     },
     tostring: function(){
       var r = tryParse(input.value);
       var src = r.ok ? JSON.stringify(r.data) : input.value;
-      if(!src){ setStatus('warn', '输入为空。'); return; }
+      if(!src){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
       var lit = JSON.stringify(src);
       renderText(lit, lit.length + ' 字符 · 字符串字面量');
       setStatus('ok', '已转为带引号的字符串字面量。');
+      toast('已转为字符串字面量', 'ok');
     },
     copy: function(){
       var text = (view === 'tree' && lastValid) ? stringify(lastData) : outRaw;
-      if(!text){ setStatus('warn', '输出区还是空的，没有可复制的内容。'); return; }
+      if(!text){
+        setStatus('warn', '输出区还是空的，没有可复制的内容。');
+        toast('输出区还是空的，没有可复制的内容', 'warn');
+        return;
+      }
       copyText(text);
     },
     download: function(){
@@ -817,22 +949,32 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       document.body.appendChild(a); a.click();
       setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
       setStatus('ok', '已下载 data.json。');
+      toast('已下载 data.json', 'ok');
     },
     full: function(){
-      var ws = document.getElementById('workspace');
-      ws.classList.toggle('full');
-      document.body.style.overflow = ws.classList.contains('full') ? 'hidden' : '';
-      setStatus('ok', ws.classList.contains('full') ? '已全屏，按 Esc 退出。' : '已退出全屏。');
+      var on = toggleFullscreen();
+      if(on){
+        setStatus('ok', '已进入全屏，按 Esc 或点右上角「退出全屏」返回。');
+        toast('已进入全屏 · 按 Esc 退出', 'ok');
+      }else{
+        setStatus('ok', '已退出全屏。');
+        toast('已退出全屏', 'ok');
+      }
     },
     collapse: function(){
       if(!lastValid){
         var r = tryParse(input.value);
-        if(!r.ok){ setStatus('err', '当前内容不是合法 JSON。', errDetail(r.err, input.value)); return; }
+        if(!r.ok){
+          setStatus('err', '当前内容不是合法 JSON。', errDetail(r.err, input.value));
+          toast('当前内容不是合法 JSON', 'err');
+          return;
+        }
       }
       buildTree();
       switchView('tree');
       setAllCollapsed(true);
       setStatus('ok', '已折叠为树形视图。');
+      toast('已折叠为树形视图', 'ok');
     },
     clear: function(){
       input.value = '';
@@ -843,6 +985,7 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       switchView('text');
       updateInputStat();
       setStatus('ok', '已清空。');
+      toast('已清空', 'ok');
       input.focus();
     },
     open: function(){ fileInput.click(); },
@@ -850,6 +993,7 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       input.value = SAMPLE;
       updateInputStat();
       setStatus('ok', '已填入示例数据，点「格式化」试试。');
+      toast('已填入示例数据', 'ok');
       input.focus();
     },
     all: function(){
@@ -868,30 +1012,54 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
 
   function sortAction(dir){
     var raw = input.value;
-    if(!raw.trim()){ setStatus('warn', '输入为空。'); return; }
+    if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
     var r = tryParse(raw);
-    if(!r.ok){ setStatus('err', 'JSON 解析失败，无法排序。', errDetail(r.err, raw)); return; }
+    if(!r.ok){
+      setStatus('err', 'JSON 解析失败，无法排序。', errDetail(r.err, raw));
+      toast('JSON 解析失败，无法排序', 'err');
+      return;
+    }
     var sorted = sortKeys(r.data, dir);
     renderData(sorted);
     setStatus('ok', '已按键名' + (dir === 'asc' ? '升序' : '降序') + '排序。');
+    toast('已按键名' + (dir === 'asc' ? '升序' : '降序') + '排序', 'ok');
   }
 
   function copyText(text){
+    var done = function(){
+      setStatus('ok', '已复制到剪贴板（' + text.length + ' 字符）。');
+      toast('已复制到剪贴板 · ' + text.length + ' 字符', 'ok');
+      flashBtn(document.getElementById('btnCopy'), '已复制 ✓');
+    };
+    var failed = function(){
+      setStatus('err', '复制失败，请手动选中输出区内容后按 Ctrl+C。');
+      toast('复制失败，请手动选中后按 Ctrl+C', 'err');
+      flashBtn(document.getElementById('btnCopy'), '复制失败');
+    };
     if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){
-        setStatus('ok', '已复制到剪贴板（' + text.length + ' 字符）。');
-      }, function(){ fallbackCopy(text); });
-    }else{ fallbackCopy(text); }
+      navigator.clipboard.writeText(text).then(done, function(){
+        /* Clipboard API 在非安全上下文会失败，退回 execCommand */
+        if(fallbackCopy(text)) done();
+        else failed();
+      });
+    }else{
+      if(fallbackCopy(text)) done();
+      else failed();
+    }
   }
   function fallbackCopy(text){
     var ta = document.createElement('textarea');
     ta.value = text;
-    ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+    ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    ta.setSelectionRange(0, text.length);
     var ok = false;
     try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
     ta.remove();
-    setStatus(ok ? 'ok' : 'err', ok ? '已复制到剪贴板。' : '复制失败，请手动选中复制。');
+    return ok;
   }
 
   /* ============ 事件绑定 ============ */
@@ -948,6 +1116,57 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     if(actions[act]) actions[act]();
   });
 
+  /* ============ 全屏 ============ */
+  var ws      = document.getElementById('workspace');
+  var btnFull = document.getElementById('btnFull');
+  var fsBar   = document.getElementById('fsBar');
+  var fsMsg   = document.getElementById('fsMsg');
+
+  function toggleFullscreen(){
+    var on = !ws.classList.contains('full');
+    ws.classList.toggle('full', on);
+    document.body.style.overflow = on ? 'hidden' : '';
+
+    /* 浮层条：显示/隐藏，并给出明确退出提示 */
+    fsBar.classList.toggle('on', on);
+    fsMsg.textContent = on ? '按 Esc 或点右侧按钮退出' : '';
+
+    /* 按钮文案切换：全屏 ↔ 退出全屏 */
+    btnFull.textContent = on ? '退出全屏' : '全屏';
+    btnFull.classList.toggle('primary', on);
+
+    /* 优先使用浏览器原生全屏 API（可用时体验更一致），失败则退回 CSS 全屏 */
+    if(on){
+      if(ws.requestFullscreen && !document.fullscreenElement){
+        var p = ws.requestFullscreen({navigationUI:'hide'});
+        if(p && p.catch) p.catch(function(){/* 退回 CSS 全屏 */});
+      }
+    }else if(document.fullscreenElement){
+      if(document.exitFullscreen) document.exitFullscreen();
+    }
+    return on;
+  }
+
+  document.getElementById('fsExit').addEventListener('click', function(){
+    if(toggleFullscreen() === false){
+      setStatus('ok', '已退出全屏。');
+      toast('已退出全屏', 'ok');
+    }
+  });
+
+  /* 浏览器原生全屏被 Esc 退出时，同步 UI 状态 */
+  document.addEventListener('fullscreenchange', function(){
+    if(!document.fullscreenElement && ws.classList.contains('full')){
+      ws.classList.remove('full');
+      document.body.style.overflow = '';
+      fsBar.classList.remove('on');
+      btnFull.textContent = '全屏';
+      btnFull.classList.remove('primary');
+      setStatus('ok', '已退出全屏。');
+      toast('已退出全屏', 'ok');
+    }
+  });
+
   var tabs = document.querySelectorAll('.tab');
   for(var i = 0; i < tabs.length; i++){
     tabs[i].addEventListener('click', function(){
@@ -994,7 +1213,6 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
       closeAll(null);
-      var ws = document.getElementById('workspace');
       if(ws.classList.contains('full')) actions.full();
     }
   });
