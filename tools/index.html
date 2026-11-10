@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>工具 — NICE.BLOG</title>
+<meta name="description" content="日常用的在线小工具，每个工具一个独立页面：JSON 解析与格式化、常用命令速查、今天吃什么转盘。">
+<meta name="theme-color" content="#faf9f6">
+<style>
+:root{
+  --bg:#faf9f6;
+  --panel:#ffffff;
+  --ink:#1b1a18;
+  --muted:#857f74;
+  --line:#e6e2d9;
+  --line-strong:#d6d0c3;
+  --accent:#9c3b2a;
+  --ok:#3e7d54;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --serif:"Noto Serif SC",Georgia,"Songti SC",serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 26px;border-bottom:1px solid var(--line);
+  background:var(--bg);position:sticky;top:0;z-index:40;
+}
+.tb-brand{font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.01em}
+.tb-brand:hover{color:var(--accent)}
+.tb-sep{width:1px;height:18px;background:var(--line-strong)}
+.tb-title{font-size:14px;color:var(--muted)}
+.tb-links{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted)}
+.tb-links a:hover{color:var(--accent)}
+.tb-back{color:var(--accent);font-weight:600}
+
+/* ---------- 主体 ---------- */
+main{padding:26px 26px 56px;max-width:1400px;margin:0 auto}
+
+.hero{margin-bottom:26px;max-width:76ch}
+.hero-title{
+  font-family:var(--serif);font-size:32px;font-weight:700;letter-spacing:.01em;
+  margin:0 0 8px;
+}
+.hero-sub{margin:0;font-size:14px;color:var(--muted)}
+.hero-sub b{color:var(--ink);font-weight:600}
+
+/* ---------- 工具卡片 ---------- */
+.tools{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;
+}
+.tool{
+  display:flex;flex-direction:column;
+  padding:20px 20px 18px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  transition:border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.tool:hover{
+  border-color:var(--accent);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(27,26,24,.06);
+}
+.tool:focus-within{border-color:var(--accent)}
+
+.tool-top{display:flex;align-items:baseline;gap:10px;margin-bottom:9px}
+.tool-name{
+  font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.01em;margin:0;
+}
+.tool-tag{
+  font-size:11px;color:var(--muted);border:1px solid var(--line-strong);
+  border-radius:3px;padding:1px 6px;white-space:nowrap;
+}
+.tool-desc{margin:0 0 12px;font-size:13.5px;color:var(--muted);line-height:1.7}
+.tool-feats{list-style:none;margin:0 0 16px;padding:0;font-size:12.5px;color:var(--muted)}
+.tool-feats li{
+  padding:3px 0 3px 15px;position:relative;line-height:1.6;
+}
+.tool-feats li::before{
+  content:"";position:absolute;left:2px;top:11px;
+  width:5px;height:5px;border-radius:50%;background:var(--line-strong);
+}
+.tool-foot{
+  margin-top:auto;padding-top:13px;border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.tool-link{
+  font-size:13px;font-weight:600;color:var(--accent);
+  border-bottom:1px solid rgba(156,59,42,.35);padding-bottom:1px;
+}
+.tool-link:hover{border-color:var(--accent)}
+.tool-path{font-family:var(--mono);font-size:11px;color:var(--muted);opacity:.75}
+
+/* ---------- 使用说明 ---------- */
+.notes{
+  margin-top:34px;padding-top:22px;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px;
+}
+.note h3{
+  font-family:var(--serif);font-size:15px;font-weight:700;margin:0 0 7px;
+  display:flex;align-items:center;gap:7px;
+}
+.note h3::before{
+  content:"";width:5px;height:5px;border-radius:50%;background:var(--accent);flex:0 0 5px;
+}
+.note p{margin:0;font-size:13px;color:var(--muted);line-height:1.75}
+.note code{
+  font-family:var(--mono);font-size:12px;color:var(--ink);
+  background:rgba(0,0,0,.045);padding:1px 5px;border-radius:3px;
+}
+
+/* ---------- 页脚 ---------- */
+.foot{
+  margin-top:30px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--muted);
+}
+.foot a{color:var(--accent)}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:900px){
+  .tools{grid-template-columns:1fr}
+  .hero-title{font-size:24px}
+  .tb-links{gap:14px;font-size:12.5px}
+  main{padding:18px 16px 40px}
+  .topbar{padding:12px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+  .tool{transition:none}
+  .tool:hover{transform:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="tb-brand" href="../index.html">NICE.BLOG</a>
+  <span class="tb-sep"></span>
+  <span class="tb-title">工具</span>
+  <nav class="tb-links">
+    <a href="json.html">JSON 工具</a>
+    <a href="commands.html">命令速查</a>
+    <a href="what-to-eat.html">今天吃什么</a>
+    <a class="tb-back" href="../index.html">← 返回主页</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 class="hero-title">工具</h1>
+    <p class="hero-sub">
+      日常随手用的小工具，<b>每个工具一个独立页面</b>，互不干扰、互不掺杂。
+      点进任意一张卡片，进入的就是它自己的专属页面。
+    </p>
+  </section>
+
+  <ul class="tools">
+    <li>
+      <a class="tool" href="json.html">
+        <div class="tool-top">
+          <h2 class="tool-name">JSON 解析与格式化</h2>
+          <span class="tool-tag">文本处理</span>
+        </div>
+        <p class="tool-desc">
+          把 JSON 文本整理成能读的格式，或反过来压缩成一行。附带校验、修复、键排序与 Unicode 转义。
+        </p>
+        <ul class="tool-feats">
+          <li>格式化 / 压缩 / 键名排序</li>
+          <li>脏 JSON 自动修复（去尾逗号、补引号）</li>
+          <li>树形视图折叠展开</li>
+          <li>Unicode 转义与反转义</li>
+          <li>内置 5 档示例数据，打开即用</li>
+        </ul>
+        <div class="tool-foot">
+          <span class="tool-link">打开工具 →</span>
+          <span class="tool-path">tools/json.html</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="tool" href="commands.html">
+        <div class="tool-top">
+          <h2 class="tool-name">常用命令速查</h2>
+          <span class="tool-tag">开发运维</span>
+        </div>
+        <p class="tool-desc">
+          Git、SVN、Linux、Docker、Maven、MySQL、Redis、Nginx、Java 九类常用命令，随手查、随手复制。
+        </p>
+        <ul class="tool-feats">
+          <li>9 大分类 · 119 条命令</li>
+          <li>按分类切换，关键词搜索</li>
+          <li>单条复制，或整组复制成带注释脚本</li>
+          <li>EXPLAIN 等命令附返回列逐项释义</li>
+        </ul>
+        <div class="tool-foot">
+          <span class="tool-link">打开工具 →</span>
+          <span class="tool-path">tools/commands.html</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="tool" href="what-to-eat.html">
+        <div class="tool-top">
+          <h2 class="tool-name">今天吃什么 · 转盘</h2>
+          <span class="tool-tag">生活</span>
+        </div>
+        <p class="tool-desc">
+          按当前时间自动判断早、中、晚餐，再从中餐、西餐、马来西亚餐里转出一个答案，替你解决选择困难。
+        </p>
+        <ul class="tool-feats">
+          <li>按时段自动匹配三餐</li>
+          <li>8 种菜系可切换</li>
+          <li>转盘动画揭晓结果</li>
+          <li>候选菜品可自行增删</li>
+        </ul>
+        <div class="tool-foot">
+          <span class="tool-link">打开工具 →</span>
+          <span class="tool-path">tools/what-to-eat.html</span>
+        </div>
+      </a>
+    </li>
+  </ul>
+
+  <section class="notes">
+    <div class="note">
+      <h3>各页独立，互不影响</h3>
+      <p>每个工具跑在自己的页面里，脚本互不干扰。可以单独收藏某页地址长期使用，不必每次都从这里进。</p>
+    </div>
+    <div class="note">
+      <h3>不用注册、不上传</h3>
+      <p>全部在浏览器本地运行，数据不离开你的电脑。JSON 内容不会存到任何服务器，关掉页面就清空。</p>
+    </div>
+    <div class="note">
+      <h3>随时接着改</h3>
+      <p>工具是持续在长的。新增功能会同步更新到对应页面，也会记进仓库的变更记录里。</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    每个工具都是独立页面 —— 也可以直接收藏某一页的地址，单独使用，不必经过目录。
+    <a href="../index.html">← 回到笔记首页</a>
+  </footer>
+</main>
+
+</body>
+</html>

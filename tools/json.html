@@ -285,6 +285,9 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   .out-area{min-height:240px}
   main{padding:18px 16px 34px}
   .topbar{padding:12px 16px}
+  /* 窄屏收敛顶栏：只留「全部工具」与「返回主页」 */
+  .tb-links{gap:14px;font-size:12.5px}
+  .tb-links a:not(:first-child):not(.tb-back){display:none}
 }
 </style>
 </head>
@@ -295,8 +298,9 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   <span class="tb-sep"></span>
   <span class="tb-title">工具 · JSON 解析与格式化</span>
   <nav class="tb-links">
+    <a href="index.html">全部工具</a>
     <a href="commands.html">命令速查</a>
-    <a href="../what-to-eat.html">今天吃什么</a>
+    <a href="what-to-eat.html">今天吃什么</a>
     <a class="tb-back" href="../index.html">← 返回主页</a>
   </nav>
 </header>
