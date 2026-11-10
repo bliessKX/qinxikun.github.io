@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>常用命令速查 — NICE.BLOG</title>
+<meta name="description" content="Git / SVN / Linux / Docker / Maven / MySQL / Redis / Nginx / Java 常用命令速查，支持分类浏览、关键词搜索与一键复制。">
+<meta name="theme-color" content="#faf9f6">
+<style>
+:root{
+  --bg:#faf9f6;
+  --panel:#ffffff;
+  --ink:#1b1a18;
+  --muted:#857f74;
+  --line:#e6e2d9;
+  --line-strong:#d6d0c3;
+  --accent:#9c3b2a;
+  --ok:#3e7d54;
+  --warn:#a5741f;
+  --err:#b03a2e;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --serif:"Noto Serif SC",Georgia,"Songti SC",serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 26px;border-bottom:1px solid var(--line);
+  background:var(--bg);position:sticky;top:0;z-index:40;
+}
+.tb-brand{font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.01em}
+.tb-brand:hover{color:var(--accent)}
+.tb-sep{width:1px;height:18px;background:var(--line-strong)}
+.tb-title{font-size:14px;color:var(--muted)}
+.tb-links{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted)}
+.tb-links a:hover{color:var(--accent)}
+.tb-back{color:var(--accent);font-weight:600}
+
+/* ---------- 主体 ---------- */
+main{padding:26px 26px 56px;max-width:1400px;margin:0 auto}
+
+/* ---------- 标题区 ---------- */
+.hero{margin-bottom:16px}
+.hero-title{
+  margin:0 0 6px;font-family:var(--serif);font-size:26px;font-weight:700;letter-spacing:.01em;
+}
+.hero-sub{margin:0 0 14px;font-size:14px;color:var(--muted);max-width:78ch}
+.hero-sub b{color:var(--ink);font-weight:600}
+.hero-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.csearch{
+  flex:1 1 320px;min-width:220px;padding:9px 12px;
+  font-family:var(--sans);font-size:14px;color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:4px;background:var(--panel);
+}
+.csearch:focus{outline:none;border-color:var(--accent);background:#fff}
+.csearch::placeholder{color:#b3aca0}
+.cbtn{
+  all:unset;cursor:pointer;padding:9px 14px;border:1px solid var(--line-strong);border-radius:4px;
+  font-size:13px;line-height:1.5;color:var(--ink);white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.cbtn:hover{background:rgba(0,0,0,.04);border-color:var(--ink)}
+.cbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.cbtn.done{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d;font-weight:600}
+.cbtn.done:hover{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d}
+
+/* ---------- 分类栏 ---------- */
+.tabbar{
+  position:sticky;top:var(--tbh,60px);z-index:30;
+  display:flex;gap:4px;flex-wrap:wrap;padding:8px 10px;margin-bottom:18px;
+  background:rgba(250,249,246,.94);backdrop-filter:saturate(140%) blur(6px);
+  border:1px solid var(--line);border-radius:6px;
+}
+.ctab{
+  all:unset;cursor:pointer;padding:5px 11px;border-radius:4px;
+  font-size:13px;color:var(--muted);border:1px solid transparent;
+}
+.ctab:hover{color:var(--accent);background:rgba(156,59,42,.06)}
+.ctab.on{background:rgba(156,59,42,.1);color:var(--accent);font-weight:600;border-color:rgba(156,59,42,.28)}
+.ctab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ctab .n{font-family:var(--mono);font-size:11px;opacity:.6;margin-left:5px}
+
+/* ---------- 命令卡片 ---------- */
+.cgroup{margin-bottom:30px;scroll-margin-top:calc(var(--tbh,60px) + 58px)}
+.cgroup:last-child{margin-bottom:0}
+.cgroup-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cgroup-title{margin:0;font-family:var(--serif);font-size:17px;font-weight:700;letter-spacing:.02em}
+.cgroup-title .n{font-family:var(--mono);font-size:11.5px;font-weight:400;color:var(--muted);margin-left:8px}
+.cgroup-head .sp{margin-left:auto}
+
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.ccard{
+  border:1px solid var(--line);border-radius:6px;padding:10px 12px;
+  background:var(--panel);transition:border-color .15s,box-shadow .15s;
+}
+.ccard:hover{border-color:var(--line-strong);box-shadow:0 1px 3px rgba(40,34,28,.05)}
+.ccard-top{display:flex;align-items:flex-start;gap:10px}
+.cdesc{flex:1;font-size:13px;line-height:1.5;color:var(--ink)}
+.ccopy{
+  all:unset;cursor:pointer;flex:0 0 auto;
+  padding:2px 9px;border:1px solid var(--line-strong);border-radius:4px;
+  font-size:11.5px;color:var(--muted);
+}
+.ccopy:hover{color:var(--accent);border-color:var(--accent);background:rgba(156,59,42,.06)}
+.ccopy:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ccopy.done{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d;font-weight:600}
+.ccmd{
+  display:block;margin-top:7px;padding:7px 9px;
+  background:rgba(0,0,0,.04);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;
+  font-family:var(--mono);font-size:12.5px;line-height:1.6;color:var(--ink);
+  white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;
+}
+.ccard.wide{grid-column:1/-1}
+.cnote{
+  margin-top:10px;padding:11px 13px;border-radius:4px;
+  background:rgba(0,0,0,.028);border-left:2px solid var(--line-strong);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));gap:0 30px;
+}
+.cnote-h{
+  grid-column:1/-1;font-size:11.5px;letter-spacing:.06em;color:var(--muted);
+  padding:0 0 7px;margin-bottom:2px;border-bottom:1px solid rgba(0,0,0,.08);
+}
+.cn-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(0,0,0,.07)}
+.cn-k{flex:0 0 116px;font-family:var(--mono);font-size:11.5px;color:var(--accent);word-break:break-word;padding-top:1px}
+.cn-v{flex:1;font-size:12.5px;line-height:1.7;color:var(--muted)}
+.cempty{padding:40px 10px;text-align:center;color:var(--muted);font-size:13px}
+
+/* ---------- 浮层提示 ---------- */
+.toast-wrap{position:fixed;right:20px;bottom:20px;z-index:120;display:flex;flex-direction:column;gap:8px}
+.toast{
+  padding:9px 14px;border-radius:5px;font-size:13px;color:#fff;background:#2c2a26;
+  box-shadow:0 6px 20px rgba(0,0,0,.16);opacity:1;transform:translateY(0);
+  transition:opacity .3s,transform .3s;
+}
+.toast.ok{background:#33694a}
+.toast.err{background:#a33a2c}
+.toast.out{opacity:0;transform:translateY(6px)}
+
+@media (max-width:900px){
+  main{padding:20px 16px 44px}
+  .topbar{padding:12px 16px;gap:10px}
+  .tb-links{gap:14px;font-size:12.5px}
+  /* 窄屏收敛顶栏：只留「全部工具」与「返回主页」 */
+  .tb-links a:not(:first-child):not(.tb-back){display:none}
+  .hero-title{font-size:22px}
+  .csearch{flex:1 1 100%}
+  .tabbar{
+    top:var(--tbh,56px);padding:7px 8px;
+    flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none}
+  .ctab{flex:0 0 auto}
+  .cgrid{grid-template-columns:1fr}
+  .cn-k{flex:0 0 92px}
+  .toast-wrap{left:16px;right:16px;bottom:16px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="tb-brand" href="../index.html">NICE.BLOG</a>
+  <span class="tb-sep"></span>
+  <span class="tb-title">工具 · 常用命令速查</span>
+  <nav class="tb-links">
+    <a href="index.html">全部工具</a>
+    <a href="json.html">JSON 工具</a>
+    <a href="what-to-eat.html">今天吃什么</a>
+    <a class="tb-back" href="../index.html">← 返回主页</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1 class="hero-title">常用命令速查</h1>
+    <p class="hero-sub">
+      9 大分类 · 119 条命令，覆盖日常开发、运维与数据库排查。<b>点「复制」直接取走命令</b>，
+      也可按分组整段复制成带注释的脚本；带字段释义的命令（如 <code>EXPLAIN</code>）会把返回列含义一并带上。
+    </p>
+    <div class="hero-bar">
+      <input class="csearch" id="search" type="search" autocomplete="off"
+             placeholder="搜索命令或用途，如 port、docker、提交、索引">
+      <button class="cbtn" id="copyAll" type="button">复制当前全部</button>
+      <button class="cbtn" id="resetBtn" type="button">重置</button>
+    </div>
+  </section>
+
+  <nav class="tabbar" id="tabs" aria-label="命令分类"></nav>
+  <div id="body"></div>
+</main>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+(function(){
+  var COMMANDS = [
+    { cat:'Git', items:[
+      { d:'查看当前分支与工作区状态', c:'git status' },
+      { d:'一行式提交历史（带分支图）', c:'git log --oneline --graph --decorate --all' },
+      { d:'拉取远端并变基合并', c:'git pull --rebase origin main' },
+      { d:'推送当前分支到远端', c:'git push origin HEAD' },
+      { d:'强推但保护远端新提交', c:'git push --force-with-lease' },
+      { d:'暂存当前改动并加备注', c:'git stash push -m "wip: 临时改动"' },
+      { d:'恢复最近一次暂存', c:'git stash pop' },
+      { d:'查看本地分支及上游追踪', c:'git branch -vv' },
+      { d:'新建并切换分支', c:'git switch -c feature/xxx' },
+      { d:'丢弃工作区未提交改动', c:'git restore .' },
+      { d:'取消已暂存但未提交的改动', c:'git restore --staged .' },
+      { d:'修改上一次提交的信息', c:'git commit --amend' },
+      { d:'交互式整理最近 5 次提交', c:'git rebase -i HEAD~5' },
+      { d:'带说明提交已跟踪文件', c:'git commit -am "fix: 修复审批驳回状态覆盖问题"' },
+      { d:'查看某文件的逐行改动', c:'git log -p -- src/main/java/App.java' },
+      { d:'查某几行代码是谁改的', c:'git blame -L 20,40 src/main/java/App.java' },
+      { d:'解决冲突后标记完成', c:'git add . && git commit' },
+      { d:'把本地提交推到远端指定分支', c:'git push origin HEAD:refs/heads/main' }
+    ]},
+    { cat:'SVN', items:[
+      { d:'更新到最新版本', c:'svn update' },
+      { d:'查看仓库或文件版本信息', c:'svn info' },
+      { d:'提交全部改动', c:'svn commit -m "fix: 修复统计接口 NPE"' },
+      { d:'查看本地改动差异', c:'svn diff' },
+      { d:'把差异存成补丁文件', c:'svn diff > fix.patch' },
+      { d:'查看某文件的提交历史', c:'svn log -v src/main/java/App.java' },
+      { d:'查看指定版本的改动', c:'svn diff -c 12345' },
+      { d:'回退到指定版本', c:'svn update -r 12345' },
+      { d:'撤销某文件的本地修改', c:'svn revert src/main/java/App.java' },
+      { d:'解决冲突后标记已解决', c:'svn resolve --accept=working src/main/java/App.java' },
+      { d:'新增文件并纳入版本控制', c:'svn add newfile.java' },
+      { d:'删除文件并纳入版本控制', c:'svn rm oldfile.java' },
+      { d:'导出干净代码（不含 .svn）', c:'svn export ^/trunk ./release' },
+      { d:'查看仓库目录结构', c:'svn list ^/' },
+      { d:'切换到分支', c:'svn switch ^/branches/release-v2' }
+    ]},
+    { cat:'Linux', items:[
+      { d:'查看各磁盘使用情况', c:'df -h' },
+      { d:'查看当前目录各项大小', c:'du -sh * | sort -h' },
+      { d:'查找占用某端口的进程', c:'lsof -i:8080' },
+      { d:'实时跟踪日志并过滤', c:'tail -f app.log | grep -i error' },
+      { d:'统计文件行数', c:'wc -l access.log' },
+      { d:'按文件名查找文件', c:'find /var/log -name "*.log"' },
+      { d:'按内容查找文件', c:'grep -rn "TODO" src/' },
+      { d:'统计访问 IP 排行', c:"awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -20" },
+      { d:'批量重命名文件', c:'for f in *.txt; do mv "$f" "${f%.txt}.md"; done' },
+      { d:'查看 Java 进程完整命令', c:'ps -ef | grep java' },
+      { d:'结束指定进程', c:'kill -9 12345' },
+      { d:'查看内存与系统负载', c:'free -h && uptime' },
+      { d:'测试端口连通性', c:'nc -zv 127.0.0.1 3306' },
+      { d:'按时间查看文件', c:'ls -lhtr' },
+      { d:'同步大文件到远程', c:'rsync -avz --progress ./dist/ root@host:/data/app/' },
+      { d:'就地替换文本', c:"sed -i 's/old/new/g' config.properties" },
+      { d:'打包并解压目录', c:'tar -zcvf backup.tar.gz dist/ && tar -zxvf backup.tar.gz' },
+      { d:'查看定时任务', c:'crontab -l' }
+    ]},
+    { cat:'Docker', items:[
+      { d:'查看运行中的容器', c:'docker ps' },
+      { d:'查看全部容器（含已停止）', c:'docker ps -a' },
+      { d:'拉取镜像', c:'docker pull nginx:1.25-alpine' },
+      { d:'构建镜像', c:'docker build -t myapp:1.0 .' },
+      { d:'后台启动容器并映射端口', c:'docker run -d --name web -p 8080:8080 myapp:1.0' },
+      { d:'进入容器执行命令', c:'docker exec -it web bash' },
+      { d:'跟踪查看容器日志', c:'docker logs -f --tail 100 web' },
+      { d:'停止并删除容器', c:'docker stop web && docker rm web' },
+      { d:'查看本地镜像', c:'docker images' },
+      { d:'清理无用镜像与构建缓存', c:'docker system prune -f' },
+      { d:'导出与导入镜像', c:'docker save -o myapp.tar myapp:1.0 && docker load -i myapp.tar' },
+      { d:'实时查看容器资源占用', c:'docker stats' },
+      { d:'查看容器端口映射', c:'docker port web' },
+      { d:'查看 Docker 网络', c:'docker network ls' },
+      { d:'带环境变量运行一次性容器', c:'docker run --rm -e TZ=Asia/Shanghai alpine date' }
+    ]},
+    { cat:'Maven', items:[
+      { d:'清理并打包（跳过测试）', c:'mvn clean package -DskipTests' },
+      { d:'仅编译', c:'mvn clean compile' },
+      { d:'运行单元测试', c:'mvn test' },
+      { d:'安装到本地仓库', c:'mvn clean install' },
+      { d:'指定 profile 打包', c:'mvn clean package -Pprod' },
+      { d:'离线构建', c:'mvn clean package -o' },
+      { d:'查看依赖树', c:'mvn dependency:tree' },
+      { d:'强制更新 SNAPSHOT 依赖', c:'mvn clean install -U' },
+      { d:'本地启动 Spring Boot', c:'mvn spring-boot:run' }
+    ]},
+    { cat:'MySQL', items:[
+      { d:'连接数据库', c:'mysql -h 127.0.0.1 -P 3306 -uroot -p' },
+      { d:'导出整个库', c:'mysqldump -uroot -p db > backup.sql' },
+      { d:'导入数据库', c:'mysql -uroot -p db < backup.sql' },
+      { d:'只导出表结构', c:'mysqldump -uroot -p --no-data db > schema.sql' },
+      { d:'导出单张表', c:'mysqldump -uroot -p db table_name > table.sql' },
+      { d:'导出查询结果为 CSV', c:'mysql -uroot -p db -e "SELECT * FROM table_name" > out.csv' },
+      { d:'查看正在执行的 SQL', c:'SHOW FULL PROCESSLIST;',
+        noteTitle:'输出列含义',
+        note:[
+          ['Id','连接线程号，杀阻塞会话时用它'],
+          ['User','发起连接的账号'],
+          ['Host','客户端地址与端口'],
+          ['db','当前所在的库'],
+          ['Command','Query 表示正在执行语句，Sleep 表示空闲连接（Sleep 多不代表有问题）'],
+          ['Time','该状态已持续秒数，持续偏大说明有慢查询或长事务'],
+          ['State','当前在做什么：Sending data 正在发送结果、Sending to client 等待客户端取数、Sorting 排序中、Copying to tmp table 落临时表、Waiting for table metadata lock 等锁等待'],
+          ['Info','正在执行的完整 SQL，Kill 掉卡死的会话先看这一列']
+        ]},
+      { d:'EXPLAIN 分析 SQL 执行计划', c:'EXPLAIN SELECT * FROM t_order WHERE company_id = 100 AND status = 1;',
+        noteTitle:'返回列含义',
+        note:[
+          ['id','查询编号，值越大越先执行；id 相同时按从上到下的顺序执行'],
+          ['select_type','查询类型：SIMPLE 简单查询、PRIMARY 外层查询、UNION 联合、DEPENDENT UNION 依赖子查询、SUBQUERY 子查询、DERIVED 派生表、MATERIALIZED 物化子查询'],
+          ['table','这一行实际访问的表'],
+          ['partitions','命中的分区，单分区表恒为 NULL'],
+          ['type','访问类型，直接决定性能：const 主键或唯一索引等值命中 → eq_ref 唯一索引关联每次一行 → ref 普通索引等值查找 → range 范围扫描 → index 全索引扫描 → ALL 全表扫描；出现 ALL 基本等于没走索引'],
+          ['possible_keys','优化器认为可能用到的索引'],
+          ['key','实际选用的索引，为 NULL 说明没有走索引'],
+          ['key_len','实际使用的索引长度，可据此判断联合索引用到了几列'],
+          ['ref','与索引比较的列或常量：const 表示与常量比较，其余为字段名'],
+          ['rows','预估需要扫描的行数，越小越好'],
+          ['filtered','经过存储引擎条件过滤后剩余的百分比，rows × filtered 接近实际返回行数'],
+          ['Extra','额外信息，重点看：Using index 覆盖索引无需回表、Using where 需二次过滤、Using filesort 需要额外排序、Using temporary 使用了临时表、Using join buffer 关联时没走上索引']
+        ]},
+      { d:'EXPLAIN ANALYZE 实际执行并计时（MySQL 8.0.18+）', c:'EXPLAIN ANALYZE SELECT * FROM t_order WHERE company_id = 100 AND status = 1;',
+        noteTitle:'使用说明',
+        note:[
+          ['说明','真正跑一遍查询，逐个算子输出实际行数与耗时，比 EXPLAIN 的估算更准'],
+          ['注意','会真实执行语句，对 UPDATE / DELETE 慎用；建议先在只读副本上验证']
+        ]},
+      { d:'查看所有数据库', c:'SHOW DATABASES;' },
+      { d:'查看所有表', c:'SHOW TABLES;' },
+      { d:'查看建表语句', c:'SHOW CREATE TABLE table_name\\G' },
+      { d:'查看表索引', c:'SHOW INDEX FROM table_name;' },
+      { d:'查看各表数据行数', c:"SELECT table_name, table_rows FROM information_schema.tables WHERE table_schema = 'db';" },
+      { d:'查看慢查询开关', c:"SHOW VARIABLES LIKE 'slow_query_log';" }
+    ]},
+    { cat:'Redis', items:[
+      { d:'启动 Redis 服务', c:'redis-server --port 6379 --daemonize yes' },
+      { d:'连接 Redis', c:'redis-cli -h 127.0.0.1 -p 6379' },
+      { d:'查看服务器信息', c:'redis-cli info' },
+      { d:'查看内存占用', c:'redis-cli info memory' },
+      { d:'查看键数量', c:'redis-cli dbsize' },
+      { d:'列出键名（生产慎用）', c:'redis-cli keys "*"' },
+      { d:'查看键的过期时间', c:'redis-cli ttl user:1001' },
+      { d:'查看慢日志', c:'redis-cli slowlog get 10' },
+      { d:'查看内存淘汰策略', c:'redis-cli config get maxmemory-policy' },
+      { d:'后台生成 RDB 快照', c:'redis-cli bgsave' }
+    ]},
+    { cat:'Nginx', items:[
+      { d:'检查配置文件语法', c:'nginx -t' },
+      { d:'重载配置（不中断服务）', c:'nginx -s reload' },
+      { d:'停止 Nginx', c:'nginx -s stop' },
+      { d:'查看实际生效的完整配置', c:'nginx -T | grep -n "server_name"' },
+      { d:'查看监听端口', c:'netstat -tlnp | grep nginx' },
+      { d:'跟踪访问日志', c:'tail -f /var/log/nginx/access.log' },
+      { d:'统计 IP 访问量 TOP', c:"awk '{print $1}' access.log | sort | uniq -c | sort -rn | head" },
+      { d:'统计状态码分布', c:"awk '{print $9}' access.log | sort | uniq -c | sort -rn" },
+      { d:'平滑重启服务', c:'systemctl restart nginx' },
+      { d:'设置开机自启', c:'systemctl enable nginx' }
+    ]},
+    { cat:'Java', items:[
+      { d:'查看 Java 版本', c:'java -version' },
+      { d:'查看进程与主类', c:'jps -l' },
+      { d:'导出堆快照', c:'jmap -dump:live,format=b,file=heap.hprof 12345' },
+      { d:'查看对象数量排行（OOM 排查）', c:'jmap -histo:live 12345 | head -30' },
+      { d:'导出线程栈', c:'jstack 12345 > thread.txt' },
+      { d:'观察 GC 情况', c:'jstat -gcutil 12345 1000' },
+      { d:'打印进程内线程', c:'jcmd 12345 Thread.print' },
+      { d:'带堆内存限制启动', c:'java -Xms512m -Xmx1g -Xmn256m -XX:+HeapDumpOnOutOfMemoryError -jar app.jar' },
+      { d:'开启 GC 日志', c:'java -XX:+PrintGCDetails -Xlog:gc*:file=gc.log:time,uptime,level,tags -jar app.jar' }
+    ]}
+  ];
+
+  var CMD_LIST = [];
+  var CMD_BY_ID = {};
+  var cheatCat = '全部';
+  var cheatKey = '';
+  var cheatMap = {};
+
+  (function(){
+    var id = 0;
+    for(var g = 0; g < COMMANDS.length; g++){
+      var items = COMMANDS[g].items;
+      for(var i = 0; i < items.length; i++){
+        var key = 'cmd' + (id++);
+        var it = {
+          id:key, cat:COMMANDS[g].cat, d:items[i].d, c:items[i].c,
+          note:items[i].note || null, noteTitle:items[i].noteTitle || ''
+        };
+        CMD_LIST.push(it);
+        CMD_BY_ID[key] = it;
+      }
+    }
+  })();
+
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* ---------- 渲染 ---------- */
+  function renderTabs(){
+    var cats = ['全部'], seen = {};
+    for(var i = 0; i < CMD_LIST.length; i++){
+      if(!seen[CMD_LIST[i].cat]){ seen[CMD_LIST[i].cat] = 1; cats.push(CMD_LIST[i].cat); }
+    }
+    var html = '';
+    for(var j = 0; j < cats.length; j++){
+      var c = cats[j], n = 0;
+      if(c === '全部'){
+        n = CMD_LIST.length;
+      }else{
+        for(var k = 0; k < CMD_LIST.length; k++) if(CMD_LIST[k].cat === c) n++;
+      }
+      html += '<button class="ctab' + (c === cheatCat ? ' on' : '') + '" type="button" ' +
+              'aria-selected="' + (c === cheatCat) + '" data-cat="' + esc(c) + '">' + esc(c) +
+              '<span class="n">' + n + '</span></button>';
+    }
+    document.getElementById('tabs').innerHTML = html;
+  }
+
+  function render(){
+    var body = document.getElementById('body');
+    var key = cheatKey.trim().toLowerCase();
+    cheatMap = {};
+    var order = [];
+    for(var i = 0; i < CMD_LIST.length; i++){
+      var it = CMD_LIST[i];
+      if(cheatCat !== '全部' && it.cat !== cheatCat) continue;
+      if(key && it.d.toLowerCase().indexOf(key) < 0 && it.c.toLowerCase().indexOf(key) < 0) continue;
+      if(!cheatMap[it.cat]){ cheatMap[it.cat] = []; order.push(it.cat); }
+      cheatMap[it.cat].push(it);
+    }
+    if(!order.length){
+      body.innerHTML = '<div class="cempty">没有匹配的命令，换个关键词试试。</div>';
+      return;
+    }
+    var html = '';
+    for(var g = 0; g < order.length; g++){
+      var cat = order[g], list = cheatMap[cat];
+      html += '<section class="cgroup" id="grp-' + esc(cat) + '">';
+      html += '<div class="cgroup-head"><h2 class="cgroup-title">' + esc(cat) +
+              '<span class="n">' + list.length + ' 条</span></h2>' +
+              '<span class="sp"><button class="cbtn" type="button" data-act="copyGroup" data-cat="' + esc(cat) + '">复制本组</button></span></div>';
+      html += '<div class="cgrid">';
+      for(var k = 0; k < list.length; k++){
+        var card = list[k];
+        html += '<article class="ccard' + (card.note ? ' wide' : '') + '">' +
+                  '<div class="ccard-top"><span class="cdesc">' + esc(card.d) + '</span>' +
+                  '<button class="ccopy" type="button" data-act="copyCmd" data-cmd-id="' + card.id + '">复制</button></div>' +
+                  '<code class="ccmd">' + esc(card.c) + '</code>' +
+                  (card.note ? '<div class="cnote">' +
+                    '<div class="cnote-h">' + esc(card.noteTitle || '字段含义') + '</div>' +
+                    card.note.map(function(row){
+                      return '<div class="cn-row"><span class="cn-k">' + esc(row[0]) + '</span><span class="cn-v">' + esc(row[1]) + '</span></div>';
+                    }).join('') + '</div>' : '') +
+                '</article>';
+      }
+      html += '</div></section>';
+    }
+    body.innerHTML = html;
+  }
+
+  /* ---------- 复制与反馈 ---------- */
+  function toast(msg, type){
+    var wrap = document.getElementById('toastWrap');
+    var el = document.createElement('div');
+    el.className = 'toast' + (type ? ' ' + type : '');
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(function(){ el.classList.add('out'); }, 1800);
+    setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 2300);
+  }
+
+  function flash(btn, label){
+    if(!btn) return;
+    var orig = btn.getAttribute('data-label');
+    if(orig === null){ orig = btn.textContent; btn.setAttribute('data-label', orig); }
+    btn.textContent = label;
+    btn.classList.add('done');
+    clearTimeout(btn._timer);
+    btn._timer = setTimeout(function(){
+      btn.textContent = orig;
+      btn.classList.remove('done');
+    }, 1400);
+  }
+
+  function fallbackCopy(text){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-999px';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    }catch(e){ return false; }
+  }
+
+  function copyText(text, btn){
+    var done = function(){
+      toast('已复制到剪贴板 · ' + text.length + ' 字符', 'ok');
+      flash(btn, '已复制 ✓');
+    };
+    var failed = function(){
+      toast('复制失败，请手动选中后按 Ctrl+C', 'err');
+      flash(btn, '复制失败');
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){
+        if(fallbackCopy(text)) done(); else failed();
+      });
+    }else{
+      if(fallbackCopy(text)) done(); else failed();
+    }
+  }
+
+  function buildScript(list, withCat){
+    var script = '';
+    for(var i = 0; i < list.length; i++){
+      var it = list[i];
+      script += '# ' + (withCat ? '[' + it.cat + '] ' : '') + it.d + '\n';
+      if(it.note){
+        script += '#   —— ' + (it.noteTitle || '字段含义') + ' ——\n';
+        for(var j = 0; j < it.note.length; j++){
+          script += '#   ' + it.note[j][0] + ' —— ' + it.note[j][1] + '\n';
+        }
+      }
+      script += it.c + '\n\n';
+    }
+    return script.replace(/\n+$/, '\n');
+  }
+
+  var actions = {
+    copyCmd: function(btn){
+      var it = CMD_BY_ID[btn.getAttribute('data-cmd-id')];
+      if(it) copyText(it.c, btn);
+    },
+    copyGroup: function(btn){
+      var list = cheatMap[btn.getAttribute('data-cat')] || [];
+      if(!list.length){ toast('该分组当前没有可复制的命令', 'warn'); return; }
+      copyText(buildScript(list, false), btn);
+    }
+  };
+
+  /* ---------- 事件 ---------- */
+  document.addEventListener('click', function(e){
+    var act = e.target.closest('[data-act]');
+    if(act && actions[act.getAttribute('data-act')]){
+      e.preventDefault();
+      actions[act.getAttribute('data-act')](act);
+      return;
+    }
+    var tab = e.target.closest('.ctab');
+    if(tab){
+      cheatCat = tab.getAttribute('data-cat');
+      renderTabs();
+      render();
+      window.scrollTo({ top: document.querySelector('.hero').offsetHeight + 10, behavior: 'smooth' });
+    }
+  });
+
+  document.getElementById('search').addEventListener('input', function(e){
+    cheatKey = e.target.value;
+    render();
+  });
+  document.getElementById('search').addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      e.target.value = '';
+      cheatKey = '';
+      render();
+    }
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    document.getElementById('search').value = '';
+    cheatKey = '';
+    cheatCat = '全部';
+    renderTabs();
+    render();
+  });
+  document.getElementById('copyAll').addEventListener('click', function(e){
+    var all = [];
+    for(var c in cheatMap){
+      if(Object.prototype.hasOwnProperty.call(cheatMap, c)) all = all.concat(cheatMap[c]);
+    }
+    if(!all.length){ toast('当前没有可复制的命令', 'warn'); return; }
+    copyText(buildScript(all, true), e.currentTarget);
+  });
+
+  /* 顶栏高度 → 分类栏吸顶偏移 */
+  function syncTopbarHeight(){
+    var tb = document.querySelector('.topbar');
+    document.documentElement.style.setProperty('--tbh', tb.offsetHeight + 'px');
+  }
+  window.addEventListener('resize', syncTopbarHeight);
+  syncTopbarHeight();
+
+  renderTabs();
+  render();
+})();
+</script>
+</body>
+</html>

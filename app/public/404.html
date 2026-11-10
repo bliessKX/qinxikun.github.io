@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>页面不存在 — NICE.BLOG</title>
+<meta name="theme-color" content="#faf9f6">
+<style>
+:root{
+  --bg:#faf9f6;
+  --panel:#ffffff;
+  --ink:#1b1a18;
+  --muted:#857f74;
+  --line:#e6e2d9;
+  --accent:#9c3b2a;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --serif:"Noto Serif SC",Georgia,"Songti SC",serif;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:40px 20px;
+}
+a{color:inherit;text-decoration:none}
+.box{max-width:520px;width:100%}
+.code{
+  font-family:var(--mono);font-size:52px;font-weight:700;color:var(--line-strong);
+  line-height:1;margin:0 0 10px;letter-spacing:-.02em;
+}
+h1{
+  font-family:var(--serif);font-size:24px;font-weight:700;margin:0 0 8px;
+}
+p{margin:0 0 24px;font-size:14px;color:var(--muted)}
+.list{list-style:none;margin:0 0 22px;padding:0}
+.list li{margin-bottom:8px}
+.list a{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:11px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);
+  transition:border-color .18s ease,background .18s ease;
+}
+.list a:hover{border-color:var(--accent);background:#fdfaf7}
+.list .n{font-size:13.5px;font-weight:600}
+.list .p{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.list .arr{color:var(--accent);font-size:13px}
+.back{
+  display:inline-block;font-size:13px;color:var(--accent);font-weight:600;
+  border-bottom:1px solid rgba(156,59,42,.35);padding-bottom:1px;
+}
+.back:hover{border-color:var(--accent)}
+@media (max-width:600px){
+  .code{font-size:42px}
+  h1{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <p class="code">404</p>
+  <h1>这个页面不在了</h1>
+  <p>地址可能写错了，或者工具挪过位置。下面是现在还能用的入口 —— 每个工具都是一个独立页面。</p>
+
+  <ul class="list">
+    <li><a href="tools/json.html">
+      <span class="n">JSON 解析与格式化</span>
+      <span class="arr">→</span>
+    </a></li>
+    <li><a href="tools/commands.html">
+      <span class="n">常用命令速查</span>
+      <span class="arr">→</span>
+    </a></li>
+    <li><a href="tools/what-to-eat.html">
+      <span class="n">今天吃什么 · 转盘</span>
+      <span class="arr">→</span>
+    </a></li>
+    <li><a href="tools/index.html">
+      <span class="n">全部工具</span>
+      <span class="arr">→</span>
+    </a></li>
+  </ul>
+
+  <a class="back" href="index.html">← 回到笔记首页</a>
+</div>
+
+</body>
+</html>

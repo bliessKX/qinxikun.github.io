@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>JSON 解析与格式化 — NICE.BLOG</title>
+<meta name="description" content="对 JSON 文本或文件进行格式化、校验、修复、排序和压缩。">
+<meta name="theme-color" content="#faf9f6">
+<style>
+:root{
+  --bg:#faf9f6;
+  --panel:#ffffff;
+  --ink:#1b1a18;
+  --muted:#857f74;
+  --line:#e6e2d9;
+  --line-strong:#d6d0c3;
+  --accent:#9c3b2a;
+  --ok:#3e7d54;
+  --warn:#a5741f;
+  --err:#b03a2e;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --serif:"Noto Serif SC",Georgia,"Songti SC",serif;
+  --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,"Courier New",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+
+/* ---------- 顶栏 ---------- */
+.topbar{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:14px 26px;border-bottom:1px solid var(--line);
+  background:var(--bg);position:sticky;top:0;z-index:40;
+}
+.tb-brand{font-family:var(--serif);font-size:19px;font-weight:700;letter-spacing:.01em}
+.tb-brand:hover{color:var(--accent)}
+.tb-sep{width:1px;height:18px;background:var(--line-strong)}
+.tb-title{font-size:14px;color:var(--muted)}
+.tb-links{margin-left:auto;display:flex;align-items:center;gap:18px;font-size:13px;color:var(--muted)}
+.tb-links a:hover{color:var(--accent)}
+.tb-back{color:var(--accent);font-weight:600}
+
+/* ---------- 主体 ---------- */
+main{padding:22px 26px 40px;max-width:1400px;margin:0 auto}
+.intro{margin:0 0 18px;font-size:14px;color:var(--muted);max-width:76ch}
+.intro b{color:var(--ink);font-weight:600}
+
+/* ---------- 工具条 ---------- */
+.toolbar{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  padding:10px 12px;background:var(--panel);
+  border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:6px;margin-bottom:14px;
+}
+.tb-btn{
+  all:unset;cursor:pointer;
+  padding:6px 12px;border:1px solid var(--line-strong);border-radius:4px;
+  font-size:13px;line-height:1.5;color:var(--ink);white-space:nowrap;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.tb-btn:hover{background:rgba(0,0,0,.04);border-color:var(--ink)}
+.tb-btn:active{background:rgba(0,0,0,.07)}
+.tb-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tb-btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tb-btn.primary:hover{background:#8a3324;border-color:#8a3324}
+.tb-btn.danger{color:var(--err);border-color:#e6c3bd}
+.tb-btn.danger:hover{background:#fdf3f1;border-color:var(--err)}
+.tb-btn.done{
+  background:#eaf5ee;border-color:var(--ok);color:#2f7a4d;font-weight:600;
+}
+.tb-btn.done:hover{background:#eaf5ee;border-color:var(--ok);color:#2f7a4d}
+.tb-btn i{font-style:normal;font-size:10px;opacity:.65;margin-left:4px}
+.tb-sepv{width:1px;height:20px;background:var(--line);margin:0 3px}
+
+select.tb-sel{
+  appearance:none;-webkit-appearance:none;
+  padding:6px 30px 6px 11px;font-size:13px;color:var(--ink);
+  border:1px solid var(--line-strong);border-radius:4px;background:var(--panel);cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 13px,calc(100% - 10px) 13px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+select.tb-sel:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 下拉菜单 */
+.dd{position:relative;display:inline-block}
+.dd-menu{
+  position:absolute;top:calc(100% + 4px);left:0;z-index:60;
+  min-width:150px;padding:4px;background:var(--panel);
+  border:1px solid var(--line-strong);border-radius:5px;
+  box-shadow:0 6px 20px rgba(30,25,18,.1);
+  display:none;
+}
+.dd.open .dd-menu{display:block}
+.dd-menu button{
+  all:unset;cursor:pointer;display:block;width:100%;
+  padding:7px 10px;border-radius:3px;font-size:13px;color:var(--ink);
+}
+.dd-menu button:hover{background:rgba(156,59,42,.08);color:var(--accent)}
+.dd-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* ---------- 工作区 ---------- */
+.workspace{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;
+  align-items:stretch;
+}
+.workspace.full{
+  position:fixed;inset:0;z-index:80;gap:0;padding:52px 0 0;background:var(--bg);
+}
+.workspace.full .pane{border-radius:0;border-top:none;border-bottom:none;border-left:none;border-right:none}
+.workspace.full .pane:first-child{border-left:1px solid var(--line)}
+
+.pane{
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  display:flex;flex-direction:column;min-height:460px;overflow:hidden;
+}
+.pane-head{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:9px 12px;border-bottom:1px solid var(--line);
+  font-size:12px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;
+}
+.pane-head .sp{margin-left:auto;display:flex;align-items:center;gap:6px}
+.mini{
+  all:unset;cursor:pointer;font-size:12px;letter-spacing:0;text-transform:none;
+  padding:3px 9px;border:1px solid var(--line-strong);border-radius:4px;color:var(--ink);
+}
+.mini:hover{background:rgba(0,0,0,.04);border-color:var(--ink)}
+.mini:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tabs{display:flex;gap:4px}
+.tab{
+  all:unset;cursor:pointer;font-size:12px;letter-spacing:0;text-transform:none;
+  padding:3px 10px;border-radius:4px;color:var(--muted);
+}
+.tab.on{background:rgba(156,59,42,.09);color:var(--accent);font-weight:600}
+.tab:hover{color:var(--accent)}
+
+textarea#input{
+  flex:1;width:100%;min-height:380px;resize:vertical;border:none;outline:none;
+  padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.75;
+  color:var(--ink);background:transparent;tab-size:2;
+}
+textarea#input::placeholder{color:#b3aca0}
+
+.out-area{flex:1;overflow:auto;min-height:380px;position:relative}
+pre#outText{
+  margin:0;padding:14px 16px;font-family:var(--mono);font-size:13px;line-height:1.75;
+  color:var(--ink);white-space:pre-wrap;word-break:break-word;
+}
+pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-family:var(--sans)}
+#treeWrap{padding:10px 12px;font-family:var(--mono);font-size:13px;line-height:1.85;display:none}
+#treeWrap.on{display:block}
+#outText.off{display:none}
+.empty-tree{color:#b3aca0;font-family:var(--sans);padding:14px 16px}
+
+.pane-foot{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:7px 12px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);font-family:var(--mono);
+}
+.pane-foot .sp{margin-left:auto}
+
+/* 语法着色 */
+.j-key{color:#1f6f4a}
+.j-str{color:#8a5a12}
+.j-num{color:#2f5fa8}
+.j-bool{color:#9c3b2a}
+.j-null{color:#8d867a}
+
+/* 树形视图 */
+.tn{padding-left:16px;position:relative}
+.tn.root{padding-left:0}
+.th{display:flex;align-items:flex-start;gap:4px;white-space:pre-wrap;word-break:break-all}
+.tc{
+  all:unset;cursor:pointer;width:14px;flex:0 0 14px;text-align:center;
+  color:var(--muted);font-size:10px;line-height:1.9;
+}
+.tc:hover{color:var(--accent)}
+.tl{color:var(--ink)}
+.tl.tkey{color:#1f6f4a}
+.tbrace{color:var(--muted)}
+.tcount{color:#a9a294;font-size:11px;margin-left:6px}
+.tv{word-break:break-all}
+.tkids{padding-left:2px;border-left:1px dotted var(--line-strong);margin-left:6px}
+.tn.collapsed .tkids,.tn.collapsed .tfoot{display:none}
+.tfoot{color:var(--muted)}
+.hl{background:rgba(156,59,42,.14);border-radius:2px;box-shadow:0 0 0 2px rgba(156,59,42,.14)}
+.tree-bar{display:flex;align-items:center;gap:12px;padding:0 16px 10px;font-size:12px;color:var(--muted)}
+
+/* 状态条 */
+.status{
+  margin-top:14px;padding:10px 14px;background:var(--panel);
+  border:1px solid var(--line);border-left:3px solid var(--line-strong);
+  border-radius:6px;font-size:13px;color:var(--muted);
+  display:flex;align-items:flex-start;gap:10px;
+}
+.status.ok{border-left-color:var(--ok)}
+.status.ok .st{color:var(--ok);font-weight:600}
+.status.err{border-left-color:var(--err)}
+.status.err .st{color:var(--err);font-weight:600}
+.status.warn{border-left-color:var(--warn)}
+.status.warn .st{color:var(--warn);font-weight:600}
+.status .st{flex:0 0 auto}
+.status code{
+  font-family:var(--mono);font-size:12px;background:rgba(0,0,0,.045);
+  padding:1px 5px;border-radius:3px;
+}
+
+/* ---------- 浮层提示 Toast ---------- */
+.toast-wrap{
+  position:fixed;right:20px;bottom:20px;z-index:200;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-end;
+  pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:9px;
+  max-width:min(78vw,360px);
+  padding:9px 14px 9px 12px;
+  background:#26221c;color:#f6f2e9;
+  border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--muted);
+  border-radius:6px;font-size:13px;line-height:1.5;
+  box-shadow:0 8px 24px rgba(35,32,27,.22);
+  animation:toastIn .18s ease-out;
+}
+.toast.out{animation:toastOut .18s ease-in forwards}
+.toast.ok{border-left-color:#4f9d6b}
+.toast.err{border-left-color:#d0563f}
+.toast.warn{border-left-color:#d5902f}
+.toast .ti{
+  flex:0 0 auto;width:15px;height:15px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;line-height:1;
+  background:rgba(255,255,255,.12);
+}
+.toast.ok .ti{background:#4f9d6b;color:#fff}
+.toast.err .ti{background:#d0563f;color:#fff}
+.toast.warn .ti{background:#d5902f;color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateY(6px)}}
+
+/* ---------- 全屏浮层条 ---------- */
+.fs-bar{
+  position:fixed;top:9px;left:50%;transform:translateX(-50%);
+  z-index:120;display:none;align-items:center;gap:12px;
+  padding:6px 8px 6px 14px;
+  background:rgba(38,34,28,.94);color:#f6f2e9;
+  border:1px solid rgba(255,255,255,.1);border-radius:7px;
+  font-size:12.5px;box-shadow:0 8px 26px rgba(35,32,27,.3);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.fs-bar.on{display:flex}
+.fs-bar .fs-tag{
+  font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:#c9c0ae;
+}
+.fs-bar .fs-msg{
+  max-width:46vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:#f6f2e9;
+}
+.fs-bar .fs-hint{color:#a99f8c}
+.fs-bar kbd{
+  font-family:var(--mono);font-size:11px;border:1px solid rgba(255,255,255,.22);
+  border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:rgba(255,255,255,.06);
+}
+.fs-bar .fs-exit{
+  all:unset;cursor:pointer;padding:4px 11px;border-radius:4px;
+  background:rgba(255,255,255,.1);color:#f6f2e9;font-size:12.5px;font-weight:600;
+}
+.fs-bar .fs-exit:hover{background:rgba(255,255,255,.2)}
+.fs-bar .fs-exit:focus-visible{outline:2px solid #f6f2e9;outline-offset:2px}
+.tips{margin-top:22px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+.tips kbd{
+  font-family:var(--mono);font-size:11px;border:1px solid var(--line-strong);
+  border-bottom-width:2px;border-radius:3px;padding:1px 5px;background:var(--panel);color:var(--ink);
+}
+
+@media (max-width:900px){
+  .workspace{grid-template-columns:1fr}
+  .pane{min-height:340px}
+  textarea#input{min-height:240px}
+  .out-area{min-height:240px}
+  main{padding:18px 16px 34px}
+  .topbar{padding:12px 16px}
+  /* 窄屏收敛顶栏：只留「全部工具」与「返回主页」 */
+  .tb-links{gap:14px;font-size:12.5px}
+  .tb-links a:not(:first-child):not(.tb-back){display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="tb-brand" href="../index.html">NICE.BLOG</a>
+  <span class="tb-sep"></span>
+  <span class="tb-title">工具 · JSON 解析与格式化</span>
+  <nav class="tb-links">
+    <a href="index.html">全部工具</a>
+    <a href="commands.html">命令速查</a>
+    <a href="what-to-eat.html">今天吃什么</a>
+    <a class="tb-back" href="../index.html">← 返回主页</a>
+  </nav>
+</header>
+
+<main>
+  <p class="intro">对 JSON 文本或文件进行<b>格式化、校验、修复、排序和压缩</b>。纯前端运行，内容不离开浏览器。</p>
+
+  <!-- 工具条 -->
+  <div class="toolbar" id="toolbar">
+    <select class="tb-sel" id="indentSel" aria-label="缩进">
+      <option value="2">2 个空格缩进</option>
+      <option value="4">4 个空格缩进</option>
+      <option value="tab">Tab 缩进</option>
+    </select>
+
+    <div class="dd" data-dd="select">
+      <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">选择<i>▾</i></button>
+      <div class="dd-menu" role="menu">
+        <button type="button" data-act="all">全选文本</button>
+        <button type="button" data-act="keys">选中所有键</button>
+        <button type="button" data-act="values">选中所有值</button>
+        <button type="button" data-act="none">取消选择</button>
+      </div>
+    </div>
+
+    <button class="tb-btn primary" type="button" data-act="format">格式化</button>
+    <button class="tb-btn" type="button" data-act="validate">校验</button>
+    <button class="tb-btn" type="button" data-act="repair">修复</button>
+    <button class="tb-btn" type="button" data-act="minify">压缩</button>
+
+    <div class="dd" data-dd="sample">
+      <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">示例<i>▾</i></button>
+      <div class="dd-menu" role="menu">
+        <button type="button" data-act="sampleBlog">博客配置</button>
+        <button type="button" data-act="sampleApi">接口响应</button>
+        <button type="button" data-act="sampleArray">数组列表</button>
+        <button type="button" data-act="sampleDirty">脏数据（试修复）</button>
+        <button type="button" data-act="sampleUni">Unicode 转义</button>
+      </div>
+    </div>
+
+    <div class="dd" data-dd="sort">
+      <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">键排序<i>▾</i></button>
+      <div class="dd-menu" role="menu">
+        <button type="button" data-act="asc">键名升序</button>
+        <button type="button" data-act="desc">键名降序</button>
+      </div>
+    </div>
+
+    <div class="dd" data-dd="escape">
+      <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">转义<i>▾</i></button>
+      <div class="dd-menu" role="menu">
+        <button type="button" data-act="unicode">中文转 \uXXXX</button>
+        <button type="button" data-act="ununicode">\uXXXX 还原</button>
+        <button type="button" data-act="tostring">转为字符串字面量</button>
+      </div>
+    </div>
+
+    <span class="tb-sepv"></span>
+
+    <button class="tb-btn" type="button" data-act="copy" id="btnCopy">复制</button>
+    <button class="tb-btn" type="button" data-act="download">下载</button>
+    <button class="tb-btn" type="button" data-act="full" id="btnFull">全屏</button>
+    <button class="tb-btn" type="button" data-act="collapse">折叠</button>
+    <button class="tb-btn danger" type="button" data-act="clear">清空</button>
+  </div>
+
+  <!-- 工作区 -->
+  <div class="workspace" id="workspace">
+    <!-- 全屏浮层条：进入全屏时给出明确出口（置于工作区内，原生全屏下同样可见） -->
+    <div class="fs-bar" id="fsBar" role="status" aria-live="polite">
+      <span class="fs-tag">全屏</span>
+      <span class="fs-msg" id="fsMsg">按 Esc 或点右侧按钮退出</span>
+      <button class="fs-exit" type="button" id="fsExit">退出全屏</button>
+    </div>
+
+    <!-- 浮层提示 -->
+    <div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="false"></div>
+
+    <section class="pane">
+      <div class="pane-head">
+        输入
+        <span class="sp">
+          <button class="mini" type="button" data-act="open">打开文件</button>
+          <button class="mini" type="button" data-act="sample">示例</button>
+        </span>
+      </div>
+      <textarea id="input" spellcheck="false" placeholder="把 JSON 粘贴到这里，或点「打开文件」载入 .json 文件…"></textarea>
+      <div class="pane-foot">
+        <span id="inStat">行 1 · 列 1</span>
+        <span id="inSize">0 字符</span>
+        <span class="sp" id="inHint">拖入 .json 文件亦可</span>
+      </div>
+    </section>
+
+    <section class="pane">
+      <div class="pane-head">
+        输出
+        <span class="sp">
+          <span class="tabs">
+            <button class="tab on" type="button" data-view="text">文本</button>
+            <button class="tab" type="button" data-view="tree">树形</button>
+          </span>
+        </span>
+      </div>
+      <div class="out-area">
+        <pre id="outText"></pre>
+        <div id="treeWrap"></div>
+      </div>
+      <div class="pane-foot">
+        <span id="outStat">—</span>
+        <span class="sp" id="outHint"></span>
+      </div>
+    </section>
+  </div>
+
+  <div class="status" id="status">
+    <span class="st">就绪</span>
+    <span class="tx">粘贴 JSON 后点「格式化」。</span>
+  </div>
+
+  <p class="tips">
+    快捷键：<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Enter</kbd> 格式化 · <kbd>Esc</kbd> 退出全屏 · 编辑区按 <kbd>Tab</kbd> 插入缩进。
+    「修复」可处理：注释、单引号、中文引号、尾逗号、未加引号的键、<code>=</code> 误写、<code>True/False/None</code>、<code>NaN/Infinity</code>。
+  </p>
+</main>
+
+<input type="file" id="fileInput" accept=".json,.txt,application/json,text/plain" hidden>
+
+<script>
+(function(){
+  'use strict';
+
+  var input    = document.getElementById('input');
+  var outText  = document.getElementById('outText');
+  var treeWrap = document.getElementById('treeWrap');
+  var outStat  = document.getElementById('outStat');
+  var outHint  = document.getElementById('outHint');
+  var inStat   = document.getElementById('inStat');
+  var inSize   = document.getElementById('inSize');
+  var statusEl = document.getElementById('status');
+  var fileInput= document.getElementById('fileInput');
+
+  var indentMode = '2';
+  var lastData   = null;   // 最近一次成功解析的数据
+  var lastValid  = false;
+  var outRaw     = '';     // 输出区原始文本
+  var view       = 'text';
+
+  /* ============ 基础 ============ */
+  function indentStr(){
+    return indentMode === 'tab' ? '\t' : (indentMode === '4' ? '    ' : '  ');
+  }
+  function stringify(v){ return JSON.stringify(v, null, indentStr()); }
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function bytes(n){
+    if(n < 1024) return n + ' B';
+    if(n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+    return (n/1024/1024).toFixed(2) + ' MB';
+  }
+
+  function setStatus(kind, text, detail){
+    statusEl.className = 'status' + (kind ? ' ' + kind : '');
+    var st = statusEl.querySelector('.st');
+    var tx = statusEl.querySelector('.tx');
+    st.textContent = kind === 'ok' ? '成功' : (kind === 'err' ? '失败' : (kind === 'warn' ? '提示' : '就绪'));
+    tx.innerHTML = esc(text) + (detail ? ' ' + detail : '');
+  }
+
+  /* ============ 浮层提示 Toast ============ */
+  var toastWrap = document.getElementById('toastWrap');
+  function toast(text, kind){
+    kind = kind || 'ok';
+    var el = document.createElement('div');
+    el.className = 'toast ' + kind;
+    var mark = kind === 'err' ? '!' : (kind === 'warn' ? '!' : '✓');
+    el.innerHTML = '<span class="ti">' + mark + '</span><span>' + esc(text) + '</span>';
+    toastWrap.appendChild(el);
+    /* 最多同时保留 3 条 */
+    while(toastWrap.children.length > 3) toastWrap.removeChild(toastWrap.firstChild);
+    setTimeout(function(){
+      el.classList.add('out');
+      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 200);
+    }, 2600);
+  }
+
+  /* 按钮内联反馈：文案短暂变成「已复制」等 */
+  function flashBtn(btn, label, ms){
+    if(!btn) return;
+    if(btn._flashTimer) clearTimeout(btn._flashTimer);
+    var old = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', old);
+    btn.textContent = label;
+    btn.classList.add('done');
+    btn._flashTimer = setTimeout(function(){
+      btn.textContent = btn.getAttribute('data-label') || old;
+      btn.classList.remove('done');
+    }, ms || 1600);
+  }
+
+  /* ============ 解析与错误定位 ============ */
+  function parseErr(e, raw){
+    var msg = (e && e.message) ? e.message : String(e);
+    var out = { msg:msg, pos:-1, line:-1, col:-1 };
+    var mp = /position\s+(\d+)/.exec(msg);
+    if(mp) out.pos = parseInt(mp[1], 10);
+    var ml = /line\s+(\d+)\s+column\s+(\d+)/.exec(msg);
+    if(ml){ out.line = parseInt(ml[1],10); out.col = parseInt(ml[2],10); }
+    else if(out.pos >= 0){
+      var before = raw.slice(0, out.pos);
+      out.line = before.split('\n').length;
+      out.col  = out.pos - before.lastIndexOf('\n');
+    }
+    return out;
+  }
+  function errDetail(e, raw){
+    var p = parseErr(e, raw);
+    var bits = [];
+    if(p.line > 0) bits.push('第 ' + p.line + ' 行 第 ' + p.col + ' 列');
+    else if(p.pos >= 0) bits.push('第 ' + p.pos + ' 个字符处');
+    var tail = '<code>' + esc(p.msg) + '</code>';
+    return bits.length ? '（' + bits.join('，') + '） ' + tail : tail;
+  }
+
+  function tryParse(raw){
+    try{
+      var d = JSON.parse(raw);
+      lastData = d; lastValid = true;
+      return { ok:true, data:d };
+    }catch(e){
+      lastValid = false;
+      return { ok:false, err:e };
+    }
+  }
+
+  /* ============ 修复 ============ */
+  /* 把文本切成 comment / string / code 三类，便于安全改写 */
+  function scanSegments(s){
+    var segs = [], buf = '', i = 0, n = s.length;
+    function flush(){ if(buf){ segs.push({t:'code', v:buf}); buf = ''; } }
+    while(i < n){
+      var c = s[i];
+      if(c === '/' && s[i+1] === '/'){
+        flush();
+        var j = s.indexOf('\n', i); if(j < 0) j = n;
+        segs.push({t:'comment', v:s.slice(i,j)}); i = j; continue;
+      }
+      if(c === '/' && s[i+1] === '*'){
+        flush();
+        var k = s.indexOf('*/', i+2); k = (k < 0) ? n : k+2;
+        segs.push({t:'comment', v:s.slice(i,k)}); i = k; continue;
+      }
+      if(c === '#'){
+        flush();
+        var m = s.indexOf('\n', i); if(m < 0) m = n;
+        segs.push({t:'comment', v:s.slice(i,m)}); i = m; continue;
+      }
+      if(c === '"' || c === "'"){
+        flush();
+        var q = c, p = i+1, str = c;
+        while(p < n){
+          if(s[p] === '\\'){ str += s[p] + (s[p+1] || ''); p += 2; continue; }
+          str += s[p];
+          if(s[p] === q){ p++; break; }
+          p++;
+        }
+        segs.push({t:'str', v:str, q:q}); i = p; continue;
+      }
+      buf += c; i++;
+    }
+    flush();
+    return segs;
+  }
+
+  function fixKeysAndAssign(s){
+    var out = '', i = 0, n = s.length;
+    while(i < n){
+      var c = s[i];
+      if(c === '"'){
+        var j = i+1; out += c;
+        while(j < n){
+          if(s[j] === '\\'){ out += s[j] + (s[j+1] || ''); j += 2; continue; }
+          out += s[j];
+          if(s[j] === '"'){ j++; break; }
+          j++;
+        }
+        i = j; continue;
+      }
+      if(c === '=' && s[i+1] !== '=' && (i === 0 || '<>=!'.indexOf(s[i-1]) < 0)){
+        /* 只有「标识符 = 值」才改成冒号；前面没有键名时保留原样，避免产出悬空冒号 */
+        var back = out.replace(/\s+$/, '');
+        if(/[A-Za-z0-9_$"']$/.test(back)){ out += ':'; i++; continue; }
+        out += c; i++; continue;
+      }
+      var m = /^[A-Za-z_$][A-Za-z0-9_$]*/.exec(s.slice(i));
+      if(m){
+        var after = i + m[0].length, probe = after;
+        while(probe < n && /\s/.test(s[probe])) probe++;
+        var prevOk = (i === 0) || !/[A-Za-z0-9_$]/.test(s[i-1]);
+        if(prevOk && s[probe] === ':'){
+          out += '"' + m[0] + '"'; i = after; continue;
+        }
+        if(prevOk && s[probe] === '='){
+          /* 「键 = 值」：键加引号，等号改冒号 */
+          out += '"' + m[0] + '":'; i = probe + 1; continue;
+        }
+        out += m[0]; i = after; continue;
+      }
+      out += c; i++;
+    }
+    return out;
+  }
+
+  function removeTrailingCommas(s){
+    var out = '', i = 0, n = s.length;
+    while(i < n){
+      var c = s[i];
+      if(c === '"'){
+        var j = i+1; out += c;
+        while(j < n){
+          if(s[j] === '\\'){ out += s[j] + (s[j+1] || ''); j += 2; continue; }
+          out += s[j];
+          if(s[j] === '"'){ j++; break; }
+          j++;
+        }
+        i = j; continue;
+      }
+      if(c === ','){
+        var k = i+1;
+        while(k < n && /\s/.test(s[k])) k++;
+        if(k < n && (s[k] === '}' || s[k] === ']')){ i++; continue; }
+      }
+      out += c; i++;
+    }
+    return out;
+  }
+
+  function repairJson(src){
+    var segs = scanSegments(src);
+    var text = '';
+    for(var k = 0; k < segs.length; k++){
+      var s = segs[k];
+      if(s.t === 'comment') continue;                     // 去掉注释
+      if(s.t === 'str'){
+        if(s.q === "'"){                                 // 单引号 → 双引号
+          var body = s.v.slice(1,-1).replace(/\\'/g, "'").replace(/"/g, '\\"');
+          text += '"' + body + '"';
+        }else{
+          text += s.v;
+        }
+        continue;
+      }
+      var code = s.v
+        .replace(/[“”]/g, '"').replace(/[‘’]/g, '"')
+        .replace(/\bNone\b/g, 'null')
+        .replace(/\bTrue\b/g, 'true')
+        .replace(/\bFalse\b/g, 'false')
+        .replace(/-?\bInfinity\b/g, 'null')
+        .replace(/\bNaN\b/g, 'null');
+      text += code;
+    }
+    text = fixKeysAndAssign(text);
+    text = removeTrailingCommas(text);
+    return text;
+  }
+
+  /* ============ 排序 ============ */
+  function sortKeys(v, dir){
+    if(Array.isArray(v)) return v.map(function(x){ return sortKeys(x, dir); });
+    if(v && typeof v === 'object'){
+      var keys = Object.keys(v).sort(function(a,b){
+        var r = a.localeCompare(b, 'zh-Hans-CN', {numeric:true, sensitivity:'base'});
+        return dir === 'desc' ? -r : r;
+      });
+      var o = {};
+      keys.forEach(function(k){ o[k] = sortKeys(v[k], dir); });
+      return o;
+    }
+    return v;
+  }
+
+  function countKeys(v){
+    if(Array.isArray(v)) return v.reduce(function(a,x){ return a + countKeys(x); }, 0);
+    if(v && typeof v === 'object'){
+      return Object.keys(v).reduce(function(a,k){ return a + 1 + countKeys(v[k]); }, 0);
+    }
+    return 0;
+  }
+  function countNodes(v){
+    if(Array.isArray(v)) return v.reduce(function(a,x){ return a + countNodes(x); }, 0);
+    if(v && typeof v === 'object'){
+      return Object.keys(v).reduce(function(a,k){ return a + 1 + countNodes(v[k]); }, 0);
+    }
+    return 0;
+  }
+
+  /* ============ 语法着色 ============ */
+  function highlight(text){
+    var e = esc(text);
+    return e.replace(
+      /("(?:\\.|[^"\\])*")(\s*:)?|(-?\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b)|\b(true|false)\b|\b(null)\b/g,
+      function(m, str, colon, num, bool, nul){
+        if(str) return colon ? '<span class="j-key">' + str + '</span>' + colon : '<span class="j-str">' + str + '</span>';
+        if(num) return '<span class="j-num">' + num + '</span>';
+        if(bool) return '<span class="j-bool">' + bool + '</span>';
+        if(nul) return '<span class="j-null">' + nul + '</span>';
+        return m;
+      }
+    );
+  }
+  function scalarHtml(v){
+    if(typeof v === 'string') return '<span class="j-str">' + esc(JSON.stringify(v)) + '</span>';
+    if(typeof v === 'number') return '<span class="j-num">' + v + '</span>';
+    if(typeof v === 'boolean') return '<span class="j-bool">' + v + '</span>';
+    if(v === null) return '<span class="j-null">null</span>';
+    return '<span class="j-null">undefined</span>';
+  }
+
+  /* ============ 树形视图 ============ */
+  function buildTree(){
+    if(!lastValid){ setStatus('err', '当前内容不是合法 JSON，无法生成树形。'); switchView('text'); return; }
+    treeWrap.innerHTML = '';
+    var bar = document.createElement('div');
+    bar.className = 'tree-bar';
+    bar.innerHTML = '<span>共 ' + countNodes(lastData) + ' 个节点</span>' +
+      '<button class="mini" type="button" id="expandAll">展开全部</button>' +
+      '<button class="mini" type="button" id="collapseAll">全部折叠</button>';
+    treeWrap.appendChild(bar);
+    var root = document.createElement('div');
+    root.className = 'tn root';
+    treeWrap.appendChild(root);
+    root.appendChild(treeNode(null, lastData, false, true));
+    bar.querySelector('#expandAll').addEventListener('click', function(){ setAllCollapsed(false); });
+    bar.querySelector('#collapseAll').addEventListener('click', function(){ setAllCollapsed(true); });
+  }
+
+  function treeNode(label, value, isKey, isRoot){
+    var wrap = document.createElement('div');
+    wrap.className = 'tn' + (isRoot ? ' root' : '');
+    var head = document.createElement('div');
+    head.className = 'th';
+
+    var isObj = (value !== null && typeof value === 'object');
+    if(isObj){
+      var isArr = Array.isArray(value);
+      var keys = isArr ? value.map(function(_,i){ return i; }) : Object.keys(value);
+      var caret = document.createElement('button');
+      caret.type = 'button'; caret.className = 'tc'; caret.textContent = '▾';
+      caret.setAttribute('aria-expanded', 'true');
+      var lab = document.createElement('span');
+      lab.className = 'tl' + (isKey ? ' tkey' : '');
+      lab.textContent = (label !== null && label !== undefined) ? label + ': ' : '';
+      var brace = document.createElement('span');
+      brace.className = 'tbrace'; brace.textContent = isArr ? '[' : '{';
+      var cnt = document.createElement('span');
+      cnt.className = 'tcount'; cnt.textContent = isArr ? (keys.length + ' 项') : (keys.length + ' 键');
+
+      head.appendChild(caret); head.appendChild(lab); head.appendChild(brace); head.appendChild(cnt);
+      wrap.appendChild(head);
+
+      var kids = document.createElement('div');
+      kids.className = 'tkids';
+      keys.forEach(function(k){
+        kids.appendChild(treeNode(String(k), value[k], !isArr, false));
+      });
+      wrap.appendChild(kids);
+
+      var foot = document.createElement('div');
+      foot.className = 'tfoot'; foot.textContent = isArr ? ']' : '}';
+      wrap.appendChild(foot);
+
+      caret.addEventListener('click', function(){
+        var expanded = caret.getAttribute('aria-expanded') === 'true';
+        caret.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        caret.textContent = expanded ? '▸' : '▾';
+        brace.textContent = expanded ? (isArr ? '[ … ]' : '{ … }') : (isArr ? '[' : '{');
+        wrap.classList.toggle('collapsed', expanded);
+      });
+      return wrap;
+    }
+
+    var lab2 = document.createElement('span');
+    lab2.className = 'tl' + (isKey ? ' tkey' : '');
+    lab2.textContent = (label !== null && label !== undefined) ? label + ': ' : '';
+    var val = document.createElement('span');
+    val.className = 'tv tleaf'; val.innerHTML = scalarHtml(value);
+    head.appendChild(lab2); head.appendChild(val);
+    wrap.appendChild(head);
+    return wrap;
+  }
+
+  function setAllCollapsed(collapsed){
+    var carets = treeWrap.querySelectorAll('.tc');
+    for(var i = 0; i < carets.length; i++){
+      var c = carets[i];
+      var wrap = c.closest ? c.closest('.tn') : c.parentNode.parentNode;
+      var brace = wrap.querySelector('.tbrace');
+      var isArr = brace && brace.textContent.charAt(0) === '[';
+      var expanded = c.getAttribute('aria-expanded') === 'true';
+      if(collapsed && expanded){
+        c.setAttribute('aria-expanded','false'); c.textContent = '▸';
+        brace.textContent = isArr ? '[ … ]' : '{ … }';
+        wrap.classList.add('collapsed');
+      }else if(!collapsed && !expanded){
+        c.setAttribute('aria-expanded','true'); c.textContent = '▾';
+        brace.textContent = isArr ? '[' : '{';
+        wrap.classList.remove('collapsed');
+      }
+    }
+  }
+  function clearHighlight(){
+    var hs = treeWrap.querySelectorAll('.hl');
+    for(var i = 0; i < hs.length; i++) hs[i].classList.remove('hl');
+  }
+  function highlightTree(sel){
+    clearHighlight();
+    if(!lastValid){
+      setStatus('err', '当前内容不是合法 JSON，无法标记。');
+      toast('当前内容不是合法 JSON', 'err');
+      return;
+    }
+    /* 文本视图下树形 DOM 尚未生成，先建再切，否则标记无处落地 */
+    buildTree();
+    switchView('tree');
+    var list = treeWrap.querySelectorAll(sel);
+    for(var i = 0; i < list.length; i++) list[i].classList.add('hl');
+    if(list.length && list[0].scrollIntoView) list[0].scrollIntoView({block:'center'});
+    setStatus('ok', '已在树形视图中标记 ' + list.length + ' 处。');
+    toast('已标记 ' + list.length + ' 处', 'ok');
+  }
+
+  function switchView(v){
+    view = v;
+    var tabs = document.querySelectorAll('.tab');
+    for(var i = 0; i < tabs.length; i++){
+      tabs[i].classList.toggle('on', tabs[i].getAttribute('data-view') === v);
+    }
+    if(v === 'tree'){ outText.classList.add('off'); treeWrap.classList.add('on'); }
+    else { outText.classList.remove('off'); treeWrap.classList.remove('on'); }
+  }
+
+  /* ============ 输出 ============ */
+  function renderText(text, stat, hint){
+    outRaw = text;
+    outText.innerHTML = highlight(text);
+    outStat.textContent = stat || (text.length + ' 字符 · ' + bytes(new Blob([text]).size));
+    outHint.textContent = hint || '';
+  }
+  function renderTreeFromData(data, stat){
+    outRaw = stringify(data);
+    outText.innerHTML = highlight(outRaw);
+    outStat.textContent = stat || (outRaw.length + ' 字符 · ' + countKeys(data) + ' 个键');
+    outHint.textContent = '';
+    buildTree();
+  }
+  /* 只更新输出内容，不改变当前视图 */
+  function renderData(data, stat){
+    outRaw = stringify(data);
+    outText.innerHTML = highlight(outRaw);
+    outStat.textContent = stat || (outRaw.length + ' 字符 · ' + countKeys(data) + ' 个键');
+    outHint.textContent = '';
+    if(view === 'tree') buildTree();
+  }
+
+  /* ============ 动作 ============ */
+  var actions = {
+    format: function(){
+      var raw = input.value;
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var r = tryParse(raw);
+      if(!r.ok){
+        setStatus('err', 'JSON 解析失败。', errDetail(r.err, raw));
+        toast('JSON 解析失败，请检查语法', 'err');
+        return;
+      }
+      renderData(r.data);
+      setStatus('ok', '格式化成功：' + countKeys(r.data) + ' 个键 · ' + countNodes(r.data) + ' 个节点。');
+      toast('格式化成功 · ' + countKeys(r.data) + ' 个键', 'ok');
+    },
+    validate: function(){
+      var raw = input.value;
+      if(!raw.trim()){ setStatus('warn', '输入为空，无法校验。'); toast('输入为空，无法校验', 'warn'); return; }
+      var r = tryParse(raw);
+      if(r.ok){
+        setStatus('ok', '校验通过，是合法的 JSON。共 ' + countKeys(r.data) + ' 个键。');
+        toast('校验通过 · 是合法的 JSON', 'ok');
+      }else{
+        setStatus('err', '校验不通过。', errDetail(r.err, raw));
+        toast('校验不通过 · ' + ((r.err && r.err.msg) ? r.err.msg : 'JSON 非法'), 'err');
+      }
+    },
+    repair: function(){
+      var raw = input.value;
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var fixed = repairJson(raw);
+      var r = tryParse(fixed);
+      if(r.ok){
+        renderData(r.data, fixed.length + ' 字符 · ' + countKeys(r.data) + ' 个键');
+        setStatus('ok', '修复成功，已输出修复并格式化后的结果。');
+        toast('修复成功 · 已输出修复后的结果', 'ok');
+      }else{
+        renderText(fixed, fixed.length + ' 字符（修复后仍不合法）');
+        setStatus('warn', '已尽力修复，但仍不是合法 JSON，请手动检查。', errDetail(r.err, fixed));
+        toast('已尽力修复，但仍不合法，请手动检查', 'warn');
+      }
+    },
+    minify: function(){
+      var raw = input.value;
+      if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var r = tryParse(raw);
+      if(!r.ok){
+        setStatus('err', 'JSON 解析失败，无法压缩。', errDetail(r.err, raw));
+        toast('JSON 解析失败，无法压缩', 'err');
+        return;
+      }
+      renderText(JSON.stringify(r.data), JSON.stringify(r.data).length + ' 字符 · 已压缩');
+      setStatus('ok', '压缩完成。');
+      toast('压缩完成', 'ok');
+    },
+    asc: function(){ sortAction('asc'); },
+    desc: function(){ sortAction('desc'); },
+    unicode: function(){
+      var raw = input.value;
+      if(!raw){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var out = raw.replace(/[^\x00-\x7F]/g, function(ch){
+        return '\\u' + ('0000' + ch.charCodeAt(0).toString(16)).slice(-4);
+      });
+      renderText(out, out.length + ' 字符 · 非 ASCII 已转义');
+      setStatus('ok', '已把中文与非 ASCII 字符转成 \\uXXXX。');
+      toast('非 ASCII 字符已转成 \\uXXXX', 'ok');
+    },
+    ununicode: function(){
+      var raw = input.value;
+      if(!raw){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var out = raw.replace(/\\u([0-9a-fA-F]{4})/g, function(m,h){
+        return String.fromCharCode(parseInt(h,16));
+      }).replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\r/g,'\r');
+      renderText(out, out.length + ' 字符 · 已还原');
+      setStatus('ok', '已把 \\uXXXX 还原为原字符。');
+      toast('\\uXXXX 已还原为原字符', 'ok');
+    },
+    tostring: function(){
+      var r = tryParse(input.value);
+      var src = r.ok ? JSON.stringify(r.data) : input.value;
+      if(!src){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+      var lit = JSON.stringify(src);
+      renderText(lit, lit.length + ' 字符 · 字符串字面量');
+      setStatus('ok', '已转为带引号的字符串字面量。');
+      toast('已转为字符串字面量', 'ok');
+    },
+    copy: function(){
+      var text = (view === 'tree' && lastValid) ? stringify(lastData) : outRaw;
+      if(!text){
+        setStatus('warn', '输出区还是空的，没有可复制的内容。');
+        toast('输出区还是空的，没有可复制的内容', 'warn');
+        return;
+      }
+      copyText(text);
+    },
+    download: function(){
+      var text = (view === 'tree' && lastValid) ? stringify(lastData) : outRaw;
+      if(!text){ setStatus('warn', '输出区还是空的，没有可下载的内容。'); return; }
+      var blob = new Blob([text], {type:'application/json;charset=utf-8'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'data.json';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      setStatus('ok', '已下载 data.json。');
+      toast('已下载 data.json', 'ok');
+    },
+    full: function(){
+      var on = toggleFullscreen();
+      if(on){
+        setStatus('ok', '已进入全屏，按 Esc 或点右上角「退出全屏」返回。');
+        toast('已进入全屏 · 按 Esc 退出', 'ok');
+      }else{
+        setStatus('ok', '已退出全屏。');
+        toast('已退出全屏', 'ok');
+      }
+    },
+    collapse: function(){
+      if(!lastValid){
+        var r = tryParse(input.value);
+        if(!r.ok){
+          setStatus('err', '当前内容不是合法 JSON。', errDetail(r.err, input.value));
+          toast('当前内容不是合法 JSON', 'err');
+          return;
+        }
+      }
+      buildTree();
+      switchView('tree');
+      setAllCollapsed(true);
+      setStatus('ok', '已折叠为树形视图。');
+      toast('已折叠为树形视图', 'ok');
+    },
+    clear: function(){
+      input.value = '';
+      outRaw = ''; lastData = null; lastValid = false;
+      outText.innerHTML = '';
+      treeWrap.innerHTML = '';
+      outStat.textContent = '—'; outHint.textContent = '';
+      switchView('text');
+      updateInputStat();
+      setStatus('ok', '已清空。');
+      toast('已清空', 'ok');
+      input.focus();
+    },
+    open: function(){ fileInput.click(); },
+    sample: function(){
+      input.value = SAMPLES.blog;
+      updateInputStat();
+      setStatus('ok', '已填入示例数据，点「格式化」试试。');
+      toast('已填入示例数据', 'ok');
+      input.focus();
+    },
+    sampleBlog: function(){ loadSample('blog'); },
+    sampleApi:  function(){ loadSample('api'); },
+    sampleArray:function(){ loadSample('array'); },
+    sampleDirty:function(){ loadSample('dirty'); },
+    sampleUni:  function(){ loadSample('unicode'); },
+    all: function(){
+      input.focus(); input.select();
+      setStatus('ok', '已全选输入内容。');
+    },
+    keys: function(){ highlightTree('.tkey'); },
+    values: function(){ highlightTree('.tleaf'); },
+    none: function(){
+      clearHighlight();
+      input.focus();
+      if(input.setSelectionRange) input.setSelectionRange(0,0);
+      setStatus('ok', '已取消选择。');
+      toast('已取消选择', 'ok');
+    }
+  };
+
+  function sortAction(dir){
+    var raw = input.value;
+    if(!raw.trim()){ setStatus('warn', '输入为空。'); toast('输入为空', 'warn'); return; }
+    var r = tryParse(raw);
+    if(!r.ok){
+      setStatus('err', 'JSON 解析失败，无法排序。', errDetail(r.err, raw));
+      toast('JSON 解析失败，无法排序', 'err');
+      return;
+    }
+    var sorted = sortKeys(r.data, dir);
+    renderData(sorted);
+    setStatus('ok', '已按键名' + (dir === 'asc' ? '升序' : '降序') + '排序。');
+    toast('已按键名' + (dir === 'asc' ? '升序' : '降序') + '排序', 'ok');
+  }
+
+  function copyText(text, btn){
+    var target = btn || document.getElementById('btnCopy');
+    var done = function(){
+      setStatus('ok', '已复制到剪贴板（' + text.length + ' 字符）。');
+      toast('已复制到剪贴板 · ' + text.length + ' 字符', 'ok');
+      flashBtn(target, '已复制 ✓');
+    };
+    var failed = function(){
+      setStatus('err', '复制失败，请手动选中内容后按 Ctrl+C。');
+      toast('复制失败，请手动选中后按 Ctrl+C', 'err');
+      flashBtn(target, '复制失败');
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){
+        /* Clipboard API 在非安全上下文会失败，退回 execCommand */
+        if(fallbackCopy(text)) done();
+        else failed();
+      });
+    }else{
+      if(fallbackCopy(text)) done();
+      else failed();
+    }
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly','');
+    ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0';
+    ta.style.opacity = '0'; ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+    ta.remove();
+    return ok;
+  }
+
+  /* ============ 事件绑定 ============ */
+  var SAMPLES = {
+    blog: '{\n' +
+      '  "name": "NICE.BLOG",\n' +
+      '  "desc": "个人博客主页 · 技术笔记",\n' +
+      '  "version": "1.0.0",\n' +
+      '  "tags": ["java", "spring-boot", "mysql", "react"],\n' +
+      '  "stats": { "notes": 10, "tools": 2 },\n' +
+      '  "author": { "nickname": "nice", "email": "iceio@outlook.com" },\n' +
+      '  "links": null,\n' +
+      '  "enabled": true\n' +
+      '}',
+    api: '{\n' +
+      '  "code": 200,\n' +
+      '  "message": "success",\n' +
+      '  "data": {\n' +
+      '    "total": 3,\n' +
+      '    "list": [\n' +
+      '      { "id": 1, "title": "第一条笔记", "views": 128, "tags": ["java"] },\n' +
+      '      { "id": 2, "title": "第二条笔记", "views": 96,  "tags": ["mysql", "react"] },\n' +
+      '      { "id": 3, "title": "第三条笔记", "views": 0,   "tags": [] }\n' +
+      '    ]\n' +
+      '  }\n' +
+      '}',
+    array: '[\n' +
+      '  { "id": 1, "name": "张三", "age": 28, "roles": ["admin", "dev"] },\n' +
+      '  { "id": 2, "name": "李四", "age": 34, "roles": ["dev"] },\n' +
+      '  { "id": 3, "name": "王五", "age": 41, "roles": [] }\n' +
+      ']',
+    dirty: '{\n' +
+      "  name: 'NICE.BLOG',   // 单引号 + 注释\n" +
+      '  version: "1.0.0",\n' +
+      '  tags: ["java", "mysql",],\n' +
+      '  active: True,\n' +
+      '  extra: None,\n' +
+      '  count = 10\n' +
+      '}',
+    unicode: '{\n' +
+      '  "中文": "\\u4f60\\u597d",\n' +
+      '  "emoji": "\\ud83d\\ude00",\n' +
+      '  "路径": "C:\\\\Users\\\\nice\\\\logs"\n' +
+      '}'
+  };
+
+  function loadSample(key){
+    var text = SAMPLES[key];
+    if(!text) return;
+    input.value = text;
+    updateInputStat();
+    var names = {
+      blog: '博客配置', api: '接口响应', array: '数组列表',
+      dirty: '脏数据（可测试修复）', unicode: 'Unicode 转义'
+    };
+    setStatus('ok', '已载入示例：' + (names[key] || key) + '，点「格式化」查看效果。');
+    toast('已载入示例 · ' + (names[key] || key), 'ok');
+    input.focus();
+  }
+
+  function updateInputStat(){
+    var v = input.value;
+    var pos = input.selectionStart || 0;
+    var before = v.slice(0, pos);
+    var line = before.split('\n').length;
+    var col = pos - before.lastIndexOf('\n');
+    inStat.textContent = '行 ' + line + ' · 列 ' + col;
+    inSize.textContent = v.length + ' 字符 · ' + bytes(new Blob([v]).size);
+  }
+
+  input.addEventListener('input', updateInputStat);
+  input.addEventListener('keyup', updateInputStat);
+  input.addEventListener('click', updateInputStat);
+  input.addEventListener('keydown', function(e){
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      var s = input.selectionStart, t = input.selectionEnd;
+      input.value = input.value.slice(0,s) + '  ' + input.value.slice(t);
+      input.selectionStart = input.selectionEnd = s + 2;
+      updateInputStat();
+    }
+    if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+      e.preventDefault();
+      actions.format();
+    }
+  });
+
+  document.getElementById('indentSel').addEventListener('change', function(e){
+    indentMode = e.target.value;
+    if(lastValid && outRaw){
+      renderData(lastData);
+      setStatus('ok', '缩进已改为' + (indentMode === 'tab' ? 'Tab' : indentMode + ' 个空格') + '。');
+    }
+  });
+
+  /* 事件委托：绑在 document 上，面板头（示例/打开文件）等工具栏之外的按钮同样生效 */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    var act = btn.getAttribute('data-act');
+    if(actions[act]){ e.preventDefault(); actions[act](btn); }
+  });
+
+  /* ============ 全屏 ============ */
+  var ws      = document.getElementById('workspace');
+  var btnFull = document.getElementById('btnFull');
+  var fsBar   = document.getElementById('fsBar');
+  var fsMsg   = document.getElementById('fsMsg');
+
+  function toggleFullscreen(){
+    var on = !ws.classList.contains('full');
+    ws.classList.toggle('full', on);
+    document.body.style.overflow = on ? 'hidden' : '';
+
+    /* 浮层条：显示/隐藏，并给出明确退出提示 */
+    fsBar.classList.toggle('on', on);
+    fsMsg.textContent = on ? '按 Esc 或点右侧按钮退出' : '';
+
+    /* 按钮文案切换：全屏 ↔ 退出全屏 */
+    btnFull.textContent = on ? '退出全屏' : '全屏';
+    btnFull.classList.toggle('primary', on);
+
+    /* 优先使用浏览器原生全屏 API（可用时体验更一致），失败则退回 CSS 全屏 */
+    if(on){
+      if(ws.requestFullscreen && !document.fullscreenElement){
+        var p = ws.requestFullscreen({navigationUI:'hide'});
+        if(p && p.catch) p.catch(function(){/* 退回 CSS 全屏 */});
+      }
+    }else if(document.fullscreenElement){
+      if(document.exitFullscreen) document.exitFullscreen();
+    }
+    return on;
+  }
+
+  document.getElementById('fsExit').addEventListener('click', function(){
+    if(toggleFullscreen() === false){
+      setStatus('ok', '已退出全屏。');
+      toast('已退出全屏', 'ok');
+    }
+  });
+
+  /* 浏览器原生全屏被 Esc 退出时，同步 UI 状态 */
+  document.addEventListener('fullscreenchange', function(){
+    if(!document.fullscreenElement && ws.classList.contains('full')){
+      ws.classList.remove('full');
+      document.body.style.overflow = '';
+      fsBar.classList.remove('on');
+      btnFull.textContent = '全屏';
+      btnFull.classList.remove('primary');
+      setStatus('ok', '已退出全屏。');
+      toast('已退出全屏', 'ok');
+    }
+  });
+
+  var tabs = document.querySelectorAll('.tab');
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].addEventListener('click', function(){
+      var v = this.getAttribute('data-view');
+      if(v === 'tree'){
+        if(!lastValid){
+          var r = tryParse(input.value);
+          if(!r.ok){ setStatus('err', '当前内容不是合法 JSON。', errDetail(r.err, input.value)); return; }
+        }
+        buildTree();
+        switchView('tree');
+      }else{
+        switchView('text');
+      }
+    });
+  }
+
+  /* 下拉菜单 */
+  var dds = document.querySelectorAll('.dd');
+  function closeAll(except){
+    for(var i = 0; i < dds.length; i++){
+      if(dds[i] !== except){
+        dds[i].classList.remove('open');
+        dds[i].querySelector('.dd-btn').setAttribute('aria-expanded','false');
+      }
+    }
+  }
+  for(var j = 0; j < dds.length; j++){
+    (function(dd){
+      var btn = dd.querySelector('.dd-btn');
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = dd.classList.contains('open');
+        closeAll(dd);
+        dd.classList.toggle('open', !open);
+        btn.setAttribute('aria-expanded', String(!open));
+      });
+      dd.querySelector('.dd-menu').addEventListener('click', function(e){
+        if(e.target.tagName === 'BUTTON') closeAll(dd);
+      });
+    })(dds[j]);
+  }
+  document.addEventListener('click', function(){ closeAll(null); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      closeAll(null);
+      if(ws.classList.contains('full')) actions.full();
+    }
+  });
+
+  /* 文件 */
+  fileInput.addEventListener('change', function(){
+    var f = fileInput.files && fileInput.files[0];
+    if(!f) return;
+    readFile(f);
+    fileInput.value = '';
+  });
+  function readFile(f){
+    var fr = new FileReader();
+    fr.onload = function(){
+      input.value = String(fr.result);
+      updateInputStat();
+      setStatus('ok', '已载入文件「' + f.name + '」（' + bytes(f.size) + '）。');
+      actions.format();
+    };
+    fr.onerror = function(){ setStatus('err', '文件读取失败。'); };
+    fr.readAsText(f, 'utf-8');
+  }
+  ['dragenter','dragover'].forEach(function(ev){
+    document.addEventListener(ev, function(e){ e.preventDefault(); e.stopPropagation(); });
+  });
+  document.addEventListener('drop', function(e){
+    e.preventDefault(); e.stopPropagation();
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) readFile(f);
+  });
+
+  updateInputStat();
+  /* 首屏预置示例，避免两个空面板让人不知从何下手 */
+  input.value = SAMPLES.blog;
+  updateInputStat();
+  tryParse(input.value);
+  renderData(JSON.parse(input.value));
+  setStatus('', '已载入示例数据，可直接点「格式化」，或粘贴你自己的 JSON。');
+})();
+</script>
+</body>
+</html>

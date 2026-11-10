@@ -2,6 +2,38 @@
 
 个人博客主页，主要分享在日常开发中遇到的问题和解决方案。
 
+## 2.0 — Interactive Developer Platform（2026-11-10）
+
+React 18 + TypeScript + Vite 构建的交互式开发者平台，纯静态部署，零后端、零追踪。
+
+- **Home** `#/` — Canvas 粒子技术网络（视差/悬停/点击进图谱），精选内容
+- **Blog** `#/blog` — 11 篇真实项目笔记，搜索 + 详情 + 旧 hash 兼容（`#/3` 自动落对应笔记）
+- **Tools** `#/tools` — 工具中心，收藏/最近使用（localStorage）；旧工具页（`tools/*.html`）原样保留互跳
+- **Knowledge** `#/knowledge` — 自研 Canvas 力导向知识图谱：23 技术 + 11 文章 + 3 工具，搜索/筛选/详情/拖拽
+- **Lab** `#/lab` — JSON 工作台 / 正则测试器 / 时间戳·Base64（全部本机计算）
+- **Projects / About** — 真实脱敏项目与介绍
+
+### 开发
+
+```bash
+cd app
+npm install
+npm run dev      # 本地开发
+npm run build    # 构建到 app/dist（public/ 原样透传旧站面）
+```
+
+### 部署
+
+push `main` → GitHub Actions 构建（含旧站面守卫：CNAME/404/旧工具页缺失即失败）→ Pages 发布。
+首次启用需在仓库 Settings → Pages 把 Source 切到 **GitHub Actions**。
+
+### 架构与审计文档
+
+- `docs/sprint0/` — 项目审计 / 迁移方案 / URL 映射 / 文件变更计划 / 技术决策
+- `docs/2.0/` — 变更记录 / 测试报告 / 遗留任务
+
+## 1.0 旧站（仍完整保留）
+
 - **笔记**：收录 11 篇技术博文，涵盖鉴权、JDK 新特性、分页优化、MySQL 调优、Agent 编排与智能体选型等方向。
 - **工具**：`tools/`，日常用的小工具集合。**每个工具一个独立页面**，互不掺杂，可单独收藏地址直接使用。
   - `tools/index.html` —— 工具目录页。一张卡片一个工具，写清它能做什么，点进去就是该工具自己的页面；各工具页顶栏统一带「全部工具」入口，可随时互跳。
