@@ -287,8 +287,21 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   display:block;margin-top:6px;padding:6px 8px;
   background:rgba(0,0,0,.04);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;
   font-family:var(--mono);font-size:12px;line-height:1.6;color:var(--ink);
-  white-space:pre-wrap;word-break:break-all;
+  white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;
 }
+.ccard.wide{grid-column:1/-1}
+.cnote{
+  margin-top:9px;padding:10px 12px;border-radius:4px;
+  background:rgba(0,0,0,.028);border-left:2px solid var(--line-strong);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(min(460px,100%),1fr));gap:0 30px;
+}
+.cnote-h{
+  grid-column:1/-1;font-size:11.5px;letter-spacing:.06em;color:var(--muted);
+  padding:0 0 6px;margin-bottom:2px;border-bottom:1px solid rgba(0,0,0,.08);
+}
+.cn-row{display:flex;gap:10px;padding:4px 0;border-bottom:1px dashed rgba(0,0,0,.07)}
+.cn-k{flex:0 0 116px;font-family:var(--mono);font-size:11.5px;color:var(--accent);word-break:break-word;padding-top:1px}
+.cn-v{flex:1;font-size:12px;line-height:1.7;color:var(--muted)}
 .cheat-empty{padding:30px 10px;text-align:center;color:var(--muted);font-size:13px}
 
 /* ---------- 浮层提示 Toast ---------- */
@@ -369,6 +382,7 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   .cheat-search{margin-left:0;flex:1 1 100%}
   .cheat-body{max-height:330px;padding:12px 10px}
   .cgrid{grid-template-columns:1fr}
+  .cn-k{flex:0 0 92px}
 }
 </style>
 </head>
@@ -1125,7 +1139,15 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       if(!list.length){ toast('该分组当前没有可复制的命令', 'warn'); return; }
       var script = '';
       for(var i = 0; i < list.length; i++){
-        script += '# ' + list[i].d + '\n' + list[i].c + '\n\n';
+        script += '# ' + list[i].d + '\n';
+        /* 带说明的命令，把字段含义也写成注释，拷走即用 */
+        if(list[i].note){
+          script += '#   —— ' + (list[i].noteTitle || '字段含义') + ' ——\n';
+          for(var j = 0; j < list[i].note.length; j++){
+            script += '#   ' + list[i].note[j][0] + ' —— ' + list[i].note[j][1] + '\n';
+          }
+        }
+        script += list[i].c + '\n\n';
       }
       copyText(script.replace(/\n+$/, '\n'), btn);
     },
@@ -1335,6 +1357,40 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       { d:'只导出表结构', c:'mysqldump -uroot -p --no-data db > schema.sql' },
       { d:'导出单张表', c:'mysqldump -uroot -p db table_name > table.sql' },
       { d:'导出查询结果为 CSV', c:'mysql -uroot -p db -e "SELECT * FROM table_name" > out.csv' },
+      { d:'查看正在执行的 SQL', c:'SHOW FULL PROCESSLIST;',
+        noteTitle:'输出列含义',
+        note:[
+          ['Id','连接线程号，杀阻塞会话时用它'],
+          ['User','发起连接的账号'],
+          ['Host','客户端地址与端口'],
+          ['db','当前所在的库'],
+          ['Command','Query 表示正在执行语句，Sleep 表示空闲连接（Sleep 多不代表有问题）'],
+          ['Time','该状态已持续秒数，持续偏大说明有慢查询或长事务'],
+          ['State','当前在做什么：Sending data 正在发送结果、Sending to client 等待客户端取数、Sorting 排序中、Copying to tmp table 落临时表、Waiting for table metadata lock 等锁等待'],
+          ['Info','正在执行的完整 SQL，Kill 掉卡死的会话先看这一列']
+        ]},
+      { d:'EXPLAIN 分析 SQL 执行计划', c:'EXPLAIN SELECT * FROM t_order WHERE company_id = 100 AND status = 1;',
+        noteTitle:'返回列含义',
+        note:[
+          ['id','查询编号，值越大越先执行；id 相同时按从上到下的顺序执行'],
+          ['select_type','查询类型：SIMPLE 简单查询、PRIMARY 外层查询、UNION 联合、DEPENDENT UNION 依赖子查询、SUBQUERY 子查询、DERIVED 派生表、MATERIALIZED 物化子查询'],
+          ['table','这一行实际访问的表'],
+          ['partitions','命中的分区，单分区表恒为 NULL'],
+          ['type','访问类型，直接决定性能：const 主键或唯一索引等值命中 → eq_ref 唯一索引关联每次一行 → ref 普通索引等值查找 → range 范围扫描 → index 全索引扫描 → ALL 全表扫描；出现 ALL 基本等于没走索引'],
+          ['possible_keys','优化器认为可能用到的索引'],
+          ['key','实际选用的索引，为 NULL 说明没有走索引'],
+          ['key_len','实际使用的索引长度，可据此判断联合索引用到了几列'],
+          ['ref','与索引比较的列或常量：const 表示与常量比较，其余为字段名'],
+          ['rows','预估需要扫描的行数，越小越好'],
+          ['filtered','经过存储引擎条件过滤后剩余的百分比，rows × filtered 接近实际返回行数'],
+          ['Extra','额外信息，重点看：Using index 覆盖索引无需回表、Using where 需二次过滤、Using filesort 需要额外排序、Using temporary 使用了临时表、Using join buffer 关联时没走上索引']
+        ]},
+      { d:'EXPLAIN ANALYZE 实际执行并计时（MySQL 8.0.18+）', c:'EXPLAIN ANALYZE SELECT * FROM t_order WHERE company_id = 100 AND status = 1;',
+        noteTitle:'使用说明',
+        note:[
+          ['说明','真正跑一遍查询，逐个算子输出实际行数与耗时，比 EXPLAIN 的估算更准'],
+          ['注意','会真实执行语句，对 UPDATE / DELETE 慎用；建议先在只读副本上验证']
+        ]},
       { d:'查看所有数据库', c:'SHOW DATABASES;' },
       { d:'查看所有表', c:'SHOW TABLES;' },
       { d:'查看建表语句', c:'SHOW CREATE TABLE table_name\\G' },
@@ -1391,7 +1447,7 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       var items = COMMANDS[g].items;
       for(var i = 0; i < items.length; i++){
         var key = 'cmd' + (id++);
-        var it = { id:key, cat:COMMANDS[g].cat, d:items[i].d, c:items[i].c };
+        var it = { id:key, cat:COMMANDS[g].cat, d:items[i].d, c:items[i].c, note:items[i].note || null, noteTitle:items[i].noteTitle || '' };
         CMD_LIST.push(it);
         CMD_BY_ID[key] = it;
       }
@@ -1445,10 +1501,16 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
               '<span class="sp"><button class="mini" type="button" data-act="copyGroup" data-cat="' + esc(cat) + '">复制本组</button></span></div>';
       html += '<div class="cgrid">';
       for(var k = 0; k < list.length; k++){
-        html += '<article class="ccard">' +
-                  '<div class="ccard-top"><span class="cdesc">' + esc(list[k].d) + '</span>' +
-                  '<button class="ccopy" type="button" data-act="copyCmd" data-cmd-id="' + list[k].id + '">复制</button></div>' +
-                  '<code class="ccmd">' + esc(list[k].c) + '</code>' +
+        var card = list[k];
+        html += '<article class="ccard' + (card.note ? ' wide' : '') + '">' +
+                  '<div class="ccard-top"><span class="cdesc">' + esc(card.d) + '</span>' +
+                  '<button class="ccopy" type="button" data-act="copyCmd" data-cmd-id="' + card.id + '">复制</button></div>' +
+                  '<code class="ccmd">' + esc(card.c) + '</code>' +
+                  (card.note ? '<div class="cnote">' +
+                    '<div class="cnote-h">' + esc(card.noteTitle || '字段含义') + '</div>' +
+                    card.note.map(function(row){
+                      return '<div class="cn-row"><span class="cn-k">' + esc(row[0]) + '</span><span class="cn-v">' + esc(row[1]) + '</span></div>';
+                    }).join('') + '</div>' : '') +
                 '</article>';
       }
       html += '</div></section>';
