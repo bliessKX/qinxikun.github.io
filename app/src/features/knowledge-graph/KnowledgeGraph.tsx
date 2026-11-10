@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import raw from '../../data/graph.json'
 
 /* Sprint 6（2D 部分）— 知识图谱 Canvas 力导向实现。
@@ -29,8 +29,11 @@ export default function KnowledgeGraph() {
   const [cat, setCat] = useState('全部')
   const [sel, setSel] = useState<GNode | null>(null)
   const [params] = useSearchParams()
+  const nav = useNavigate()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  /* 节点坐标跨 effect 重跑持久化：搜索/选中触发重建时布局不重排 */
+  const nodesRef = useRef<XNode[]>([])
 
   /* 邻接表：用于悬停/选中时高亮邻居 */
   const adj = useMemo(() => {
@@ -63,7 +66,9 @@ export default function KnowledgeGraph() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
     let W = 0, H = 0, raf = 0, running = true, frame = 0
     let nodes: XNode[] = []
-    const drag = { id: null as string | null, ox: 0, oy: 0 }
+    /* 区分「点击」与「拖拽」：位移超过阈值才算拖拽，单击直接触发跳转/选中 */
+    const drag = { id: null as string | null, ox: 0, oy: 0, moved: false }
+    let downX = 0, downY = 0
     let hover: string | null = null
     let mouseX = -9999, mouseY = -9999
 
@@ -91,9 +96,16 @@ export default function KnowledgeGraph() {
       W = rect.width; H = rect.height
       canvas.width = W * dpr; canvas.height = H * dpr
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      if (!nodes.length) nodes = graph.nodes.map((n) => ({ ...n, x: 0, y: 0, vx: 0, vy: 0 }))
-      seed()
-      if (reduced) { for (let i = 0; i < 220; i++) tick(true); draw() }
+      let first = false
+      if (!nodesRef.current.length) {
+        nodesRef.current = graph.nodes.map((n) => ({ ...n, x: 0, y: 0, vx: 0, vy: 0 }))
+        first = true
+      }
+      nodes = nodesRef.current
+      if (first) {
+        seed()
+        if (reduced) { for (let i = 0; i < 220; i++) tick(true); draw() }
+      }
     }
 
     function tick(silent = false) {
@@ -200,25 +212,42 @@ export default function KnowledgeGraph() {
     function onDown(e: PointerEvent) {
       const p = pos(e)
       const n = pick(p.x, p.y)
-      if (n) { drag.id = n.id; drag.ox = p.x - n.x; drag.oy = p.y - n.y; canvas!.setPointerCapture(e.pointerId) }
+      downX = p.x; downY = p.y
+      if (n) { drag.id = n.id; drag.ox = p.x - n.x; drag.oy = p.y - n.y; drag.moved = false; canvas!.setPointerCapture(e.pointerId) }
     }
     function onMove(e: PointerEvent) {
       const p = pos(e)
       mouseX = p.x; mouseY = p.y
       if (drag.id) {
-        const n = nodes.find((x) => x.id === drag.id)
-        if (n) { n.x = p.x - drag.ox; n.y = p.y - drag.oy; n.vx = 0; n.vy = 0 }
+        if (!drag.moved && Math.hypot(p.x - downX, p.y - downY) > 4) drag.moved = true
+        if (drag.moved) {
+          const n = nodes.find((x) => x.id === drag.id)
+          if (n) { n.x = p.x - drag.ox; n.y = p.y - drag.oy; n.vx = 0; n.vy = 0 }
+        }
       } else {
         const n = pick(p.x, p.y)
         hover = n ? n.id : null
         canvas!.style.cursor = n ? 'pointer' : 'default'
       }
     }
+    /* 点击节点直达：有站内笔记走路由，有外链开新页，都没有才停留显示详情 */
+    function openNode(n: XNode) {
+      if (n.blog) nav('/blog/' + n.blog)
+      else if (n.url) {
+        if (n.url.startsWith('http')) window.open(n.url, '_blank', 'noopener')
+        else window.location.href = n.url
+      } else {
+        setSel({ ...n })
+      }
+    }
     function onUp(e: PointerEvent) {
-      if (drag.id) { drag.id = null; return }
+      const wasDrag = drag.id !== null && drag.moved
+      drag.id = null
+      if (wasDrag) return
       const p = pos(e)
       const n = pick(p.x, p.y)
-      setSel(n ? { ...n } : null)
+      if (n) openNode(n)
+      else setSel(null)
     }
     function onLeave() { hover = null; mouseX = mouseY = -9999 }
     function onVis() {
@@ -246,7 +275,7 @@ export default function KnowledgeGraph() {
       canvas.removeEventListener('pointerleave', onLeave)
       document.removeEventListener('visibilitychange', onVis)
     }
-  }, [q, cat, sel, adj])
+  }, [q, cat, sel, adj, nav])
 
   return (
     <div className="kg-wrap rise">
@@ -277,7 +306,7 @@ export default function KnowledgeGraph() {
         <span><span style={{ color: TYPE_COLOR.tech }}>●</span> 技术 {graph.nodes.filter((n) => n.type === 'tech').length}</span>
         <span><span style={{ color: TYPE_COLOR.article }}>●</span> 文章 {graph.nodes.filter((n) => n.type === 'article').length}</span>
         <span><span style={{ color: TYPE_COLOR.tool }}>●</span> 工具 {graph.nodes.filter((n) => n.type === 'tool').length}</span>
-        <span>边 {graph.edges.length} · 拖拽节点 · 点击查看关联</span>
+        <span>边 {graph.edges.length} · 拖拽节点 · 点击节点直达笔记与工具</span>
       </div>
     </div>
   )

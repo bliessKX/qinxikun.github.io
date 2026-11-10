@@ -2,7 +2,7 @@
   "nodes": [
     { "id": "java", "name": "Java", "type": "tech", "category": "语言", "description": "主力语言，后端全部业务线的基础。" },
     { "id": "python", "name": "Python", "type": "tech", "category": "语言", "description": "装饰器、脚本工具与 AI 生态的第二语言。" },
-    { "id": "spring-boot", "name": "Spring Boot", "type": "tech", "category": "框架", "description": "微服务底座，xq-platform 的骨架。" },
+    { "id": "spring-boot", "name": "Spring Boot", "type": "tech", "category": "框架", "description": "微服务底座，后端服务的骨架。" },
     { "id": "spring-cloud", "name": "Spring Cloud", "type": "tech", "category": "框架", "description": "服务注册、配置中心与网关体系。" },
     { "id": "spring-ai-alibaba", "name": "Spring AI Alibaba", "type": "tech", "category": "AI", "description": "Java 侧智能体快速落地路线。" },
     { "id": "langgraph", "name": "LangGraph", "type": "tech", "category": "AI", "description": "状态图编排的复杂智能体路线。" },
@@ -12,7 +12,7 @@
     { "id": "mysql", "name": "MySQL", "type": "tech", "category": "数据", "description": "主力存储，索引与执行计划的日常战场。" },
     { "id": "redis", "name": "Redis", "type": "tech", "category": "数据", "description": "基础数据多级缓存与热点加速。" },
     { "id": "rabbitmq", "name": "RabbitMQ", "type": "tech", "category": "中间件", "description": "异步消息与模块解耦。" },
-    { "id": "websocket", "name": "WebSocket", "type": "tech", "category": "网络", "description": "坐席-客户实时通道，心跳检测保活。" },
+    { "id": "websocket", "name": "WebSocket", "type": "tech", "category": "网络", "description": "浏览器与服务端的双向实时通道，心跳检测保活。" },
     { "id": "tcp-udp", "name": "TCP / UDP", "type": "tech", "category": "网络", "description": "传输层协议的取舍与排查。" },
     { "id": "jdk21", "name": "JDK 21", "type": "tech", "category": "语言", "description": "虚拟线程与新语法落地评估。" },
     { "id": "react", "name": "React", "type": "tech", "category": "前端", "description": "2.0 主站框架。" },

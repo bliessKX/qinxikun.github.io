@@ -8,20 +8,6 @@
     "link": "#/"
   },
   {
-    "id": "agent-platform",
-    "name": "智能客服系统",
-    "status": "迭代中",
-    "desc": "FastAPI + React 的多模型智能客服：多轮对话、FAQ 检索、意图识别、人工坐席接管（WebSocket 心跳保活）、会话持久化，附管理后台。",
-    "stack": ["FastAPI", "React", "WebSocket", "MySQL"]
-  },
-  {
-    "id": "curing-platform",
-    "name": "公路养护管理平台",
-    "status": "生产运行",
-    "desc": "Spring Cloud 微服务体系下的养护业务模块群：审批流、病害统计、性能调优与多数据库（MySQL/达梦）适配。日常踩坑的主要来源。",
-    "stack": ["Spring Boot", "Spring Cloud", "MyBatis-Plus", "Redis", "RabbitMQ"]
-  },
-  {
     "id": "tools-suite",
     "name": "站内工具集",
     "status": "持续扩充",

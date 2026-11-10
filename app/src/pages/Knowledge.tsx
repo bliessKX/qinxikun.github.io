@@ -10,7 +10,7 @@ export default function Knowledge() {
     <div className="page">
       <div className="page-head">
         <h1><span className="slash">/</span>knowledge</h1>
-        <p>把技术、文章、工具连成一张图。数据全部来自真实内容，节点链接指得进去；悬停看邻居，点击看详情，拖拽随意摆。</p>
+        <p>把技术、文章、工具连成一张图。数据全部来自真实内容，节点链接指得进去；悬停看邻居，点击节点直达笔记与工具，拖拽随意摆。</p>
       </div>
       <KnowledgeGraph />
     </div>
