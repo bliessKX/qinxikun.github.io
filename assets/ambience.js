@@ -93,8 +93,8 @@
     for(i = 0; i < 12; i++) specks.push({ x: Math.random() * W, y: Math.random() * H, r: 0.8 + Math.random() * 1.4, s: 0.12 + Math.random() * 0.22, ph: Math.random() * 6.28 });
     for(i = 0; i < 34; i++) leaves.push(newLeaf(true));
     /* 两排水稻：后排密而矮，前排疏而高（加大加浓到一眼可见） */
-    for(i = 0; i < 30; i++) riceBack.push({ x: (i + Math.random() * 0.7) * W / 30, h: 34 + Math.random() * 30, lean: (Math.random() - 0.5) * 9, earLen: 11 + Math.random() * 7, ph: Math.random() * 6.28 });
-    for(i = 0; i < 18; i++) riceFront.push({ x: (i + Math.random() * 0.8) * W / 18, h: 70 + Math.random() * 50, lean: (Math.random() - 0.5) * 18, earLen: 18 + Math.random() * 10, ph: Math.random() * 6.28 });
+    for(i = 0; i < 34; i++) riceBack.push({ x: (i + Math.random() * 0.7) * W / 34, h: 40 + Math.random() * 36, lean: (Math.random() - 0.5) * 9, earLen: 12 + Math.random() * 8, ph: Math.random() * 6.28 });
+    for(i = 0; i < 22; i++) riceFront.push({ x: (i + Math.random() * 0.8) * W / 22, h: 110 + Math.random() * 80, lean: (Math.random() - 0.5) * 20, earLen: 22 + Math.random() * 12, ph: Math.random() * 6.28 });
   }
 
   var t = 0;
@@ -148,8 +148,8 @@
     var sway = Math.sin(t * 0.013 + p.ph) * (front ? 5 : 3.2);
     var topX = p.x + p.lean + sway, topY = baseY - p.h;
     /* 秆 */
-    ctx.strokeStyle = front ? 'rgba(96,116,52,0.55)' : 'rgba(101,120,58,0.38)';
-    ctx.lineWidth = front ? 2.2 : 1.5;
+    ctx.strokeStyle = front ? 'rgba(88,108,46,0.72)' : 'rgba(101,120,58,0.45)';
+    ctx.lineWidth = front ? 2.6 : 1.6;
     ctx.beginPath();
     ctx.moveTo(p.x, baseY);
     ctx.quadraticCurveTo(p.x + (topX - p.x) * 0.3, baseY - p.h * 0.55, topX, topY);
@@ -174,10 +174,10 @@
       ctx.translate(gx2, gy2);
       ctx.rotate(dir * (0.5 + u * 1.2));
       ctx.fillStyle = front
-        ? 'rgba(196,156,62,' + (0.72 - u * 0.16) + ')'  /* 金黄谷粒 */
-        : 'rgba(176,155,80,0.45)';
+        ? 'rgba(186,142,48,' + (0.85 - u * 0.15) + ')'  /* 金黄谷粒 */
+        : 'rgba(176,155,80,0.5)';
       ctx.beginPath();
-      ctx.ellipse(0, 0, front ? 3.6 : 2.4, front ? 2 : 1.3, 0, 0, 6.283);
+      ctx.ellipse(0, 0, front ? 4.4 : 2.5, front ? 2.5 : 1.4, 0, 0, 6.283);
       ctx.fill();
       ctx.restore();
       gx = gx2; gy = gy2;
