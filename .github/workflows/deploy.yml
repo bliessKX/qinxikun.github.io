@@ -30,17 +30,25 @@ jobs:
       - name: Build
         working-directory: app
         run: npm run build
-      - name: Guard — CNAME / 404 / legacy tools must exist
+      - name: Stage — 水墨主站为根，React 2.0 挂载到 /2.0/
         run: |
-          test -f app/dist/CNAME || { echo "CNAME missing"; exit 1; }
-          test -f app/dist/404.html || { echo "404.html missing"; exit 1; }
-          test -f app/dist/tools/json.html || { echo "tools/json.html missing"; exit 1; }
-          test -f app/dist/tools/commands.html || { echo "tools/commands.html missing"; exit 1; }
-          test -f app/dist/tools/what-to-eat.html || { echo "tools/what-to-eat.html missing"; exit 1; }
-          echo "legacy surface OK"
+          mkdir -p site/2.0
+          cp -r index.html 404.html CNAME assets ink tools what-to-eat.html site/
+          cp -r app/dist/. site/2.0/
+      - name: Guard — 双站面完整性校验
+        run: |
+          test -f site/CNAME || { echo "CNAME missing"; exit 1; }
+          test -f site/404.html || { echo "404.html missing"; exit 1; }
+          test -f site/index.html || { echo "ink index missing"; exit 1; }
+          test -f site/tools/json.html || { echo "tools/json.html missing"; exit 1; }
+          test -f site/tools/commands.html || { echo "tools/commands.html missing"; exit 1; }
+          test -f site/tools/what-to-eat.html || { echo "tools/what-to-eat.html missing"; exit 1; }
+          test -f site/2.0/index.html || { echo "react index missing"; exit 1; }
+          test -f site/2.0/tools/json.html || { echo "2.0 tools missing"; exit 1; }
+          echo "both surfaces OK"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: app/dist
+          path: site
 
   deploy:
     needs: build
