@@ -376,6 +376,14 @@ var NOTES = [
     ]}
 ];
 
+/* 按发布时间倒序：最新的一篇排在最前。
+   排序放在数据层做，这样以后新增笔记直接 append 到数组末尾即可，
+   不必手工维护顺序，也不会因为插错位置把目录排乱。 */
+NOTES.sort(function(a, b){
+  if(a.date === b.date) return 0;
+  return a.date < b.date ? 1 : -1;
+});
+
 (function(){
   var list = document.getElementById('tocList');
   NOTES.forEach(function(n,i){
