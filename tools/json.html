@@ -326,6 +326,17 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     <button class="tb-btn" type="button" data-act="repair">修复</button>
     <button class="tb-btn" type="button" data-act="minify">压缩</button>
 
+    <div class="dd" data-dd="sample">
+      <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">示例<i>▾</i></button>
+      <div class="dd-menu" role="menu">
+        <button type="button" data-act="sampleBlog">博客配置</button>
+        <button type="button" data-act="sampleApi">接口响应</button>
+        <button type="button" data-act="sampleArray">数组列表</button>
+        <button type="button" data-act="sampleDirty">脏数据（试修复）</button>
+        <button type="button" data-act="sampleUni">Unicode 转义</button>
+      </div>
+    </div>
+
     <div class="dd" data-dd="sort">
       <button class="tb-btn dd-btn" type="button" aria-haspopup="true" aria-expanded="false">键排序<i>▾</i></button>
       <div class="dd-menu" role="menu">
@@ -803,12 +814,19 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   }
   function highlightTree(sel){
     clearHighlight();
-    if(!lastValid) return;
+    if(!lastValid){
+      setStatus('err', '当前内容不是合法 JSON，无法标记。');
+      toast('当前内容不是合法 JSON', 'err');
+      return;
+    }
+    /* 文本视图下树形 DOM 尚未生成，先建再切，否则标记无处落地 */
+    buildTree();
     switchView('tree');
     var list = treeWrap.querySelectorAll(sel);
     for(var i = 0; i < list.length; i++) list[i].classList.add('hl');
     if(list.length && list[0].scrollIntoView) list[0].scrollIntoView({block:'center'});
     setStatus('ok', '已在树形视图中标记 ' + list.length + ' 处。');
+    toast('已标记 ' + list.length + ' 处', 'ok');
   }
 
   function switchView(v){
@@ -990,12 +1008,17 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     },
     open: function(){ fileInput.click(); },
     sample: function(){
-      input.value = SAMPLE;
+      input.value = SAMPLES.blog;
       updateInputStat();
       setStatus('ok', '已填入示例数据，点「格式化」试试。');
       toast('已填入示例数据', 'ok');
       input.focus();
     },
+    sampleBlog: function(){ loadSample('blog'); },
+    sampleApi:  function(){ loadSample('api'); },
+    sampleArray:function(){ loadSample('array'); },
+    sampleDirty:function(){ loadSample('dirty'); },
+    sampleUni:  function(){ loadSample('unicode'); },
     all: function(){
       input.focus(); input.select();
       setStatus('ok', '已全选输入内容。');
@@ -1007,6 +1030,7 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
       input.focus();
       if(input.setSelectionRange) input.setSelectionRange(0,0);
       setStatus('ok', '已取消选择。');
+      toast('已取消选择', 'ok');
     }
   };
 
@@ -1063,16 +1087,62 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   }
 
   /* ============ 事件绑定 ============ */
-  var SAMPLE = '{\n' +
-    '  "name": "NICE.BLOG",\n' +
-    '  "desc": "个人博客主页 · 技术笔记",\n' +
-    '  "version": "1.0.0",\n' +
-    '  "tags": ["java", "spring-boot", "mysql", "react"],\n' +
-    '  "stats": { "notes": 10, "tools": 2 },\n' +
-    '  "author": { "nickname": "nice", "email": "iceio@outlook.com" },\n' +
-    '  "links": null,\n' +
-    '  "enabled": true\n' +
-    '}';
+  var SAMPLES = {
+    blog: '{\n' +
+      '  "name": "NICE.BLOG",\n' +
+      '  "desc": "个人博客主页 · 技术笔记",\n' +
+      '  "version": "1.0.0",\n' +
+      '  "tags": ["java", "spring-boot", "mysql", "react"],\n' +
+      '  "stats": { "notes": 10, "tools": 2 },\n' +
+      '  "author": { "nickname": "nice", "email": "iceio@outlook.com" },\n' +
+      '  "links": null,\n' +
+      '  "enabled": true\n' +
+      '}',
+    api: '{\n' +
+      '  "code": 200,\n' +
+      '  "message": "success",\n' +
+      '  "data": {\n' +
+      '    "total": 3,\n' +
+      '    "list": [\n' +
+      '      { "id": 1, "title": "第一条笔记", "views": 128, "tags": ["java"] },\n' +
+      '      { "id": 2, "title": "第二条笔记", "views": 96,  "tags": ["mysql", "react"] },\n' +
+      '      { "id": 3, "title": "第三条笔记", "views": 0,   "tags": [] }\n' +
+      '    ]\n' +
+      '  }\n' +
+      '}',
+    array: '[\n' +
+      '  { "id": 1, "name": "张三", "age": 28, "roles": ["admin", "dev"] },\n' +
+      '  { "id": 2, "name": "李四", "age": 34, "roles": ["dev"] },\n' +
+      '  { "id": 3, "name": "王五", "age": 41, "roles": [] }\n' +
+      ']',
+    dirty: '{\n' +
+      "  name: 'NICE.BLOG',   // 单引号 + 注释\n" +
+      '  version: "1.0.0",\n' +
+      '  tags: ["java", "mysql",],\n' +
+      '  active: True,\n' +
+      '  extra: None,\n' +
+      '  count = 10\n' +
+      '}',
+    unicode: '{\n' +
+      '  "中文": "\\u4f60\\u597d",\n' +
+      '  "emoji": "\\ud83d\\ude00",\n' +
+      '  "路径": "C:\\\\Users\\\\nice\\\\logs"\n' +
+      '}'
+  };
+
+  function loadSample(key){
+    var text = SAMPLES[key];
+    if(!text) return;
+    input.value = text;
+    updateInputStat();
+    var names = {
+      blog: '博客配置', api: '接口响应', array: '数组列表',
+      dirty: '脏数据（可测试修复）', unicode: 'Unicode 转义'
+    };
+    setStatus('ok', '已载入示例：' + (names[key] || key) + '，点「格式化」查看效果。');
+    toast('已载入示例 · ' + (names[key] || key), 'ok');
+    input.focus();
+  }
 
   function updateInputStat(){
     var v = input.value;
@@ -1109,11 +1179,12 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
     }
   });
 
-  document.getElementById('toolbar').addEventListener('click', function(e){
+  /* 事件委托：绑在 document 上，面板头（示例/打开文件）等工具栏之外的按钮同样生效 */
+  document.addEventListener('click', function(e){
     var btn = e.target.closest('[data-act]');
     if(!btn) return;
     var act = btn.getAttribute('data-act');
-    if(actions[act]) actions[act]();
+    if(actions[act]){ e.preventDefault(); actions[act](); }
   });
 
   /* ============ 全屏 ============ */
@@ -1245,7 +1316,12 @@ pre#outText:empty::after{content:"结果会显示在这里";color:#b3aca0;font-f
   });
 
   updateInputStat();
-  setStatus('', '粘贴 JSON 后点「格式化」，或先点「示例」载入一段数据。');
+  /* 首屏预置示例，避免两个空面板让人不知从何下手 */
+  input.value = SAMPLES.blog;
+  updateInputStat();
+  tryParse(input.value);
+  renderData(JSON.parse(input.value));
+  setStatus('', '已载入示例数据，可直接点「格式化」，或粘贴你自己的 JSON。');
 })();
 </script>
 </body>
