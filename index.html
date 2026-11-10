@@ -580,24 +580,26 @@ NOTES.sort(function(a, b){
   syncUI();
 
   var LEAF_COLORS = ['#c9a86a', '#b0713f', '#9c3b2a', '#a8843c'];
-  var specks = [], leaves = [], blades = [];
+  var specks = [], leaves = [], riceBack = [], riceFront = [];
 
   function newLeaf(anyY){
     return {
       x: Math.random() * W, y: anyY ? Math.random() * H : -24,
-      s: 6 + Math.random() * 8, vy: 0.35 + Math.random() * 0.55,
+      s: 7 + Math.random() * 9, vy: 0.4 + Math.random() * 0.65,
       ph: Math.random() * 6.28, rot: Math.random() * 6.28,
-      rs: (Math.random() - 0.5) * 0.02,
+      rs: (Math.random() - 0.5) * 0.025,
       c: LEAF_COLORS[Math.floor(Math.random() * LEAF_COLORS.length)],
-      a: 0.24 + Math.random() * 0.16
+      a: 0.36 + Math.random() * 0.2
     };
   }
   function initScene(){
-    specks = []; leaves = []; blades = [];
+    specks = []; leaves = []; riceBack = []; riceFront = [];
     var i;
     for(i = 0; i < 12; i++) specks.push({ x: Math.random() * W, y: Math.random() * H, r: 0.8 + Math.random() * 1.4, s: 0.12 + Math.random() * 0.22, ph: Math.random() * 6.28 });
-    for(i = 0; i < 18; i++) leaves.push(newLeaf(true));
-    for(i = 0; i < 16; i++) blades.push({ x: Math.random() * W, h: 26 + Math.random() * 46, ph: Math.random() * 6.28, w: 1 + Math.random() * 1.2 });
+    for(i = 0; i < 34; i++) leaves.push(newLeaf(true));
+    /* 两排水稻：后排密而矮，前排疏而高 */
+    for(i = 0; i < 26; i++) riceBack.push({ x: (i + Math.random() * 0.7) * W / 26, h: 26 + Math.random() * 22, lean: (Math.random() - 0.5) * 8, earLen: 10 + Math.random() * 6, ph: Math.random() * 6.28 });
+    for(i = 0; i < 15; i++) riceFront.push({ x: (i + Math.random() * 0.8) * W / 15, h: 52 + Math.random() * 36, lean: (Math.random() - 0.5) * 16, earLen: 16 + Math.random() * 9, ph: Math.random() * 6.28 });
   }
   initScene();
 
@@ -606,21 +608,21 @@ NOTES.sort(function(a, b){
     /* 田野渐变带：占下方约一半，青绿打底、稻金色收边 */
     var base = ctx.createLinearGradient(0, H * 0.42, 0, H);
     base.addColorStop(0, 'rgba(122,143,77,0)');
-    base.addColorStop(0.55, 'rgba(122,143,77,0.09)');
-    base.addColorStop(1, 'rgba(93,112,64,0.16)');
+    base.addColorStop(0.55, 'rgba(122,143,77,0.11)');
+    base.addColorStop(1, 'rgba(93,112,64,0.2)');
     ctx.fillStyle = base; ctx.fillRect(0, H * 0.42, W, H * 0.58);
     var gold = ctx.createLinearGradient(0, H * 0.5, 0, H);
     gold.addColorStop(0, 'rgba(217,180,91,0)');
-    gold.addColorStop(1, 'rgba(217,180,91,0.07)');
+    gold.addColorStop(1, 'rgba(217,180,91,0.09)');
     ctx.fillStyle = gold; ctx.fillRect(0, H * 0.5, W, H * 0.5);
     /* 右上日光晕 */
     var sun = ctx.createRadialGradient(W * 0.82, H * 0.12, 0, W * 0.82, H * 0.12, Math.max(W, H) * 0.42);
     sun.addColorStop(0, 'rgba(255,243,214,0.14)');
     sun.addColorStop(1, 'rgba(255,243,214,0)');
     ctx.fillStyle = sun; ctx.fillRect(0, 0, W, H);
-    /* 三道风吹稻浪的浅波纹 */
-    var rows = [H * 0.55, H * 0.68, H * 0.82], amp = [6, 9, 13], alp = [0.06, 0.08, 0.1];
-    for(var k = 0; k < 3; k++){
+    /* 两道浅波纹（远处田面水光，弱化让位给稻子） */
+    var rows = [H * 0.6, H * 0.72], amp = [6, 9], alp = [0.05, 0.07];
+    for(var k = 0; k < 2; k++){
       ctx.strokeStyle = 'rgba(109,127,69,' + alp[k] + ')';
       ctx.lineWidth = 1.4 + k * 0.5;
       ctx.beginPath();
@@ -630,17 +632,10 @@ NOTES.sort(function(a, b){
       }
       ctx.stroke();
     }
-    /* 前景稻叶轻摇 */
-    ctx.strokeStyle = 'rgba(109,127,69,0.13)';
-    for(var b = 0; b < blades.length; b++){
-      var bl = blades[b];
-      var bend = Math.sin(t * 0.014 + bl.ph) * bl.h * 0.28;
-      ctx.lineWidth = bl.w;
-      ctx.beginPath();
-      ctx.moveTo(bl.x, H + 2);
-      ctx.quadraticCurveTo(bl.x + bend * 0.4, H - bl.h * 0.6, bl.x + bend, H - bl.h);
-      ctx.stroke();
-    }
+    /* 后排稻子（远，矮，偏绿，淡） */
+    for(var r = 0; r < riceBack.length; r++) drawRicePlant(riceBack[r], H * 0.86, false);
+    /* 前排稻子（近，高，带金黄垂穗） */
+    for(var f = 0; f < riceFront.length; f++) drawRicePlant(riceFront[f], H + 6, true);
     /* 上浮的暖色光点 */
     for(var i = 0; i < specks.length; i++){
       var p = specks[i];
@@ -654,16 +649,64 @@ NOTES.sort(function(a, b){
     ctx.globalAlpha = 1;
   }
 
+  /* 一株水稻：弯曲的秆 + 顶端垂下的稻穗（一串谷粒椭圆） */
+  function drawRicePlant(p, baseY, front){
+    var sway = Math.sin(t * 0.013 + p.ph) * (front ? 5 : 3.2);
+    var topX = p.x + p.lean + sway, topY = baseY - p.h;
+    /* 秆 */
+    ctx.strokeStyle = front ? 'rgba(101,120,58,0.34)' : 'rgba(101,120,58,0.2)';
+    ctx.lineWidth = front ? 1.6 : 1.1;
+    ctx.beginPath();
+    ctx.moveTo(p.x, baseY);
+    ctx.quadraticCurveTo(p.x + (topX - p.x) * 0.3, baseY - p.h * 0.55, topX, topY);
+    ctx.stroke();
+    /* 叶片一根 */
+    ctx.lineWidth = front ? 1.1 : 0.8;
+    ctx.strokeStyle = front ? 'rgba(122,143,77,0.26)' : 'rgba(122,143,77,0.16)';
+    ctx.beginPath();
+    ctx.moveTo(p.x, baseY - p.h * 0.25);
+    ctx.quadraticCurveTo(p.x + p.lean * 0.6 - 6, baseY - p.h * 0.5, p.x + p.lean * 0.5 - 11, baseY - p.h * 0.72);
+    ctx.stroke();
+    /* 垂穗：谷粒沿下垂弧线排列 */
+    var gx = topX, gy = topY;
+    var droop = front ? 9 : 6;               /* 下垂深度 */
+    var dir = p.lean >= 0 ? 1 : -1;          /* 穗朝倾斜方向垂 */
+    var grains = front ? 7 : 5;
+    for(var g = 0; g < grains; g++){
+      var u = g / (grains - 1);
+      var gx2 = topX + dir * u * p.earLen + sway * u * 0.6;
+      var gy2 = topY + u * u * droop + u * 3;
+      ctx.save();
+      ctx.translate(gx2, gy2);
+      ctx.rotate(dir * (0.5 + u * 1.2));
+      ctx.fillStyle = front
+        ? 'rgba(200,162,74,' + (0.5 - u * 0.14) + ')'   /* 金黄谷粒 */
+        : 'rgba(181,160,86,0.3)';
+      ctx.beginPath();
+      ctx.ellipse(0, 0, front ? 3.1 : 2.2, front ? 1.7 : 1.2, 0, 0, 6.283);
+      ctx.fill();
+      ctx.restore();
+      gx = gx2; gy = gy2;
+    }
+    /* 穗轴 */
+    ctx.strokeStyle = front ? 'rgba(160,132,60,0.3)' : 'rgba(160,132,60,0.18)';
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    ctx.moveTo(topX, topY);
+    ctx.quadraticCurveTo(topX + dir * p.earLen * 0.5, topY + droop * 0.4, gx, gy);
+    ctx.stroke();
+  }
+
   function drawLeafScene(){
-    /* 秋暮：顶部薄凉青灰 + 底部暖赭 */
+    /* 秋暮：顶部薄凉青灰 + 底部暖赭（比初版更浓） */
     var top = ctx.createLinearGradient(0, 0, 0, H * 0.4);
-    top.addColorStop(0, 'rgba(138,151,168,0.07)');
+    top.addColorStop(0, 'rgba(138,151,168,0.09)');
     top.addColorStop(1, 'rgba(138,151,168,0)');
     ctx.fillStyle = top; ctx.fillRect(0, 0, W, H * 0.4);
-    var bot = ctx.createLinearGradient(0, H * 0.55, 0, H);
+    var bot = ctx.createLinearGradient(0, H * 0.5, 0, H);
     bot.addColorStop(0, 'rgba(201,138,59,0)');
-    bot.addColorStop(1, 'rgba(201,138,59,0.1)');
-    ctx.fillStyle = bot; ctx.fillRect(0, H * 0.55, W, H * 0.45);
+    bot.addColorStop(1, 'rgba(190,120,45,0.17)');
+    ctx.fillStyle = bot; ctx.fillRect(0, H * 0.5, W, H * 0.5);
     ctx.globalAlpha = 1;
     for(var i = 0; i < leaves.length; i++){
       var l = leaves[i];
