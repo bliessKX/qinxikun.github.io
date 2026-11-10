@@ -36,7 +36,8 @@ img{display:block;max-width:100%}
 .side{
   border-right:1px solid var(--line);
   padding:30px 20px;
-  position:sticky;top:0;height:100vh;overflow-y:auto;
+  position:sticky;top:0;height:100vh;overflow:hidden;
+  display:flex;flex-direction:column;
 }
 .brand{font-family:var(--serif);font-size:22px;font-weight:700;letter-spacing:.01em}
 .brand small{
@@ -47,8 +48,28 @@ img{display:block;max-width:100%}
   margin:32px 0 4px;font-size:12px;letter-spacing:.16em;
   color:var(--muted);text-transform:uppercase;
   border-top:1px solid var(--line);padding-top:18px;
+  flex:0 0 auto;
 }
-.toc-list{list-style:none;margin:0;padding:0}
+.side-foot{margin-top:auto;padding-top:8px}
+.side-foot .dir-title:first-child{margin-top:16px}
+.toc-wrap{
+  position:relative;flex:1 1 auto;min-height:120px;
+  display:flex;flex-direction:column;
+}
+.toc-wrap::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:34px;
+  background:linear-gradient(to bottom,rgba(250,249,246,0),rgba(250,249,246,.96));
+  pointer-events:none;
+}
+.toc-list{
+  list-style:none;margin:0;padding:0 4px 20px 0;
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:#cfc8ba transparent;
+}
+.toc-list::-webkit-scrollbar{width:6px}
+.toc-list::-webkit-scrollbar-thumb{background:#cfc8ba;border-radius:3px}
+.toc-list::-webkit-scrollbar-track{background:transparent}
 .toc-link{
   display:block;padding:8px 10px 8px 13px;
   border-left:2px solid transparent;margin-left:-2px;
@@ -76,15 +97,21 @@ img{display:block;max-width:100%}
   display:inline-block;transition:background .25s;
 }
 .music.on .dot{background:var(--accent)}
-.side-tool{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
-  margin-top:20px;padding:9px 11px;
-  border:1px solid var(--line);border-radius:5px;
-  font-size:13px;font-weight:600;color:var(--ink);
+.tool-list{list-style:none;margin:0;padding:0}
+.tool-link{
+  display:block;padding:8px 10px 8px 13px;
+  border-left:2px solid transparent;margin-left:-2px;
+  color:var(--ink);transition:background .2s,border-color .2s;
 }
-.side-tool:hover{background:rgba(0,0,0,.035);border-color:var(--accent);color:var(--accent)}
-.side-tool span{font-size:12px;color:var(--muted)}
-.side-tool:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tool-link:hover{background:rgba(0,0,0,.035);border-left-color:var(--accent)}
+.tool-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tool-link .t-name{
+  display:block;font-size:13.5px;font-weight:600;letter-spacing:.01em;
+}
+.tool-link .t-desc{
+  display:block;font-size:11px;color:var(--muted);
+  margin-top:3px;letter-spacing:.02em;font-weight:400;
+}
 
 /* ---------- 右侧内容 ---------- */
 .main{padding:42px 56px 80px;max-width:840px}
@@ -128,9 +155,13 @@ footer{
 @media (max-width:880px){
   .layout{grid-template-columns:1fr}
   .side{
-    position:static;height:auto;overflow:visible;
+    position:static;height:auto;overflow:visible;display:block;
     border-right:none;border-bottom:1px solid var(--line);
   }
+  .toc-wrap{display:block;flex:none;min-height:0}
+  .toc-wrap::after{display:none}
+  .toc-list{flex:none;min-height:0;max-height:none;overflow:visible;padding-bottom:0}
+  .side-foot{margin-top:0;padding-top:0}
   .main{padding:32px 22px 60px;max-width:none}
 }
 @media (prefers-reduced-motion:reduce){
@@ -141,16 +172,30 @@ footer{
 <body>
 
 <div class="layout">
-  <!-- 左侧：笔记一级目录 -->
+  <!-- 左侧：笔记 / 工具 一级目录 -->
   <aside class="side">
     <div class="brand">NICE.BLOG<small>技术笔记 · 实战记录</small></div>
-    <a class="side-tool" href="what-to-eat.html">今天吃什么 · 转盘 <span>↗</span></a>
     <div class="dir-title">笔记</div>
-    <ul class="toc-list" id="tocList"></ul>
-    <div class="music" id="musicWrap">
-      <button id="bgmBtn" type="button" aria-label="播放背景音乐">
-        <span class="dot"></span><span id="musicLabel">背景音乐</span>
-      </button>
+    <div class="toc-wrap">
+      <ul class="toc-list" id="tocList"></ul>
+    </div>
+    <div class="side-foot">
+      <div class="dir-title">工具</div>
+      <ul class="tool-list">
+        <li><a class="tool-link" href="tools/json.html">
+          <span class="t-name">JSON 解析与格式化</span>
+          <span class="t-desc">格式化 · 校验 · 修复 · 压缩</span>
+        </a></li>
+        <li><a class="tool-link" href="what-to-eat.html">
+          <span class="t-name">今天吃什么 · 转盘</span>
+          <span class="t-desc">按当前时段推荐吃啥</span>
+        </a></li>
+      </ul>
+      <div class="music" id="musicWrap">
+        <button id="bgmBtn" type="button" aria-label="播放背景音乐">
+          <span class="dot"></span><span id="musicLabel">背景音乐</span>
+        </button>
+      </div>
     </div>
   </aside>
 
@@ -158,7 +203,7 @@ footer{
   <main class="main">
     <div class="page-head">
       <h1>笔记</h1>
-      <p>10 篇公开笔记，点左侧任一篇展开；点开可直达 CSDN 原文。</p>
+      <p>10 篇公开笔记，点左侧任一篇展开；点开可直达 CSDN 原文。左侧「工具」目录里还有日常用的在线小工具。</p>
     </div>
 
     <article id="note"><!-- 由脚本渲染 --></article>

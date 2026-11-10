@@ -42,6 +42,7 @@ button{font-family:inherit}
 .brand i{font-style:normal;color:var(--accent)}
 .back{font-size:13px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--hair);padding-bottom:2px}
 .back:hover{color:var(--ink);border-color:var(--ink)}
+.topnav{display:flex;align-items:center;gap:16px}
 .clock{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .clock small{font-weight:600;color:var(--muted);font-size:12px;margin-right:7px}
 
@@ -166,7 +167,10 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
 
 <div class="wrap">
   <header class="topbar">
-    <a class="back" href="index.html">← 回笔记</a>
+    <div class="topnav">
+      <a class="back" href="index.html">← 回主页</a>
+      <a class="back" href="tools/json.html">JSON 工具</a>
+    </div>
     <div class="brand">今天吃什么<i>.</i></div>
     <div class="clock"><small id="clockTag">现在</small><span id="clock">--:--</span></div>
   </header>
