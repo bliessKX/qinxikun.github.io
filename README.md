@@ -5,7 +5,7 @@
 - **笔记**：收录 10 篇技术博文，涵盖鉴权、JDK 新特性、分页优化、MySQL 调优、Agent 编排等方向。
 - **工具**：`tools/`，日常用的小工具集合。
   - `tools/json.html` —— JSON 解析与格式化，支持格式化、校验、修复、压缩、键排序、转义、树形折叠、复制与下载；每次操作都有浮层提示，全屏模式下顶部常驻退出入口；内置 5 档示例数据（博客配置 / 接口响应 / 数组列表 / 脏数据 / Unicode 转义），打开即有内容可看。
-    - 工具栏下方新增「常用命令速查」：Git / SVN / Linux / Docker / Maven / MySQL / Redis / Nginx / Java 共 9 类 119 条命令，支持按分类切换、关键词搜索，单条复制或整组复制成带注释的脚本；MySQL 的 `SHOW FULL PROCESSLIST` 与 `EXPLAIN` 附输出列逐项释义。
+  - `tools/commands.html` —— 常用命令速查，Git / SVN / Linux / Docker / Maven / MySQL / Redis / Nginx / Java 共 9 类 119 条命令，支持按分类切换、关键词搜索，单条复制或整组复制成带注释的脚本；MySQL 的 `SHOW FULL PROCESSLIST` 与 `EXPLAIN` 附输出列逐项释义。
   - `what-to-eat.html` —— 一个「今天吃什么」的选餐转盘，按当前时段自动推荐早/中/晚餐，支持中餐、西餐、马来西亚餐、日料、韩餐、泰餐、印度菜等菜系切换。
 - **卷册**：`ink/`，水墨风格的设计稿原型（多卷级联目录）。
 
@@ -13,6 +13,7 @@
 
 ### 2026年11月10日
 
+- 「常用命令速查」从 JSON 工具页拆出为独立页面 `tools/commands.html` —— JSON 解析与命令查询本就是两件事，合并在一页既挤又不好维护；新页有独立标题区、吸顶分类栏与搜索框，命令不再被限制在固定高度的滚动框里；两个工具页顶栏互加跳转入口。
 - 命令速查补充 MySQL 常用排查命令：`SHOW FULL PROCESSLIST`（查看正在执行的 SQL）、`EXPLAIN`（分析执行计划）、`EXPLAIN ANALYZE`（8.0.18+ 实际执行并计时），并附上每个返回列的含义对照 —— 如 `type` 的访问类型性能排序、`key` 为空即未走索引、`Extra` 里 `Using index/filesort/temporary` 各自的含义；速查区支持「字段说明」卡片，整组复制时注释一并带走。
 - JSON 工具新增「常用命令速查」目录（工具栏下方）：收录 Git / SVN / Linux / Docker / Maven / MySQL / Redis / Nginx / Java 共 9 类 119 条常用命令，支持分类切换与关键词搜索；每条命令可一键复制，也可按分组整段复制成带注释的 shell 脚本，复制后有浮层提示与按钮态反馈。
 - 修复 JSON 工具「示例」与「打开文件」按钮点击无响应的问题（事件委托此前只绑定在工具栏内，面板头按钮不在作用域中）；新增「示例」下拉菜单，提供博客配置 / 接口响应 / 数组列表 / 脏数据 / Unicode 转义 5 档示例数据。
