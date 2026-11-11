@@ -319,7 +319,7 @@ footer{
 </div>
 
 <!-- 背景乐：music/ 下真实曲目优先，否则夏夜稻田合成底乐 -->
-<audio id="bgm" loop preload="auto" autoplay muted></audio>
+<audio id="bgm" loop preload="auto"></audio>
 
 <script>
 var BASE = 'https://blog.csdn.net/m0_68970560/article/details/';
@@ -555,18 +555,15 @@ NOTES.sort(function(a, b){
     if(audio.paused){ play(); } else { pause(); }
   });
 
-  /* 自动播放：进页面立即尝试出声；被浏览器拦截时先静音兜底，首次任意点击/按键再出声 */
+  /* 自动播放：进页面直接尝试出声（老用户浏览器记忆允许则立即响）；
+     被浏览器拦截时不搞静音戏法（muted 自动播放再取消静音会被 Chrome 暂停），等首次点击/按键出声 */
   var dismissed = false;
   try{ dismissed = localStorage.getItem(BG_KEY) === '0'; }catch(e){}
   function tryAutoPlay(){
-    audio.muted = false;
     var p = audio.play();
     if(p && p.then){
       p.then(function(){ setUI(true); remember(true); })
-       .catch(function(){
-          audio.muted = true;
-          setUI(false);
-       });
+       .catch(function(){ setUI(false); });
     }
   }
   if(!dismissed){
@@ -577,6 +574,6 @@ NOTES.sort(function(a, b){
 })();
 </script>
 
-<script src="assets/ambience.js?v=20261112"></script>
+<script src="assets/ambience.js?v=20261112b"></script>
 </body>
 </html>

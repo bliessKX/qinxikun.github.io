@@ -134,18 +134,14 @@
     if(audio.paused){ play(); } else { pause(); }
   });
 
-  /* 自动播放：先尝试直接出声；被拦截则静音兜底，等首次任意点击/按键再出声 */
+  /* 自动播放：进页面直接尝试出声；被拦截不搞静音戏法，等首次任意点击/按键出声 */
   var dismissed = false;
   try{ dismissed = localStorage.getItem(BG_KEY) === '0'; }catch(e){}
   function tryAutoPlay(){
-    audio.muted = false;
     var p = audio.play();
     if(p && p.then){
       p.then(function(){ setUI(true); remember(true); })
-       .catch(function(){
-          audio.muted = true;
-          setUI(false);
-       });
+       .catch(function(){ setUI(false); });
     }
   }
   if(!dismissed){
