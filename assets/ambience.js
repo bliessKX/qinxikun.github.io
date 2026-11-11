@@ -47,17 +47,21 @@
     }
   }
   // 同步内联兜底：ambience.css 就绪前保证层级正确，不闪块。
+  // top:auto 显式压制旧版缓存 CSS 里 inset:0 的 top:0，保证风景带始终贴底。
   gifLayer.style.cssText =
-    'position:fixed;left:0;right:0;bottom:0;height:44vh;z-index:-1;pointer-events:none;opacity:0;' +
+    'position:fixed;left:0;right:0;bottom:0;top:auto;height:44vh;z-index:-1;pointer-events:none;opacity:0;' +
     'background-repeat:no-repeat;background-position:center bottom;' +
     'background-size:100% auto';
 
-  // Load the companion stylesheet once.
+  // Load the companion stylesheet once. 带版本号击穿缓存（与脚本 ?v= 同步），
+  // 避免旧版 CSS（如 inset:0 的 top:0）压过新版内联定位导致风景带跑到页顶。
   if (!document.querySelector('link[data-ambience-css]')) {
+    var cssV = (document.currentScript && document.currentScript.src
+      ? (document.currentScript.src.match(/v=([^&]+)/) || [])[1] : '');
     var css = document.createElement('link');
     css.rel = 'stylesheet';
     css.href = (document.currentScript && document.currentScript.src
-      ? document.currentScript.src.replace(/ambience\.js(?:\?.*)?$/, 'ambience.css')
+      ? document.currentScript.src.replace(/ambience\.js(?:\?.*)?$/, 'ambience.css' + (cssV ? '?v=' + cssV : ''))
       : 'assets/ambience.css');
     css.setAttribute('data-ambience-css', '1');
     document.head.appendChild(css);

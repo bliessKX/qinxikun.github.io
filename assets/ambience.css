@@ -32,6 +32,7 @@ html.ambience-enabled #ambGif {
   left: 0;
   right: 0;
   bottom: 0;
+  top: auto;
   height: 44vh;
   z-index: -1;
   pointer-events: none;
