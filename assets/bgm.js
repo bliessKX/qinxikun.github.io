@@ -70,6 +70,34 @@
   });
   loadTrack();
 
+  /* ---------- 跨页续播：记录进度，跳转新页面后从上次位置接着放，不从头再来 ---------- */
+  var POS_KEY = 'nice-bgm-pos';
+  var lastSave = 0;
+  function trackId(){
+    var n = (audio.currentSrc || audio.src || '').split('/').pop() || '';
+    try{ return decodeURIComponent(n); }catch(e){ return n; }
+  }
+  function savePos(){
+    if(!audio.src || !audio.currentTime) return;
+    try{ localStorage.setItem(POS_KEY, JSON.stringify({ f: trackId(), t: audio.currentTime, ts: Date.now() })); }catch(e){}
+  }
+  audio.addEventListener('timeupdate', function(){
+    var now = Date.now();
+    if(now - lastSave > 1000){ lastSave = now; savePos(); }
+  });
+  addEventListener('pagehide', savePos);
+  addEventListener('beforeunload', savePos);
+  audio.addEventListener('loadedmetadata', function(){
+    try{
+      var p = JSON.parse(localStorage.getItem(POS_KEY) || 'null');
+      /* 同一首歌、10 分钟内离开过，且进度不在头尾——恢复到上次位置 */
+      if(p && p.f === trackId() && Date.now() - p.ts < 10 * 60 * 1000 &&
+         audio.duration && p.t > 3 && p.t < audio.duration - 5){
+        audio.currentTime = p.t;
+      }
+    }catch(e){}
+  });
+
   function setUI(on){
     btn.classList.toggle('on', on);
     btn.setAttribute('aria-label', on ? ('暂停背景音乐 · ' + TRACKS[idx].name) : '播放背景音乐');
@@ -91,21 +119,22 @@
     remember(false);
   }
   function armFallback(){
-    var events = ['pointerdown','keydown','touchstart','wheel','scroll'];
+    var events = ['pointerdown','keydown','touchstart'];
     var once = function(){
+      events.forEach(function(e){ document.removeEventListener(e, once); });
+      if(!audio.paused) return; /* 已经在响就不重复触发 */
       audio.muted = false;
       var p = audio.play();
       if(p && p.then){ p.then(function(){ setUI(true); remember(true); }); }
       else { setUI(true); remember(true); }
-      events.forEach(function(e){ document.removeEventListener(e, once); });
     };
-    events.forEach(function(e){ document.addEventListener(e, once, {once:true, passive:true}); });
+    events.forEach(function(e){ document.addEventListener(e, once, {once:false, passive:true}); });
   }
   btn.addEventListener('click', function(){
     if(audio.paused){ play(); } else { pause(); }
   });
 
-  /* 自动播放：先尝试直接出声；被拦截则静音保住播放态，首次交互出声 */
+  /* 自动播放：先尝试直接出声；被拦截则静音兜底，等首次任意点击/按键再出声 */
   var dismissed = false;
   try{ dismissed = localStorage.getItem(BG_KEY) === '0'; }catch(e){}
   function tryAutoPlay(){
@@ -115,9 +144,13 @@
       p.then(function(){ setUI(true); remember(true); })
        .catch(function(){
           audio.muted = true;
-          armFallback();
+          setUI(false);
        });
     }
   }
-  if(!dismissed){ tryAutoPlay(); }
+  if(!dismissed){
+    tryAutoPlay();
+    /* 兜底：只要用户没关掉音乐，在站内任意页面点击/按键都会自动开播 */
+    armFallback();
+  }
 })();
