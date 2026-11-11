@@ -30,6 +30,27 @@
 
   document.documentElement.classList.add('ambience-enabled');
 
+  // 宫崎骏乡野模式：GIF 全景动画层，与画布同级（z-index:-1），按需加载。
+  // 脚本位于 /assets/，素材在 /gif/，用相对路径 ../gif/ 解析，各子页面通用。
+  var GIF_BASE = (document.currentScript && document.currentScript.src
+    ? document.currentScript.src.replace(/ambience\.js(?:\?.*)?$/, '')
+    : 'assets/');
+  var gifLayer = document.getElementById('ambGif');
+  if (!gifLayer) {
+    gifLayer = document.createElement('div');
+    gifLayer.id = 'ambGif';
+    if (canvas.parentNode) {
+      canvas.parentNode.insertBefore(gifLayer, canvas.nextSibling);
+    } else {
+      document.body.insertBefore(gifLayer, document.body.firstChild);
+    }
+  }
+  // 同步内联兜底：ambience.css 就绪前保证层级正确，不闪块。
+  gifLayer.style.cssText =
+    'position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;' +
+    'background-repeat:no-repeat;background-position:center;' +
+    'background-size:cover,cover';
+
   // Load the companion stylesheet once.
   if (!document.querySelector('link[data-ambience-css]')) {
     var css = document.createElement('link');
@@ -57,7 +78,7 @@
 
   var mode;
   try { mode = localStorage.getItem(MODE_KEY); } catch (e) {}
-  if (mode !== 'rice' && mode !== 'leaf') {
+  if (mode !== 'rice' && mode !== 'leaf' && mode !== 'ghibli') {
     var hour = new Date().getHours();
     mode = hour >= 6 && hour < 18 ? 'rice' : 'leaf';
   }
@@ -77,12 +98,37 @@
     return t * t * (3 - 2 * t);
   }
 
+  var MODE_LABELS = { rice: '夏日稻田', leaf: '秋日落叶', ghibli: '宫崎骏乡野' };
+
   function syncButton() {
-    if (dot) dot.classList.toggle('leaf', mode === 'leaf');
-    if (label) label.textContent = mode === 'rice' ? '夏日稻田' : '秋日落叶';
+    if (dot) {
+      dot.classList.toggle('leaf', mode === 'leaf');
+      dot.classList.toggle('ghibli', mode === 'ghibli');
+    }
+    if (label) label.textContent = MODE_LABELS[mode] || '夏日稻田';
     if (button) {
       button.setAttribute('aria-label',
-        '切换背景氛围，当前：' + (mode === 'rice' ? '夏日稻田' : '秋日落叶'));
+        '切换背景氛围，当前：' + (MODE_LABELS[mode] || '夏日稻田'));
+    }
+  }
+
+  /* 按当前模式切换画布 / GIF 层的可见性与动画状态。 */
+  function applyModeLayer() {
+    document.documentElement.classList.toggle('amb-ghibli', mode === 'ghibli');
+    if (mode === 'ghibli') {
+      if (!gifLayer.style.backgroundImage) {
+        gifLayer.style.backgroundImage =
+          'url("' + GIF_BASE + '../gif/ghibli-field.gif"), ' +
+          'url("' + GIF_BASE + '../gif/ghibli-field.png")';
+      }
+      canvas.style.opacity = '0';
+      gifLayer.style.opacity = '1';
+      stop();
+    } else {
+      gifLayer.style.opacity = '0';
+      canvas.style.opacity = '';
+      if (reducedMotion) render(0);
+      else if (!document.hidden) start();
     }
   }
 
@@ -793,7 +839,7 @@
     if (!W || !H) return;
     ctx.clearRect(0, 0, W, H);
     if (mode === 'rice') drawSummer(time);
-    else drawAutumn(time);
+    else if (mode === 'leaf') drawAutumn(time);
   }
 
   function loop(now) {
@@ -811,7 +857,7 @@
   }
 
   function start() {
-    if (running || reducedMotion || document.hidden) return;
+    if (running || reducedMotion || document.hidden || mode === 'ghibli') return;
     running = true;
     lastTime = 0;
     raf = window.requestAnimationFrame(loop);
@@ -824,12 +870,13 @@
   }
 
   function switchMode() {
-    mode = mode === 'rice' ? 'leaf' : 'rice';
+    mode = mode === 'rice' ? 'leaf' : (mode === 'leaf' ? 'ghibli' : 'rice');
     try { localStorage.setItem(MODE_KEY, mode); } catch (e) {}
     syncButton();
+    applyModeLayer();
     canvas.classList.add('amb-fade');
     window.setTimeout(function () {
-      render(elapsed);
+      if (mode !== 'ghibli') render(elapsed);
       canvas.classList.remove('amb-fade');
     }, 180);
   }
@@ -838,14 +885,23 @@
   window.addEventListener('resize', resize, { passive: true });
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) stop();
-    else start();
+    else if (mode !== 'ghibli') start();
   });
 
   syncButton();
   resize();
+  applyModeLayer();
   if (reducedMotion) {
     render(0);
-  } else {
+  } else if (mode !== 'ghibli') {
     start();
   }
+
+  /* 空闲时预取 GIF，切换到宫崎骏模式即秒开。 */
+  window.addEventListener('load', function () {
+    window.setTimeout(function () {
+      var pre = new Image();
+      pre.src = GIF_BASE + '../gif/ghibli-field.gif';
+    }, 2500);
+  });
 })();

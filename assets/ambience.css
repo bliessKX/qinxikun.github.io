@@ -25,6 +25,51 @@ html.ambience-enabled #amb.amb-fade {
   opacity: .35;
 }
 
+/* 宫崎骏乡野：GIF 全景动画层（与 #amb 同级，按需加载）。
+   GIF 源分辨率较低，靠 cover 拉伸 + 顶部薄纱把柔焦变成水彩质感。 */
+html.ambience-enabled #ambGif {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover, cover;
+  transition: opacity .45s ease;
+}
+
+html.ambience-enabled #ambGif::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(250, 249, 246, .16),
+    rgba(250, 249, 246, .05) 45%,
+    rgba(250, 249, 246, .12)
+  );
+}
+
+/* 宫崎骏模式下场景色彩浓、细节密，正文底色加重保证可读性，
+   画面从卡片四周留白与左右栏边缘透出。 */
+html.ambience-enabled.amb-ghibli main,
+html.ambience-enabled.amb-ghibli .main,
+html.ambience-enabled.amb-ghibli .content {
+  background: rgba(250, 249, 246, .62);
+}
+
+/* 工具页页头介绍直接叠在场景上，宫崎骏模式下加一层柔光底。 */
+html.ambience-enabled.amb-ghibli .hero {
+  background: rgba(250, 249, 246, .55);
+  border-radius: 14px;
+}
+
+html.ambience-enabled.amb-ghibli .side,
+html.ambience-enabled.amb-ghibli .rail {
+  background: rgba(250, 249, 246, .8);
+}
+
 /* Give the content a lightly translucent paper surface.
    Keep the central reading column mostly clear so the scenery remains visible
    around the edges and through the page's whitespace. */
@@ -90,6 +135,10 @@ html.ambience-enabled .content {
 
 .amb-chip .amb-dot.leaf {
   background: #b0713f;
+}
+
+.amb-chip .amb-dot.ghibli {
+  background: #4f83b0;
 }
 
 @media (max-width: 760px) {
