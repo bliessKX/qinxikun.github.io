@@ -228,11 +228,9 @@ footer{
 }
 .next-entry:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(156,59,42,.38)}
 
-/* ---------- 氛围背景：夏日稻田 / 秋日落叶 ---------- */
-#amb{
-  position:fixed;inset:0;z-index:2;pointer-events:none;
-  transition:opacity .45s ease;
-}
+/* ---------- 氛围背景：夏日稻田 / 秋日落叶 ----------
+   画布定位与层级由 assets/ambience.css 接管（html.ambience-enabled #amb，z-index:-1 垫底），
+   脚本加载时会同步写入内联兜底样式；此处不再重复声明。 */
 .layout{position:relative;z-index:1}
 .amb-toggle{
   all:unset;cursor:pointer;
@@ -574,6 +572,6 @@ NOTES.sort(function(a, b){
 })();
 </script>
 
-<script src="assets/ambience.js?v=20261112b"></script>
+<script src="assets/ambience.js?v=20261112c"></script>
 </body>
 </html>
