@@ -21,7 +21,7 @@
 
   var style = document.createElement('style');
   style.textContent =
-    '#amb{position:fixed;inset:0;z-index:0;pointer-events:none;transition:opacity .45s ease}' +
+    '#amb{position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:multiply;transition:opacity .45s ease}' +
     '.amb-chip{position:fixed;right:20px;bottom:66px;z-index:97;display:inline-flex;align-items:center;gap:7px;' +
     'font-family:var(--sans,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif);font-size:12px;font-weight:600;' +
     'color:var(--ink,#1b1a18);background:rgba(255,255,255,.85);border:1px solid var(--line,#e6e2d9);' +
@@ -136,8 +136,8 @@
       p.y -= p.s;
       if(p.y < -8){ p.y = H + 8; p.x = Math.random() * W; }
       var px = p.x + Math.sin(t * 0.01 + p.ph) * 7;
-      ctx.globalAlpha = 0.28 + 0.14 * Math.sin(t * 0.03 + p.ph);
-      ctx.fillStyle = '#fff6dd';
+      ctx.globalAlpha = 0.3 + 0.14 * Math.sin(t * 0.03 + p.ph);
+      ctx.fillStyle = '#dfb76a';  /* 金色光点：正片叠底下才可见 */
       ctx.beginPath(); ctx.arc(px, p.y, p.r, 0, 6.283); ctx.fill();
     }
     ctx.globalAlpha = 1;

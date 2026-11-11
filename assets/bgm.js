@@ -12,7 +12,7 @@
   var base = script.src.replace(/[^\/]*$/, '');
 
   var TRACKS = [
-    { src: base + 'daoxiang.mp3', name: '稻香' },
+    { src: '/music/周杰伦-稻香.mp3', name: '稻香' },
     { src: base + 'summer-field.mp3', name: '夏夜稻田' }
   ];
   var idx = 0;

@@ -230,7 +230,7 @@ footer{
 
 /* ---------- 氛围背景：夏日稻田 / 秋日落叶 ---------- */
 #amb{
-  position:fixed;inset:0;z-index:0;pointer-events:none;
+  position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:multiply;
   transition:opacity .45s ease;
 }
 .layout{position:relative;z-index:1}
@@ -318,7 +318,7 @@ footer{
   </aside>
 </div>
 
-<!-- 背景乐：稻香优先（放入 assets/daoxiang.mp3 即用），否则夏夜稻田底乐 -->
+<!-- 背景乐：music/ 下真实曲目优先，否则夏夜稻田合成底乐 -->
 <audio id="bgm" loop preload="auto" autoplay muted></audio>
 
 <script>
@@ -477,7 +477,7 @@ NOTES.sort(function(a, b){
   var wrap = document.getElementById('musicWrap');
   var label = document.getElementById('musicLabel');
   var TRACKS = [
-    { src: 'assets/daoxiang.mp3', name: '稻香' },
+    { src: 'music/周杰伦-稻香.mp3', name: '稻香' },
     { src: 'assets/summer-field.mp3', name: '夏夜稻田' }
   ];
   var idx = 0;
@@ -543,6 +543,6 @@ NOTES.sort(function(a, b){
 })();
 </script>
 
-<script src="assets/ambience.js?v=20261110b"></script>
+<script src="assets/ambience.js?v=20261111"></script>
 </body>
 </html>
