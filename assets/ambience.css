@@ -25,30 +25,38 @@ html.ambience-enabled #amb.amb-fade {
   opacity: .35;
 }
 
-/* 宫崎骏乡野：GIF 全景动画层（与 #amb 同级，按需加载）。
-   GIF 源分辨率较低，靠 cover 拉伸 + 顶部薄纱把柔焦变成水彩质感。 */
+/* 宫崎骏乡野：高清全景 PNG 以底部风景带呈现（宽度贴合视口，不放大全屏，
+   避免模糊）；动态光效由画布代码绘制，画布叠于风景带之上。 */
 html.ambience-enabled #ambGif {
   position: fixed;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 44vh;
   z-index: -1;
   pointer-events: none;
   opacity: 0;
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover, cover;
+  background-position: center bottom;
+  background-size: 100% auto;
   transition: opacity .45s ease;
 }
 
+/* 顶部用纸色渐隐，让风景带与页面背景自然衔接；整体罩一层薄纱统一质感。 */
 html.ambience-enabled #ambGif::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(250, 249, 246, .16),
-    rgba(250, 249, 246, .05) 45%,
-    rgba(250, 249, 246, .12)
-  );
+  background:
+    linear-gradient(
+      to bottom,
+      #f4f1e8 0,
+      rgba(244, 241, 232, 0) 110px
+    ),
+    linear-gradient(
+      rgba(244, 241, 232, .10),
+      rgba(244, 241, 232, .06)
+    );
 }
 
 /* 宫崎骏模式下场景色彩浓、细节密，正文底色加重保证可读性，

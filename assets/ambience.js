@@ -30,9 +30,10 @@
 
   document.documentElement.classList.add('ambience-enabled');
 
-  // 宫崎骏乡野模式：GIF 全景动画层，与画布同级（z-index:-1），按需加载。
-  // 脚本位于 /assets/，素材在 /gif/，用相对路径 ../gif/ 解析，各子页面通用。
-  var GIF_BASE = (document.currentScript && document.currentScript.src
+  // 宫崎骏乡野模式：高清全景 PNG 以「底部风景带」形式呈现（宽度贴合视口，
+  // 不做全屏拉伸，避免低分辨率放大模糊）；动态光效由画布代码绘制。
+  // 注意：风景层插在画布之前，画布叠于其上负责动效。
+  var SCENE_BASE = (document.currentScript && document.currentScript.src
     ? document.currentScript.src.replace(/ambience\.js(?:\?.*)?$/, '')
     : 'assets/');
   var gifLayer = document.getElementById('ambGif');
@@ -40,16 +41,16 @@
     gifLayer = document.createElement('div');
     gifLayer.id = 'ambGif';
     if (canvas.parentNode) {
-      canvas.parentNode.insertBefore(gifLayer, canvas.nextSibling);
+      canvas.parentNode.insertBefore(gifLayer, canvas);
     } else {
       document.body.insertBefore(gifLayer, document.body.firstChild);
     }
   }
   // 同步内联兜底：ambience.css 就绪前保证层级正确，不闪块。
   gifLayer.style.cssText =
-    'position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;' +
-    'background-repeat:no-repeat;background-position:center;' +
-    'background-size:cover,cover';
+    'position:fixed;left:0;right:0;bottom:0;height:44vh;z-index:-1;pointer-events:none;opacity:0;' +
+    'background-repeat:no-repeat;background-position:center bottom;' +
+    'background-size:100% auto';
 
   // Load the companion stylesheet once.
   if (!document.querySelector('link[data-ambience-css]')) {
@@ -112,18 +113,18 @@
     }
   }
 
-  /* 按当前模式切换画布 / GIF 层的可见性与动画状态。 */
+  /* 按当前模式切换画布 / 风景层的可见性与动画状态。 */
   function applyModeLayer() {
     document.documentElement.classList.toggle('amb-ghibli', mode === 'ghibli');
     if (mode === 'ghibli') {
       if (!gifLayer.style.backgroundImage) {
         gifLayer.style.backgroundImage =
-          'url("' + GIF_BASE + '../gif/ghibli-field.gif"), ' +
-          'url("' + GIF_BASE + '../gif/ghibli-field.png")';
+          'url("' + SCENE_BASE + '../gif/ghibli-field.png")';
       }
-      canvas.style.opacity = '0';
       gifLayer.style.opacity = '1';
-      stop();
+      canvas.style.opacity = '';
+      if (reducedMotion) render(0);
+      else if (!document.hidden) start();
     } else {
       gifLayer.style.opacity = '0';
       canvas.style.opacity = '';
@@ -782,9 +783,7 @@
     drawMountains();
     drawVillage(t);
     drawField();
-    drawKids(t);
     drawDitch(t);
-    drawGrandpa(t);
     drawForeground(t);
 
     // Dust and pollen in the late-afternoon light.
@@ -835,11 +834,62 @@
     ctx.globalAlpha = 1;
   }
 
+  /* 宫崎骏模式的动态光效：光尘漂浮、水面波光、两只蜻蜓，全部代码绘制。 */
+  function drawGhibli(t) {
+    // 光尘与飞絮
+    var i, x, y, s;
+    for (i = 0; i < 22; i++) {
+      x = (i * 131 + t * (0.006 + (i % 3) * 0.0016)) % (W + 40) - 20;
+      y = H * (0.12 + (i % 9) * 0.09) + Math.sin(t * 0.0009 + i * 1.7) * 14;
+      s = 1 + (i % 3);
+      ctx.fillStyle = 'rgba(255,241,196,' + (0.14 + (i % 3) * 0.06) + ')';
+      ctx.beginPath(); ctx.arc(x, y, s, 0, Math.PI * 2); ctx.fill();
+    }
+    // 水面波光（风景带内），缓慢横移
+    if (!REDUCED) {
+      var k, sy, sx, sw;
+      for (k = 0; k < 8; k++) {
+        sy = H * (0.78 + (k % 3) * 0.055);
+        sx = ((k * 211 + Math.sin(t * 0.0011 + k) * 60 + t * 0.02) % (W + 120)) - 60;
+        sw = 46 + (k % 3) * 26;
+        ctx.strokeStyle = 'rgba(255,255,240,0.20)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(sx - sw, sy);
+        ctx.quadraticCurveTo(sx, sy - 2.5, sx + sw, sy);
+        ctx.stroke();
+      }
+      // 两只蜻蜓，缓慢巡游
+      var d, dx, dy, ang, flap;
+      for (d = 0; d < 2; d++) {
+        dx = W * (0.30 + d * 0.34) + Math.sin(t * 0.00045 + d * 2.1) * W * 0.14;
+        dy = H * (0.24 + d * 0.10) + Math.sin(t * 0.0008 + d * 1.3) * 22;
+        ang = Math.cos(t * 0.00045 + d * 2.1) * 0.35;
+        flap = Math.sin(t * 0.05 + d * 2) * 0.5;
+        ctx.save();
+        ctx.translate(dx, dy);
+        ctx.rotate(ang);
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.beginPath();
+        ctx.ellipse(4, -3 - flap, 7, 2.2, -0.5 + flap * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(4, 3 + flap, 7, 2.2, 0.5 - flap * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(90,105,115,0.6)';
+        ctx.lineWidth = 1.6;
+        ctx.beginPath(); ctx.moveTo(-6, 0); ctx.lineTo(8, 0); ctx.stroke();
+        ctx.restore();
+      }
+    }
+  }
+
   function render(time) {
     if (!W || !H) return;
     ctx.clearRect(0, 0, W, H);
     if (mode === 'rice') drawSummer(time);
     else if (mode === 'leaf') drawAutumn(time);
+    else if (mode === 'ghibli') drawGhibli(time);
   }
 
   function loop(now) {
@@ -857,7 +907,7 @@
   }
 
   function start() {
-    if (running || reducedMotion || document.hidden || mode === 'ghibli') return;
+    if (running || reducedMotion || document.hidden) return;
     running = true;
     lastTime = 0;
     raf = window.requestAnimationFrame(loop);
@@ -893,15 +943,15 @@
   applyModeLayer();
   if (reducedMotion) {
     render(0);
-  } else if (mode !== 'ghibli') {
+  } else {
     start();
   }
 
-  /* 空闲时预取 GIF，切换到宫崎骏模式即秒开。 */
+  /* 空闲时预取全景 PNG，切换到宫崎骏模式即秒开。 */
   window.addEventListener('load', function () {
     window.setTimeout(function () {
       var pre = new Image();
-      pre.src = GIF_BASE + '../gif/ghibli-field.gif';
+      pre.src = SCENE_BASE + '../gif/ghibli-field.png';
     }, 2500);
   });
 })();
