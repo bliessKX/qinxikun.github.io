@@ -13,7 +13,7 @@
 
   var TRACKS = [
     { src: base + 'daoxiang.mp3', name: '稻香' },
-    { src: base + 'summer-field.wav', name: '夏夜稻田' }
+    { src: base + 'summer-field.mp3', name: '夏夜稻田' }
   ];
   var idx = 0;
   var BG_KEY = 'nice-bgm';

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """夏夜稻田氛围音：风声 + 蝉鸣 + 水波 + 五声拨弦。72 秒，首尾淡入淡出可循环。
-生成 assets/summer-field.wav 作为《稻香》未放入前的占位底乐。"""
+生成 72s 夏夜稻田占位底乐（WAV 需再重采样+压码为 assets/summer-field.mp3 使用）。"""
 import numpy as np
 import wave
 
@@ -82,7 +82,7 @@ if peak > 0:
 mix = np.tanh(mix * 1.15) * 0.92
 
 data = (mix * 32767).astype('<i2')
-out = 'assets/summer-field.wav'
+out = 'assets/_summer-field-src.wav'
 with wave.open(out, 'wb') as w:
     w.setnchannels(1)
     w.setsampwidth(2)
