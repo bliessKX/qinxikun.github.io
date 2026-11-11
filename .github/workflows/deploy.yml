@@ -33,7 +33,7 @@ jobs:
       - name: Stage — 水墨主站为根，React 2.0 挂载到 /2.0/
         run: |
           mkdir -p site/2.0
-          cp -r index.html 404.html CNAME assets ink music tools what-to-eat.html site/
+          cp -r index.html 404.html CNAME assets gif ink music tools what-to-eat.html site/
           cp -r app/dist/. site/2.0/
       - name: Guard — 双站面完整性校验
         run: |
@@ -46,6 +46,8 @@ jobs:
           test -f site/2.0/index.html || { echo "react index missing"; exit 1; }
           test -f site/2.0/tools/json.html || { echo "2.0 tools missing"; exit 1; }
           test -f "site/music/周杰伦-稻香.mp3" || { echo "bgm mp3 missing"; exit 1; }
+          test -f site/gif/ghibli-field.gif || { echo "ghibli gif missing"; exit 1; }
+          test -f site/gif/ghibli-field.png || { echo "ghibli png missing"; exit 1; }
           echo "both surfaces OK"
       - uses: actions/upload-pages-artifact@v3
         with:
