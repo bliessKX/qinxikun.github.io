@@ -33,9 +33,11 @@
   // 宫崎骏乡野模式：高清全景 PNG 以「底部风景带」形式呈现（宽度贴合视口，
   // 不做全屏拉伸，避免低分辨率放大模糊）；动态光效由画布代码绘制。
   // 注意：风景层插在画布之前，画布叠于其上负责动效。
+  // 路径必须规范化：部分 CDN 不归一化 /assets/../gif/ 这类回溯路径会 404。
   var SCENE_BASE = (document.currentScript && document.currentScript.src
     ? document.currentScript.src.replace(/ambience\.js(?:\?.*)?$/, '')
     : 'assets/');
+  var SCENE_ROOT = SCENE_BASE.replace(/assets\/$/, '');
   var gifLayer = document.getElementById('ambGif');
   if (!gifLayer) {
     gifLayer = document.createElement('div');
@@ -123,7 +125,7 @@
     if (mode === 'ghibli') {
       if (!gifLayer.style.backgroundImage) {
         gifLayer.style.backgroundImage =
-          'url("' + SCENE_BASE + '../gif/ghibli-field.png")';
+          'url("' + SCENE_ROOT + 'gif/ghibli-field.png")';
       }
       gifLayer.style.opacity = '1';
       canvas.style.opacity = '';
@@ -955,7 +957,7 @@
   window.addEventListener('load', function () {
     window.setTimeout(function () {
       var pre = new Image();
-      pre.src = SCENE_BASE + '../gif/ghibli-field.png';
+      pre.src = SCENE_ROOT + 'gif/ghibli-field.png';
     }, 2500);
   });
 })();
