@@ -8,6 +8,7 @@ const NAV = [
   { to: '/knowledge', label: 'knowledge' },
   { to: '/lab', label: 'lab' },
   { to: '/projects', label: 'projects' },
+  { to: '/stats', label: 'stats' },
   { to: '/about', label: 'about' },
 ]
 
@@ -36,6 +37,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <footer className="footer">
         <div>NICE.BLOG 2.0 · Interactive Developer Platform</div>
         <div className="f-links">
+          <Link to="/stats">访问统计</Link>
           <a href="./tools/json.html">JSON 工具</a>
           <a href="./tools/commands.html">命令速查</a>
           <a href="./tools/what-to-eat.html">吃什么转盘</a>

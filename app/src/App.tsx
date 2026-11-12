@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
@@ -11,6 +11,10 @@ import Projects from './pages/Projects'
 import About from './pages/About'
 import NotFound from './pages/NotFound'
 import articles from './data/articles.json'
+import { trackVisit } from './lib/analytics'
+
+/* antd 体积较大，统计页按需加载：访问其它页面不下载这部分代码 */
+const Stats = lazy(() => import('./pages/Stats'))
 
 /** 入场编排：给 .rise 元素做一次 IntersectionObserver 淡入 */
 export function useRise() {
@@ -24,6 +28,14 @@ export function useRise() {
     els.forEach((el) => io.observe(el))
     return () => io.disconnect()
   }, [loc.pathname])
+}
+
+/** 本设备 PV 埋点：随 App 挂载一次，路由变化时写一条 localStorage 记录。
+ *  trackVisit 内部对「同会话 + 同路径 + 800ms 内」去重，StrictMode 双调用安全。 */
+function VisitTracker() {
+  const { pathname } = useLocation()
+  useEffect(() => { trackVisit(pathname) }, [pathname])
+  return null
 }
 
 function ScrollTop() {
@@ -40,6 +52,7 @@ export default function App() {
   return (
     <Layout>
       <ScrollTop />
+      <VisitTracker />
       <LegacyHashCompat />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -50,6 +63,11 @@ export default function App() {
         <Route path="/lab" element={<Lab />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/about" element={<About />} />
+        <Route path="/stats" element={
+          <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/stats · 载入看板…</p></div></div>}>
+            <Stats />
+          </Suspense>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

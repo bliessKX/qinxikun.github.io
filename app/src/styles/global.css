@@ -420,3 +420,177 @@ button { font-family: inherit; cursor: pointer; }
   .lab-io { grid-template-columns: 1fr; }
   .post-nav a { max-width: 48%; }
 }
+
+/* ============================================================
+   /stats 访问统计看板 —— antd 组件融入 CRT 琥珀终端色板
+   ============================================================ */
+.stats-alert { margin-bottom: 18px; }
+.stats .stats-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.stats .ant-card-head {
+  min-height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line-soft);
+}
+.stats .ant-card-head-title {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: .03em;
+  color: var(--ink);
+}
+.stats .ant-card-body { padding: 16px; }
+.stats .ant-statistic-title {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.stats .ant-statistic-content { font-family: var(--mono); color: var(--ink); }
+.stats .ant-alert {
+  background: rgba(240, 168, 50, .06);
+  border-color: rgba(240, 168, 50, .28);
+}
+.stats-ctl {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.stats-ctl .ctl-right { margin-left: auto; display: flex; gap: 8px; }
+.stats-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.kpi-foot {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.delta { font-family: var(--mono); font-size: 12px; margin-left: 6px; }
+.delta.up { color: var(--green); }
+.delta.down { color: var(--red); }
+.stats-two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.stats-chart { position: relative; }
+.stats-tip {
+  position: absolute;
+  top: 4px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 11px;
+  background: var(--bg-hover);
+  border: 1px solid var(--amber-dim);
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 2;
+}
+.stats-tip b { color: var(--amber); }
+.stats-tip .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.dot.amber, .sw.amber { background: var(--amber); }
+.dot.cyan, .sw.cyan { background: var(--cyan); }
+.stats-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.stats-legend .sw {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+.stats-legend .sw.cyan { height: 3px; border-radius: 0; }
+
+.stats-hours .bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 118px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+}
+.stats-hours .hbar {
+  flex: 1;
+  min-width: 2px;
+  background: linear-gradient(180deg, var(--amber), rgba(184, 130, 42, .25));
+  border-radius: 2px 2px 0 0;
+  cursor: default;
+  transition: filter .2s ease;
+}
+.stats-hours .hbar:hover { filter: brightness(1.35); }
+.stats-hours .hbar.peak {
+  background: linear-gradient(180deg, var(--cyan), rgba(77, 216, 230, .25));
+}
+.stats-hours .hlabels { display: flex; gap: 3px; margin-top: 6px; }
+.stats-hours .hlabels span {
+  flex: 1;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--muted);
+}
+
+.stats-rank { display: flex; flex-direction: column; gap: 11px; }
+.rank-head {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  margin-bottom: 4px;
+  font-size: 12.5px;
+}
+.rank-n { font-size: 11px; color: var(--amber-dim); }
+.rank-name { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-val { margin-left: auto; white-space: nowrap; font-size: 11.5px; }
+.rank-val em { margin-left: 4px; font-style: normal; font-size: 10.5px; color: var(--muted); }
+.stats .ant-progress { line-height: 1; }
+
+.stats .ant-table { background: transparent; }
+.stats .ant-table-thead > tr > th {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.stats .ant-table-tbody > tr > td { font-size: 12.5px; }
+.stats-solutions { padding-left: 18px; font-size: 12.5px; line-height: 2; color: var(--muted); }
+.stats-solutions b { color: var(--ink); }
+.stats-note code, .stats p code {
+  padding: 1px 5px;
+  background: var(--bg);
+  border: 1px solid var(--line-soft);
+  border-radius: 3px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--amber);
+}
+
+@media (max-width: 860px) {
+  .stats-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stats-two { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .stats-kpis { gap: 9px; }
+  .stats-ctl { gap: 8px; }
+  .stats-ctl .ctl-right { margin-left: 0; width: 100%; }
+  .stats .ant-card-body { padding: 12px; }
+}
