@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>今天吃什么 · 转盘</title>
-<meta name="description" content="按当前时间判断早餐、午餐、晚餐，再选中餐、西餐、马来西亚餐或别的国家，转一下就知道吃什么。">
+<meta name="description" content="按当前时间判断早餐、午餐、晚餐，从深圳外卖常见的猪脚饭、肠粉、烧腊、砂锅粥里转一个，也能切到各国菜系。">
 <meta name="theme-color" content="#fbf7ec">
 <style>
 :root{
@@ -211,9 +211,10 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
       </div>
 
       <div class="panel-block">
-        <h2>想吃哪国菜</h2>
+        <h2>想点哪一类</h2>
         <div class="chips" id="cuisineChips">
-          <button class="chip" type="button" data-cuisine="all" aria-pressed="true">全都行</button>
+          <button class="chip" type="button" data-cuisine="all" aria-pressed="false">全都行</button>
+          <button class="chip" type="button" data-cuisine="sz" aria-pressed="true">深圳外卖</button>
           <button class="chip" type="button" data-cuisine="zh" aria-pressed="false">中餐</button>
           <button class="chip" type="button" data-cuisine="west" aria-pressed="false">西餐</button>
           <button class="chip" type="button" data-cuisine="my" aria-pressed="false">马来西亚</button>
@@ -250,6 +251,12 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
 
   /* 菜池：每个菜系 × 早/午/晚。名字刻意压短，转盘上才排得下 */
   var MENU = {
+    sz:{
+      name:'深圳外卖',
+      breakfast:['广式肠粉','牛肉肠粉','皮蛋瘦肉粥','虾饺皇','叉烧包','流沙包','牛肉丸汤粉','艇仔粥','咸骨粥','普宁肠粉','糯米鸡','菠萝包'],
+      lunch:['隆江猪脚饭','烧鹅饭','蜜汁叉烧饭','腊味煲仔饭','辣椒炒肉','酸菜鱼','牛肉丸粿条','椰子鸡','潮汕卤水饭','海鲜砂锅粥','螺蛳粉','瓦罐汤拌粉','啫啫鸡煲','白切鸡饭','鸡胸藜麦碗','干炒牛河','烧腊三拼'],
+      dinner:['椰子鸡火锅','潮汕牛肉锅','光明乳鸽','蒜蓉烤生蚝','海鲜砂锅粥','啫啫鸡煲','大鹏窑鸡','麻辣小龙虾','炭火烧烤','辣味煲仔饭','毛血旺','豉油皇炒面','杨枝甘露','双皮奶','手打柠檬茶']
+    },
     zh:{
       name:'中餐',
       breakfast:['豆浆油条','小笼包','皮蛋瘦肉粥','煎饼果子','肠粉','生煎包','牛肉面','小馄饨','咸豆花','白粥腐乳'],
@@ -294,6 +301,32 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
     }
   };
 
+  /* 深圳外卖：抽中后补一句能直接下单的提示（价位带 + 一句话），别的菜系沿用原文案 */
+  var SZ_NOTE = {
+    '广式肠粉':'8–15 元 · 早餐销量霸主',       '牛肉肠粉':'12–18 元 · 现蒸现送',
+    '皮蛋瘦肉粥':'10–16 元 · 暖胃开局',         '虾饺皇':'18–28 元 · 早茶点心',
+    '叉烧包':'12–20 元 · 蜜汁松软',             '流沙包':'12–20 元 · 咸甜流心',
+    '牛肉丸汤粉':'15–22 元 · 潮汕手打丸',       '艇仔粥':'12–18 元 · 广式老味道',
+    '咸骨粥':'12–18 元 · 砂锅现煲',             '普宁肠粉':'12–18 元 · 酱厚料足',
+    '糯米鸡':'10–16 元 · 荷叶蒸香',             '菠萝包':'6–12 元 · 配杯冻柠茶',
+    '隆江猪脚饭':'15–22 元 · 深圳外卖之王',     '烧鹅饭':'20–30 元 · 皮脆配酸梅酱',
+    '蜜汁叉烧饭':'18–26 元 · 烧腊常青款',       '腊味煲仔饭':'22–32 元 · 锅巴是灵魂',
+    '辣椒炒肉':'25–38 元 · 湘菜下饭王',         '酸菜鱼':'30–45 元 · 单人份也够',
+    '牛肉丸粿条':'18–26 元 · 潮汕汤头',         '椰子鸡':'35–55 元 · 深圳聚餐头牌',
+    '潮汕卤水饭':'18–26 元 · 卤鹅配豆干',       '海鲜砂锅粥':'28–45 元 · 现煲够鲜',
+    '螺蛳粉':'15–25 元 · 乡愁解药',             '瓦罐汤拌粉':'15–22 元 · 江西小炒搭档',
+    '啫啫鸡煲':'30–45 元 · 砂锅滋滋响',         '白切鸡饭':'20–30 元 · 湛江风味',
+    '鸡胸藜麦碗':'25–38 元 · 科技园轻食',       '干炒牛河':'20–30 元 · 镬气要够',
+    '烧腊三拼':'22–32 元 · 一次吃齐',
+    '椰子鸡火锅':'60–90 元 · 沙姜青桔蘸料',     '潮汕牛肉锅':'70–110 元 · 吊龙涮八秒',
+    '光明乳鸽':'35–55 元 · 深圳出圈硬菜',       '蒜蓉烤生蚝':'30–50 元 · 夜宵外卖爆款',
+    '大鹏窑鸡':'40–60 元 · 客家农家味',         '麻辣小龙虾':'60–100 元 · 加班搭子',
+    '炭火烧烤':'40–70 元 · 城中村夜里',         '辣味煲仔饭':'22–32 元 · 主食销量第一',
+    '毛血旺':'30–45 元 · 川味下饭',             '豉油皇炒面':'18–26 元 · 镬气宵夜',
+    '杨枝甘露':'15–25 元 · 糖水收尾',           '双皮奶':'12–20 元 · 广式糖水',
+    '手打柠檬茶':'12–20 元 · 解腻神器'
+  };
+
   var MEAL_TEXT = {
     breakfast:{label:'早餐',title:'该吃早餐了',symbol:'☀'},
     lunch:{label:'午餐',title:'该吃午餐了',symbol:'◐'},
@@ -305,7 +338,7 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
   var rotor = $('rotor'), spinBtn = $('spinBtn');
   var result = $('result'), resultName = $('resultName'), resultMeta = $('resultMeta');
 
-  var state = { meal:'auto', cuisine:'all', pool:[], rotation:0, spinning:false, lastPick:-1 };
+  var state = { meal:'auto', cuisine:'sz', pool:[], rotation:0, spinning:false, lastPick:-1 };
 
   function autoMeal(){
     var d = new Date(), h = d.getHours() + d.getMinutes()/60;
@@ -490,7 +523,7 @@ footer a:hover{color:var(--ink);border-color:var(--ink)}
       result.classList.remove('hit');
       void result.offsetWidth;           /* 强制重排，让入场动效每次都跑 */
       resultName.textContent = state.pool[i];
-      resultMeta.textContent = '别纠结了，就它。';
+      resultMeta.textContent = SZ_NOTE[state.pool[i]] || '别纠结了，就它。';
       result.classList.add('hit');
       state.spinning = false;
       spinBtn.disabled = false;
