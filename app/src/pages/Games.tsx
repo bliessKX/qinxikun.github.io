@@ -16,8 +16,8 @@ export interface GameMeta {
 }
 
 export const GAMES: GameMeta[] = [
-  { id: 'llk', name: '连连看', desc: '经典 tile 配对：找到能用不超过两个转角连线消除的同图案方块，卡死自动洗牌。', stack: '原生 JS + CSS', cat: '逻辑', glyph: '◫' },
-  { id: 'match3', name: '消消乐', desc: '三消玩法：交换相邻方块凑成三连，连锁下落、无限级联，30 步内冲高分。', stack: '原生 JS + CSS', cat: '逻辑', glyph: '◆' },
+  { id: 'stardew', name: '星露谷 · 农场', desc: '纯前端农场模拟：网格 Tilemap 上翻地、播种、浇水、收获，四季轮回、背包金币，进度存本地。', stack: '原生 JS + CSS', cat: '模拟', glyph: '🌾' },
+  { id: 'happy', name: '开心消消乐', desc: '动物图片版三消：交换相邻动物凑成三个相同即消除，连锁下落翻倍计分，卡死自动重排。', stack: '原生 JS + CSS', cat: '逻辑', glyph: '🐾' },
   { id: 'shooter', name: '星河突击', desc: '太空射击：驾驶战机迎击俯冲的敌机编队，击落得分，被击中扣命，撑过一波又一波。', stack: 'Phaser 3', cat: '街机', glyph: '▲' },
   { id: 'slingshot', name: '弹弓堡垒', desc: '愤怒的小鸟式物理弹射：拉开弹弓轰塌木架，把据守的目标全部击落，三关难度递进。', stack: 'Matter.js', cat: '物理', glyph: '➤' },
   { id: 'runner3d', name: '数据流跑酷', desc: '3D 无尽跑酷：在三条数据轨道间左右切换，躲避迎面而来的防火墙方块，越跑越快。', stack: 'Three.js', cat: '3D', glyph: '◱' },
@@ -25,8 +25,8 @@ export const GAMES: GameMeta[] = [
 ]
 
 const GAME_COMPONENTS: Record<string, LazyExoticComponent<ComponentType>> = {
-  llk: lazy(() => import('../games/llk')),
-  match3: lazy(() => import('../games/match3')),
+  stardew: lazy(() => import('../games/stardew')),
+  happy: lazy(() => import('../games/happy')),
   shooter: lazy(() => import('../games/shooter')),
   slingshot: lazy(() => import('../games/slingshot')),
   runner3d: lazy(() => import('../games/runner3d')),
@@ -69,7 +69,7 @@ export default function Games() {
     <div className="page">
       <div className="page-head">
         <h1><span className="slash">/</span>games</h1>
-        <p>街机大厅 —— 纯逻辑、2D 物理弹射、3D 跑酷、摄像头体感，全部浏览器本地运行，断网也能玩。</p>
+        <p>游戏大厅 —— 农场模拟、动物三消、2D 物理弹射、3D 跑酷、摄像头体感，全部浏览器本地运行，断网也能玩。</p>
       </div>
       <div className="gm-grid">
         {GAMES.map((g) => (
@@ -88,7 +88,7 @@ export default function Games() {
         ))}
       </div>
       <p className="muted" style={{ marginTop: 20, fontFamily: 'var(--mono)', fontSize: 11.5 }}>
-        6 款游戏 · 每款独立分包，点开才下载对应引擎
+        {GAMES.length} 款游戏 · 每款独立分包，点开才下载对应引擎
       </p>
     </div>
   )

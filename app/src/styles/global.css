@@ -1430,63 +1430,77 @@ button { font-family: inherit; cursor: pointer; }
 }
 .gm-over-ops { display: flex; gap: 10px; margin-top: 6px; }
 
-/* ---- 连连看 ---- */
-.llk-board {
-  display: grid; gap: 5px;
-  max-width: 860px; margin: 0 auto;
-  background: var(--bg); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 10px;
-}
-.llk-tile {
-  aspect-ratio: 1 / 1; min-width: 0;
-  display: grid; place-items: center;
-  font-family: var(--mono); font-size: clamp(12px, 2.1vw, 17px); font-weight: 700;
-  background: var(--bg-elev); border: 1px solid var(--line); border-radius: 4px;
-  color: var(--ink); cursor: pointer; padding: 0;
-  transition: transform .12s, border-color .12s, box-shadow .12s;
-}
-.llk-tile.on:hover { border-color: var(--amber-dim); }
-.llk-tile.pick {
-  border-color: var(--amber); color: var(--amber);
-  transform: scale(1.08); box-shadow: 0 0 12px rgba(240, 168, 50, .3);
-}
-.llk-tile.bad { border-color: var(--red); color: var(--red); animation: gm-shake .3s; }
-@keyframes gm-shake {
-  25% { transform: translateX(-3px); } 50% { transform: translateX(3px); } 75% { transform: translateX(-2px); }
-}
-.llk-tile:disabled { background: transparent; border-color: transparent; cursor: default; }
-/* 图案分色（10 色循环） */
-.llk-tile.s-a { color: var(--amber); } .llk-tile.s-b { color: var(--cyan); }
-.llk-tile.s-c { color: var(--green); } .llk-tile.s-d { color: var(--red); }
-.llk-tile.s-e { color: #c9a7f5; } .llk-tile.s-f { color: #7fd4c1; }
-.llk-tile.s-g { color: #e8d44d; } .llk-tile.s-h { color: #9db8e8; }
-.llk-tile.s-j { color: #e89db8; } .llk-tile.s-k { color: #b8e89d; }
-
-/* ---- 消消乐 ---- */
-.m3-board {
+/* ---- 开心消消乐（动物图片版） ---- */
+.happy { display: flex; flex-direction: column; align-items: center; }
+.happy-board {
   position: relative; width: min(480px, 92vw); aspect-ratio: 1 / 1;
   background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
   overflow: hidden; touch-action: manipulation;
 }
-.m3-tile {
+.happy-tile {
   position: absolute; top: 0; left: 0; width: 12.5%; aspect-ratio: 1;
-  border-radius: 5px; cursor: pointer;
-  border: 1px solid rgba(232, 227, 216, .12);
-  transition: transform .18s ease, opacity .18s, scale .18s;
+  border-radius: 6px; cursor: pointer;
+  background: var(--bg-elev); border: 1px solid var(--line);
+  display: grid; place-items: center;
+  transition: transform .18s ease, opacity .18s, scale .18s, box-shadow .15s, background .15s;
 }
-.m3-tile.pick { box-shadow: 0 0 0 2px var(--ink) inset, 0 0 10px rgba(240,168,50,.4); z-index: 2; }
-.m3-tile.pop { animation: m3-pop .2s ease forwards; z-index: 3; }
+.happy-tile .happy-emoji {
+  font-size: clamp(20px, 5.5vw, 30px); line-height: 1; user-select: none;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4));
+}
+.happy-tile.pick { box-shadow: 0 0 0 2px var(--ink) inset, 0 0 12px rgba(240,168,50,.5); z-index: 2; background: var(--bg-hover); }
+.happy-tile.pop { animation: m3-pop .2s ease forwards; z-index: 3; }
 @keyframes m3-pop {
   40% { scale: 1.18; filter: brightness(1.8); }
   100% { scale: 0; opacity: 0; }
 }
-.m3-board.busy .m3-tile { cursor: wait; }
-.m3-tile.c0 { background: #f0a832; } .m3-tile.c1 { background: #4dd8e6; }
-.m3-tile.c2 { background: #7bc96f; } .m3-tile.c3 { background: #e06c60; }
-.m3-tile.c4 { background: #c9a7f5; } .m3-tile.c5 { background: #e8d44d; }
-.m3 .gm-over { position: absolute; }
+.happy-board.busy .happy-tile { cursor: wait; }
+.happy .gm-over { position: absolute; }
 .gm-chain { color: var(--amber); }
 .gm-target { font-style: normal; color: var(--muted); }
+
+/* ---- 星露谷 · 农场模拟 ---- */
+.sd { display: flex; flex-direction: column; gap: 16px; }
+.sd-bar {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elev);
+}
+.sd-bar b { color: var(--ink); font-weight: 600; }
+.sd-bar .sd-season { color: var(--amber); font-weight: 700; }
+.sd-bar-ops { margin-left: auto; display: flex; gap: 8px; }
+.sd-bar button, .sd-toolsel button, .sd-seedsel button {
+  font-family: var(--mono); font-size: 12px; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.sd-bar button:hover, .sd-toolsel button:hover, .sd-seedsel button:hover { border-color: var(--amber); color: var(--amber); }
+.sd-toolsel, .sd-seedsel { display: flex; gap: 8px; flex-wrap: wrap; }
+.sd-toolsel button.on, .sd-seedsel button.on { border-color: var(--amber); color: var(--amber); background: var(--bg-hover); }
+.sd-seedsel { align-items: center; }
+.sd-seedsel .sd-label { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-right: 4px; }
+.sd-map {
+  display: grid; gap: 2px; width: min(560px, 96vw); margin: 0 auto;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px;
+  touch-action: manipulation;
+}
+.sd-tile {
+  aspect-ratio: 1 / 1; min-width: 0;
+  display: grid; place-items: center;
+  font-size: clamp(14px, 3.2vw, 22px); line-height: 1;
+  border: 1px solid rgba(232, 227, 216, .08); border-radius: 4px;
+  cursor: pointer; user-select: none; position: relative;
+  transition: box-shadow .12s;
+}
+.sd-tile:hover { box-shadow: 0 0 0 1px var(--amber-dim) inset; }
+.sd-tile.grass  { background: #1f3a24; }
+.sd-tile.soil   { background: #5a3d24; }
+.sd-tile.watered { background: #3a2c44; box-shadow: inset 0 0 0 2px rgba(77, 216, 230, .35); }
+.sd-tile.mature .sd-crop { filter: drop-shadow(0 0 6px rgba(240, 168, 50, .55)); }
+.sd-tile .sd-badge { position: absolute; top: 1px; right: 2px; font-size: 9px; opacity: .85; }
+.sd-inv { display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.sd-inv b { color: var(--ink); }
+.sd-msg { font-size: 12px; color: var(--cyan); min-height: 16px; }
 
 /* ---- Phaser / 自绘 canvas 类游戏 ---- */
 .shooter-host, .sling-cv, .runner-host, .balloon-stage {
