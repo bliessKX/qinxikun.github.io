@@ -1,5 +1,5 @@
 /**
- * 新闻检索的 GitHub 账号核验门禁 + 每账号 1000 次配额。
+ * 新闻检索的 GitHub 账号核验门禁 + 每账号 100 次配额。
  *
  * 【能力边界】这不是 OAuth 授权。GitHub 标准 web flow 换 token 必须带
  * client_secret 并走服务端回调，纯静态站放不住 secret。这里核验账号是否
@@ -16,7 +16,7 @@
  */
 const USER_KEY = 'nice2.news.github.user.v1'
 const QUOTA_KEY = 'nice2.news.quota.v1'
-export const QUOTA_LIMIT = 1000
+export const QUOTA_LIMIT = 100
 
 export interface GithubUser {
   login: string

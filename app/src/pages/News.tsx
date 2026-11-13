@@ -132,7 +132,7 @@ export default function News() {
   const run = async () => {
     if (!user) { setLoginError('先用 GitHub 账号核验，再开始检索。'); return }
     if (remainingQuota(user.login) <= 0) {
-      setError(new NewsError('这个账号的 1000 次额度用完了。', '换个 GitHub 账号核验，或等额度重置。'))
+      setError(new NewsError('这个账号的 100 次额度用完了。', '换个 GitHub 账号核验，或等额度重置。'))
       return
     }
     setLoading(true); setError(null); setFailedImages(new Set())
@@ -162,7 +162,7 @@ export default function News() {
     <div className="page news">
       <div className="page-head">
         <h1><span className="slash">/</span>news</h1>
-        <p>新闻检索台。输入一个词，拿回按相关度排好的来源、摘要与图集。检索前先用 GitHub 账号核验，每个账号 1000 次额度。</p>
+        <p>新闻检索台。输入一个词，拿回按相关度排好的来源、摘要与图集。检索前先用 GitHub 账号核验，每个账号 100 次额度。</p>
       </div>
 
       {!user ? (
@@ -333,7 +333,7 @@ export default function News() {
       <section className="section news-about">
         <h3>检索说明</h3>
         <p>结果由 Tavily 提供，新闻范围走 <code>news</code> 索引，按相关度排列；深度检索会附带一段综述。图集来自响应的 <code>images</code> 字段，加载不到的图片自动略过。</p>
-        <p>每个 GitHub 账号 1000 次检索额度，额度记录在本机；账号核验走 GitHub 公开头像端点，不消耗 REST 配额，因此限流时仍可直接登录。数据源 <code>app/src/lib/news.ts</code>，鉴权 <code>app/src/lib/github-auth.ts</code>。</p>
+        <p>每个 GitHub 账号 100 次检索额度，额度记录在本机；账号核验走 GitHub 公开头像端点，不消耗 REST 配额，因此限流时仍可直接登录。数据源 <code>app/src/lib/news.ts</code>，鉴权 <code>app/src/lib/github-auth.ts</code>。</p>
       </section>
     </div>
   )

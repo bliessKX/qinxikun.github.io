@@ -21,6 +21,40 @@ export const CITIES: City[] = [
   { name: '纽约', lat: 40.7128, lon: -74.0060, wttr: 'New+York' },
 ]
 
+/**
+ * 任意城市名 → 坐标：Open-Meteo 地理编码解析。
+ * 预设七城直接命中，其余城市（广州、杭州、巴黎、São Paulo…）也能定位。
+ */
+export async function resolveCity(input: string): Promise<City> {
+  const name = input.trim().replace(/^@/, '')
+  if (!name) throw new Error('先填一个城市名。')
+  const preset = CITIES.find(
+    (c) => c.name === name || c.wttr.replace('+', ' ').toLowerCase() === name.toLowerCase(),
+  )
+  if (preset) return preset
+  const url =
+    'https://geocoding-api.open-meteo.com/v1/search?name=' +
+    encodeURIComponent(name) + '&count=1&language=zh&format=json'
+  let res: Response
+  try {
+    res = await fetch(url)
+  } catch {
+    throw new Error('定位服务暂时没响应，稍后再试。')
+  }
+  if (!res.ok) throw new Error('定位服务没响应，稍后再试。')
+  const j = (await res.json()) as {
+    results?: Array<{ name: string; latitude: number; longitude: number; country?: string }>
+  }
+  const hit = j.results?.[0]
+  if (!hit) throw new Error(`没找到「${name}」，换个写法（支持中英文）再试。`)
+  return {
+    name: hit.country && hit.country !== '中国' ? `${hit.name} · ${hit.country}` : hit.name,
+    lat: hit.latitude,
+    lon: hit.longitude,
+    wttr: encodeURIComponent(hit.name),
+  }
+}
+
 export type ApiKind = 'weather' | 'air' | 'hko' | 'picture' | 'photo' | 'text' | 'json'
 export interface ApiCtx { city: City; q: string }
 export interface ApiDef {

@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRise } from '../App'
 import {
-  APIS, CATEGORIES, CITIES, aqiLabel, flatFields, runApi, weatherOf,
+  APIS, CATEGORIES, CITIES, aqiLabel, flatFields, resolveCity, runApi, weatherOf,
+  type City,
   type ApiDef, type ApiResult, type Glyph,
 } from '../lib/publicApis'
 
@@ -230,21 +231,42 @@ function ApiVisual({ api, result, city }: { api: ApiDef; result: ApiResult; city
 export default function Apis() {
   useRise()
   const [selectedId, setSelectedId] = useState('open-meteo')
-  const [cityIdx, setCityIdx] = useState(0)
+  const [city, setCity] = useState<City>(CITIES[0])
+  const [cityDraft, setCityDraft] = useState(CITIES[0].name)
+  const [cityNote, setCityNote] = useState('')
   const [q, setQ] = useState('')
   const [tick, setTick] = useState(0)
   const [result, setResult] = useState<ApiResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [rawOpen, setRawOpen] = useState(false)
   const lastKey = useRef('')
+  const cityDraftRef = useRef(CITIES[0].name)
 
   useEffect(() => { document.title = 'APIs — NICE.BLOG 2.0' }, [])
 
   const selected = APIS.find((a) => a.id === selectedId) || APIS[0]
-  const city = CITIES[cityIdx]
+
+  /** 回车 / 失焦 / 重新请求时应用城市：预设直接命中，其他走地理编码定位。 */
+  const applyCity = async () => {
+    const raw = cityDraftRef.current.trim()
+    if (!raw || raw === city.name) { return }
+    setCityNote(`正在定位「${raw}」…`)
+    try {
+      const c = await resolveCity(raw)
+      lastKey.current = '' /* 城市对象变化即触发重查 */
+      setCity(c)
+      setCityDraft(c.name)
+      cityDraftRef.current = c.name
+      setCityNote(c.name === raw ? '' : `已定位：${c.name}`)
+    } catch (e) {
+      setCityNote((e as Error).message)
+      setCityDraft(city.name)
+      cityDraftRef.current = city.name
+    }
+  }
 
   useEffect(() => {
-    const key = `${selectedId}|${cityIdx}|${tick}`
+    const key = `${selectedId}|${city.name}|${city.lat}|${tick}`
     if (lastKey.current === key) return
     lastKey.current = key
     let alive = true
@@ -256,7 +278,7 @@ export default function Apis() {
     return () => { alive = false }
     // q 输入不自动触发，点「重新请求」时才用最新值
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, cityIdx, tick])
+  }, [selectedId, city, tick])
 
   // 只有「结果属于当前接口」时才渲染：切换瞬间不会拿上一个接口的 data 喂给新组件
   const shown = result && result.apiId === selected.id ? result : null
@@ -277,19 +299,28 @@ export default function Apis() {
 
       <div className="api-toolbar">
         <label>城市
-          <select value={cityIdx} onChange={(e) => setCityIdx(Number(e.target.value))}>
-            {CITIES.map((c, i) => <option key={c.name} value={i}>{c.name}</option>)}
-          </select>
+          <input
+            value={cityDraft}
+            list="api-city-presets"
+            spellCheck={false}
+            onChange={(e) => { setCityDraft(e.target.value); cityDraftRef.current = e.target.value }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCity() } }}
+            onBlur={() => applyCity()}
+            placeholder="预设可选，或输入任意城市"
+            aria-label="城市名，支持任意输入" />
+          <datalist id="api-city-presets">
+            {CITIES.map((c) => <option key={c.name} value={c.name} />)}
+          </datalist>
         </label>
         <label>关键词
           <input value={q} onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); setTick((t) => t + 1) } }}
             placeholder="名字 / 书名 / 城市名" aria-label="接口关键词" />
         </label>
-        <button className="btn" type="button" onClick={() => setTick((t) => t + 1)} disabled={loading}>
+        <button className="btn" type="button" onClick={() => { applyCity(); setTick((t) => t + 1) }} disabled={loading}>
           {loading ? '请求中…' : '重新请求'}
         </button>
-        <span className="api-toolbar-note">标了「关键词」的接口会用这个输入</span>
+        <span className="api-toolbar-note">{cityNote || '预设城市可直接选，其他城市输入后回车定位（广州、杭州、巴黎都行）'}</span>
       </div>
 
       <div className="api-grid">
