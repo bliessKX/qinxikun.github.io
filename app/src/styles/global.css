@@ -1146,3 +1146,199 @@ button { font-family: inherit; cursor: pointer; }
   .news-signal.busy { animation: none; }
   .news-prompt, .news-gallery-strip a, .news-thumb { transition: none; }
 }
+
+/* ============================================================
+   /apis · 公共接口台 —— 左索引 / 右请求控制台。
+   沿用 CRT 琥珀终端 token；天气结果是一处用力的重点，
+   其余接口安静地给图片、一句话或字段列表。
+   ============================================================ */
+.api-source { margin-top: 10px; font: 11.5px var(--mono); color: var(--muted); }
+.api-source a { color: var(--amber); }
+.api-toolbar {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px;
+  margin-bottom: 16px; padding: 14px 16px;
+  background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.api-toolbar > label { display: flex; flex-direction: column; gap: 6px; font: 11px var(--mono); color: var(--muted); }
+.api-toolbar select, .api-toolbar input {
+  font: 12.5px var(--mono); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px;
+}
+.api-toolbar input { min-width: 210px; }
+.api-toolbar input::placeholder { color: #4a5265; }
+.api-toolbar .btn { padding: 8px 16px; font-size: 12px; }
+.api-toolbar .btn:disabled { opacity: .55; cursor: progress; transform: none; }
+.api-toolbar-note { margin-left: auto; font-size: 11.5px; color: var(--muted); }
+
+.api-grid { display: grid; grid-template-columns: 286px minmax(0, 1fr); gap: 16px; align-items: start; }
+.api-index {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg-elev); padding: 6px 0; overflow: hidden;
+}
+.api-cat { padding: 10px 0 4px; border-bottom: 1px solid var(--line-soft); }
+.api-cat:last-child { border-bottom: 0; }
+.api-cat h3 {
+  padding: 0 16px 6px; font: 11px var(--mono); color: var(--muted);
+  letter-spacing: .04em; font-weight: 400;
+}
+.api-cat ul { list-style: none; margin: 0; padding: 0; }
+.api-cat li { padding: 0 8px; }
+.api-cat li > button {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 7px 8px; border: 0; border-left: 2px solid transparent;
+  background: transparent; color: var(--ink); text-align: left;
+  font: 12.5px var(--mono); border-radius: 3px;
+  transition: background .15s ease, color .15s ease;
+}
+.api-cat li > button:hover { background: var(--bg-hover); }
+.api-cat li > button.on { background: rgba(240, 168, 50, .09); border-left-color: var(--amber); color: var(--amber); }
+.api-cat li > button span { flex: 1; }
+.api-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); flex: none; }
+.api-desc { padding: 0 10px 8px 10px; font-size: 11px; line-height: 1.6; color: var(--muted); }
+.api-desc em { font-style: normal; color: var(--cyan); }
+
+.api-console { border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elev); overflow: hidden; }
+.api-endpoint {
+  display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+  background: #0f141e; border-bottom: 1px solid var(--line);
+}
+.api-method {
+  flex: none; font: 11px var(--mono); color: var(--green);
+  border: 1px solid rgba(123, 201, 111, .4); border-radius: 3px; padding: 2px 7px;
+}
+.api-endpoint code {
+  font: 11.5px var(--mono); color: var(--ink); opacity: .82;
+  white-space: nowrap; overflow-x: auto; display: block;
+}
+.api-status {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+  padding: 9px 14px; border-bottom: 1px solid var(--line-soft);
+  font: 11px var(--mono); color: var(--muted);
+}
+.api-code { border-radius: 3px; padding: 1px 7px; border: 1px solid var(--line); color: var(--muted); }
+.api-code.ok { color: var(--green); border-color: rgba(123, 201, 111, .45); }
+.api-code.bad { color: var(--red); border-color: rgba(224, 108, 96, .5); }
+.api-sep { color: var(--line); }
+.api-loading { padding: 34px 16px; text-align: center; font: 12px var(--mono); color: var(--muted); }
+.api-loading i {
+  display: inline-block; width: 7px; height: 7px; margin-right: 8px;
+  border-radius: 50%; background: var(--amber); animation: api-blink 1.1s ease-in-out infinite;
+}
+@keyframes api-blink { 50% { opacity: .3; } }
+.api-error { margin: 16px; padding: 14px 16px; border: 1px solid rgba(224, 108, 96, .4); border-radius: 4px; background: rgba(224, 108, 96, .06); }
+.api-error b { color: var(--red); font-size: 13px; }
+.api-error p { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+
+/* ---------- 天气可视化 ---------- */
+.api-weather { padding: 20px 22px 22px; }
+.api-weather-main { display: flex; align-items: center; gap: 22px; }
+.api-glyph { flex: none; }
+.api-temp { font: 600 clamp(38px, 5.4vw, 58px)/1 var(--mono); color: var(--amber); letter-spacing: -.03em; }
+.api-temp em { font-style: normal; font-size: 20px; margin-left: 5px; color: var(--muted); }
+.api-weather-label { margin-top: 8px; font: 12px var(--mono); color: var(--ink); opacity: .8; }
+.api-weather-meta { margin-top: 16px; font: 11.5px var(--mono); color: var(--muted); }
+.api-forecast {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px;
+  margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line-soft);
+}
+.api-fc-col { display: flex; flex-direction: column; align-items: center; gap: 3px; font: 11px var(--mono); }
+.api-fc-day { color: var(--muted); font-size: 10.5px; }
+.api-fc-col .api-glyph { opacity: .9; }
+.api-fc-bar { position: relative; width: 6px; height: 62px; margin: 4px 0; background: var(--line); border-radius: 3px; }
+.api-fc-bar i {
+  position: absolute; left: 0; right: 0;
+  background: linear-gradient(0deg, var(--cyan), var(--amber)); border-radius: 3px;
+}
+.api-fc-col b { color: var(--ink); font-weight: 600; }
+.api-fc-col > span:last-child { color: var(--muted); font-size: 10.5px; }
+
+/* ---------- 空气质量 / 香港天文台 ---------- */
+.api-air { display: flex; align-items: center; gap: 24px; padding: 26px 22px; }
+.api-aqi { font: 600 56px/1 var(--mono); color: var(--green); display: flex; flex-direction: column; gap: 8px; }
+.api-aqi.mid { color: var(--amber); }
+.api-aqi.warn { color: #e8a24a; }
+.api-aqi.bad { color: var(--red); }
+.api-aqi span { font: 11px var(--mono); color: var(--muted); }
+.api-air-side b { font-size: 16px; color: var(--ink); }
+.api-air-side p { margin-top: 6px; font: 12px var(--mono); color: var(--muted); }
+.api-hko { padding: 18px 22px 22px; }
+.api-hko-head { font: 12px var(--mono); color: var(--ink); margin-bottom: 14px; }
+.api-hko-head span { margin-left: 10px; color: var(--muted); font-size: 11px; }
+.api-hko-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 9px; }
+.api-hko-grid > div { padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); }
+.api-hko-grid span { display: block; font-size: 11.5px; color: var(--muted); }
+.api-hko-grid b { font: 600 20px var(--mono); color: var(--amber); }
+.api-hko-grid em { display: block; font-style: normal; font: 10.5px var(--mono); color: var(--muted); }
+.api-hko-warn { margin-top: 14px; padding: 10px 12px; border-left: 2px solid var(--amber); background: rgba(240, 168, 50, .06); font-size: 12px; color: var(--ink); }
+
+/* ---------- 图片 / 文本 / 字段 ---------- */
+.api-image { padding: 18px 22px 22px; }
+.api-image img {
+  display: block; max-width: 100%; max-height: 340px; margin: 0 auto 14px;
+  border: 1px solid var(--line); border-radius: 4px; background: var(--bg); object-fit: contain;
+}
+.api-image-fallback {
+  display: grid; place-items: center; height: 180px; margin-bottom: 14px;
+  border: 1px dashed var(--line); border-radius: 4px; color: var(--muted); font-size: 12.5px;
+}
+.api-image h3 { font: 600 16px var(--sans); color: var(--ink); margin-bottom: 8px; }
+.api-image p { max-width: 72ch; font-size: 13px; line-height: 1.85; color: var(--ink); opacity: .8; }
+.api-text { padding: 30px 24px; }
+.api-text > span { font: 11px var(--mono); color: var(--amber); }
+.api-text p { max-width: 60ch; margin-top: 10px; font: 500 19px/1.7 var(--sans); color: var(--ink); }
+.api-fields { padding: 14px 22px 20px; }
+.api-fields > div {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 8px 0; border-bottom: 1px dotted var(--line-soft); font-size: 12.5px;
+}
+.api-fields > div:last-child { border-bottom: 0; }
+.api-fields span { color: var(--cyan); flex: none; }
+.api-fields b { font-weight: 500; color: var(--ink); text-align: right; word-break: break-all; }
+
+/* ---------- 原始响应 ---------- */
+.api-raw { border-top: 1px solid var(--line-soft); }
+.api-raw > button {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 10px 14px; background: transparent; border: 0;
+  font: 11.5px var(--mono); color: var(--muted); text-align: left; cursor: pointer;
+}
+.api-raw > button:hover { color: var(--amber); }
+.api-raw > button span { margin-left: auto; font-size: 14px; }
+.api-raw pre {
+  max-height: 360px; overflow: auto; margin: 0; padding: 14px 16px;
+  background: var(--bg); border-top: 1px solid var(--line-soft);
+  font: 11.5px/1.65 var(--mono); color: var(--ink);
+}
+.api-about p { max-width: 76ch; font-size: 12.5px; line-height: 1.95; color: var(--muted); margin-bottom: 8px; }
+
+@media (max-width: 960px) {
+  .api-grid { grid-template-columns: 1fr; }
+  .api-index {
+    display: flex; gap: 8px; overflow-x: auto; padding: 8px;
+    scrollbar-color: var(--line) transparent;
+  }
+  .api-cat { flex: 0 0 auto; border: 0; padding: 0; }
+  .api-cat h3, .api-desc { display: none; }
+  .api-cat ul { display: flex; gap: 6px; }
+  .api-cat li { padding: 0; }
+  .api-cat li > button { width: auto; white-space: nowrap; padding: 7px 11px; border-left: 0; border: 1px solid var(--line); }
+  .api-cat li > button.on { border-color: var(--amber-dim); }
+  .api-toolbar-note { margin-left: 0; flex: 1 1 100%; }
+}
+@media (max-width: 560px) {
+  .apis.page { padding-top: 26px; }
+  .apis .page-head { margin-bottom: 20px; }
+  .api-toolbar input { min-width: 0; width: 100%; }
+  .api-toolbar > label { flex: 1 1 100%; }
+  .api-weather { padding: 16px; }
+  .api-weather-main { gap: 12px; }
+  .api-temp { font-size: 38px; }
+  .api-forecast { gap: 3px; }
+  .api-fc-col { font-size: 10px; }
+  .api-fc-col .api-glyph { width: 20px; height: 20px; }
+  .api-image, .api-hko, .api-text, .api-fields { padding: 14px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .api-loading i { animation: none; }
+  .api-cat li > button { transition: none; }
+}

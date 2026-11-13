@@ -8,6 +8,7 @@ const NAV = [
   { to: '/tools', label: 'tools' },
   { to: '/flights', label: 'flights' },
   { to: '/news', label: 'news' },
+  { to: '/apis', label: 'apis' },
   { to: '/knowledge', label: 'knowledge' },
   { to: '/lab', label: 'lab' },
   { to: '/projects', label: 'projects' },
@@ -43,6 +44,7 @@ export default function Layout({ children }: { children: ReactNode }) {
           <Link to="/stats">访问统计</Link>
           <Link to="/flights">航班动态</Link>
           <Link to="/news">新闻检索</Link>
+          <Link to="/apis">公共接口台</Link>
           {GUESTBOOK_ENABLED && <Link to="/guestbook">留言板</Link>}
           <a href="./tools/json.html">JSON 工具</a>
           <a href="./tools/commands.html">命令速查</a>
