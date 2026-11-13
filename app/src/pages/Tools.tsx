@@ -6,10 +6,11 @@ import { useRise } from '../App'
  */
 
 interface ToolItem {
-  id: string; name: string; desc: string; href: string; tags: string[]
+  id: string; name: string; desc: string; href: string; tags: string[]; arrow?: string
 }
 
 const TOOLS: ToolItem[] = [
+  { id: 'flights', name: '实时航班动态', desc: 'AviationStack 实时航班：航显屏式列表、代码共享折叠、延误与空中遥测、原始 JSON。', href: '#/flights', tags: ['API', '实时'], arrow: '→' },
   { id: 'json', name: 'JSON 解析与格式化', desc: '格式化 / 校验 / 修复 / 压缩 / 键排序 / 树形视图，5 档示例数据，全本地运行。', href: './tools/json.html', tags: ['JSON', '高频'] },
   { id: 'commands', name: '常用命令速查', desc: 'Git / SVN / Linux / Docker / MySQL / Redis 等 9 类 119 条，搜索 + 整组复制。', href: './tools/commands.html', tags: ['终端', '高频'] },
   { id: 'wheel', name: '今天吃什么', desc: '按时段自动推荐早/中/晚餐，8 种菜系切换的 Canvas 转盘。', href: './tools/what-to-eat.html', tags: ['摸鱼'] },
@@ -79,7 +80,7 @@ export default function Tools() {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {recent.map((id) => {
               const t = byId(id)
-              return t ? <a key={id} className="kg-chip" style={{ textDecoration: 'none', padding: '6px 12px' }} href={t.href} onClick={() => markRecent(id)}>{t.name} ↗</a> : null
+              return t ? <a key={id} className="kg-chip" style={{ textDecoration: 'none', padding: '6px 12px' }} href={t.href} onClick={() => markRecent(id)}>{t.name} {t.arrow ?? '↗'}</a> : null
             })}
           </div>
         </section>
@@ -89,7 +90,7 @@ export default function Tools() {
         {list.map((t) => (
           <div key={t.id} className="card tool-card rise in">
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <a className="t-name" href={t.href} onClick={() => markRecent(t.id)}>{t.name} ↗</a>
+              <a className="t-name" href={t.href} onClick={() => markRecent(t.id)}>{t.name} {t.arrow ?? '↗'}</a>
               <button
                 onClick={() => toggleFav(t.id)}
                 aria-label={favs.includes(t.id) ? '取消收藏' : '收藏'}

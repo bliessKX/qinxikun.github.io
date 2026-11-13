@@ -16,6 +16,8 @@ import { trackVisit } from './lib/analytics'
 
 /* antd 体积较大，统计页按需加载：访问其它页面不下载这部分代码 */
 const Stats = lazy(() => import('./pages/Stats'))
+/* 航班工具按需加载：不访问 /flights 就不下发数据层与样本数据 */
+const Flights = lazy(() => import('./pages/Flights'))
 
 /** 入场编排：给 .rise 元素做一次 IntersectionObserver 淡入 */
 export function useRise() {
@@ -68,6 +70,11 @@ export default function App() {
         <Route path="/stats" element={
           <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/stats · 载入看板…</p></div></div>}>
             <Stats />
+          </Suspense>
+        } />
+        <Route path="/flights" element={
+          <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/flights · 载入航显屏…</p></div></div>}>
+            <Flights />
           </Suspense>
         } />
         <Route path="*" element={<NotFound />} />

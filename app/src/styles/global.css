@@ -647,3 +647,283 @@ button { font-family: inherit; cursor: pointer; }
 @media (max-width: 560px) {
   .gb-panel { padding: 18px; }
 }
+
+/* ============================================================
+   /flights · 航显屏（FIDS）——沿用 CRT 琥珀终端 token，
+   用「行式排版 + IATA 巨字 + live 遥测」建立航班数据专属结构。
+   全部 .flt- 前缀，避免与 .section / .card / .grid 互相抵消。
+   ============================================================ */
+.flt { font-variant-numeric: tabular-nums; }
+.flt-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.flt code {
+  font-family: var(--mono); font-size: 11.5px; color: var(--amber);
+  background: var(--bg); border: 1px solid var(--line-soft);
+  border-radius: 3px; padding: 1px 5px;
+}
+
+/* ---------- Key 设置 ---------- */
+.flt-keypanel {
+  display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 16px; padding: 14px 16px;
+  background: var(--bg-elev); border: 1px solid var(--line);
+  border-left: 2px solid var(--amber); border-radius: var(--radius);
+}
+.flt-keypanel .btn { padding: 8px 14px; font-size: 12px; }
+.flt-keypanel p { flex: 1 1 100%; margin-top: 4px; font-size: 11.5px; color: var(--muted); }
+.flt-keyfield { display: flex; flex-direction: column; gap: 6px; font: 11px var(--mono); color: var(--muted); }
+.flt-keyfield input {
+  width: min(380px, 72vw); font: 12.5px var(--mono); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 4px; padding: 8px 11px;
+}
+
+/* ---------- 筛选控制 ---------- */
+.flt-controls {
+  padding: 18px; margin-bottom: 14px;
+  background: var(--bg-elev); border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.flt-fields { display: flex; flex-wrap: wrap; gap: 12px; }
+.flt-fields-toggle { display: none; }
+.flt-fields > label {
+  display: flex; flex-direction: column; gap: 6px;
+  flex: 1 1 108px; min-width: 96px;
+  font: 11px var(--mono); color: var(--muted); letter-spacing: .02em;
+}
+.flt-fields input, .flt-fields select, .flt-search input {
+  width: 100%; font: 12.5px var(--mono); color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 4px; padding: 8px 10px;
+  font-variant-numeric: tabular-nums;
+}
+.flt-fields input::placeholder, .flt-search input::placeholder { color: #4a5265; }
+.flt-fields select { cursor: pointer; }
+.flt-actions {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-soft);
+}
+.flt-actions .btn { padding: 8px 15px; font-size: 12px; }
+.flt-actions .btn:disabled { opacity: .55; cursor: progress; transform: none; }
+.flt-search { flex: 1 1 220px; min-width: 170px; }
+.flt-quick {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin-top: 14px; font-size: 11.5px;
+}
+.flt-quick-label { font: 11px var(--mono); color: var(--muted); margin-right: 2px; }
+.flt-quick button {
+  font: 11.5px var(--mono); color: var(--muted);
+  background: transparent; border: 1px solid var(--line);
+  border-radius: 3px; padding: 4px 10px; transition: color .15s, border-color .15s, background .15s;
+}
+.flt-quick button:hover { color: var(--ink); border-color: var(--amber-dim); }
+.flt-quick button.on { color: var(--amber); border-color: var(--amber-dim); background: rgba(240, 168, 50, .08); }
+.flt-quick-note { color: #6b7488; font-size: 11px; margin-left: auto; }
+.flt-switch { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; }
+.flt-switch input { accent-color: var(--amber); cursor: pointer; }
+
+/* ---------- 状态条 / 错误 / 空态 ---------- */
+.flt-statusbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 9px;
+  margin-bottom: 14px; font: 11.5px var(--mono); color: var(--muted);
+}
+.flt-statusbar b { color: var(--ink); font-weight: 600; }
+.flt-sep { color: var(--line); }
+.flt-signal { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: none; }
+.flt-signal.busy { background: var(--amber); animation: flt-blink 1.1s ease-in-out infinite; }
+.flt-signal.err { background: var(--red); }
+@keyframes flt-blink { 50% { opacity: .3; } }
+.flt-error {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 14px; padding: 14px 16px;
+  background: rgba(224, 108, 96, .07); border: 1px solid rgba(224, 108, 96, .4);
+  border-radius: var(--radius);
+}
+.flt-error b { color: var(--red); font-size: 13px; }
+.flt-error p { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.flt-error-actions { display: flex; gap: 8px; }
+.flt-error-actions .btn { padding: 6px 12px; font-size: 12px; }
+.flt-empty {
+  padding: 40px 20px; text-align: center;
+  background: var(--bg-elev); border: 1px dashed var(--line); border-radius: var(--radius);
+}
+.flt-empty b { color: var(--ink); }
+.flt-empty p { color: var(--muted); font-size: 12.5px; margin: 6px 0 16px; }
+.flt-empty .btn { padding: 7px 14px; font-size: 12px; margin: 0 4px; }
+
+/* ---------- 概览四格 ---------- */
+.flt-summary {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px;
+  margin-bottom: 16px; background: var(--line);
+  border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden;
+}
+.flt-summary > div { background: var(--bg-elev); padding: 14px 18px; }
+.flt-summary span { display: block; font: 11px var(--mono); color: var(--muted); }
+.flt-summary b {
+  display: inline-block; margin-top: 4px;
+  font: 600 26px/1.2 var(--mono); color: var(--amber); letter-spacing: -.02em;
+}
+.flt-summary em { font-style: normal; font-size: 11px; color: var(--muted); margin-left: 8px; }
+
+/* ---------- 航显板 ---------- */
+.flt-board-wrap { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.flt-board { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.flt-board thead th {
+  text-align: left; padding: 11px 14px;
+  font: 11px var(--mono); font-weight: 400; letter-spacing: .04em; color: var(--muted);
+  background: #0f141e; border-bottom: 1px solid var(--line);
+}
+.flt-board thead th:nth-child(1) { width: 19%; }
+.flt-board thead th:nth-child(2) { width: 26%; }
+.flt-board thead th:nth-child(3) { width: 17%; }
+.flt-board thead th:nth-child(4) { width: 12%; }
+.flt-board thead th:nth-child(5) { width: 21%; }
+.flt-board thead th:nth-child(6) { width: 5%; }
+.flt-row td {
+  padding: 13px 14px; vertical-align: middle;
+  border-bottom: 1px solid var(--line-soft); background: var(--bg-elev);
+  transition: background .15s ease;
+}
+.flt-row:last-child td { border-bottom: 0; }
+.flt-row:hover td { background: var(--bg-hover); }
+.flt-row.open td { background: var(--bg-hover); border-bottom-color: transparent; }
+.flt-row.airborne td:first-child { box-shadow: inset 2px 0 0 var(--cyan); }
+.flt-no { font: 600 19px/1.25 var(--mono); color: var(--amber); letter-spacing: -.01em; }
+.flt-sub { margin-top: 3px; font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flt-share { margin-top: 4px; font: 10.5px var(--mono); color: var(--cyan); opacity: .85; }
+.flt-route { display: flex; align-items: center; gap: 10px; }
+.flt-route b { font: 600 20px/1 var(--mono); color: var(--ink); letter-spacing: .01em; }
+.flt-route-line {
+  position: relative; flex: 1; height: 1px; min-width: 18px;
+  background: repeating-linear-gradient(90deg, var(--amber-dim) 0 5px, transparent 5px 10px);
+}
+.flt-route-line::after {
+  content: ''; position: absolute; right: -1px; top: -3px;
+  border-left: 6px solid var(--amber); border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent;
+}
+.flt-airports { max-width: 100%; }
+.flt-times { display: flex; align-items: baseline; gap: 8px; }
+.flt-times b { font: 600 16px var(--mono); color: var(--ink); }
+.flt-times span { color: var(--muted); font-size: 12px; }
+.flt-gate { font: 13px var(--mono); color: var(--ink); }
+.flt-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  font: 11.5px var(--mono); padding: 3px 9px; border-radius: 3px;
+  border: 1px solid currentColor; white-space: nowrap;
+}
+.flt-pill i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
+.flt-pill.live { color: var(--cyan); }
+.flt-pill.ok { color: var(--green); }
+.flt-pill.warn { color: var(--amber); }
+.flt-pill.bad { color: var(--red); }
+.flt-delay {
+  font-style: normal; margin-left: 8px; padding-left: 8px;
+  border-left: 1px solid currentColor; color: var(--amber);
+}
+.flt-delay.hi { color: var(--red); }
+.flt-live-mini { margin-top: 5px; font: 10.5px var(--mono); color: var(--cyan); opacity: .9; }
+.flt-expand {
+  width: 26px; height: 26px; font: 16px/1 var(--mono); color: var(--muted);
+  background: transparent; border: 1px solid var(--line); border-radius: 3px;
+  transition: color .15s, border-color .15s;
+}
+.flt-expand:hover { color: var(--amber); border-color: var(--amber-dim); }
+.flt-detail-row td { padding: 0 14px 16px !important; background: var(--bg-hover) !important; border-bottom: 1px solid var(--line) !important; }
+
+/* ---------- 展开详情 ---------- */
+.flt-detail { padding: 16px 18px; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; }
+.flt-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.flt-endpoint-title { font: 11px var(--mono); color: var(--amber); letter-spacing: .04em; margin-bottom: 10px; }
+.flt-endpoint dl { margin: 0; }
+.flt-endpoint dl > div {
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 5px 0; border-bottom: 1px dotted var(--line-soft); font-size: 12px;
+}
+.flt-endpoint dl > div:last-child { border-bottom: 0; }
+.flt-endpoint dt { color: var(--muted); flex: none; }
+.flt-endpoint dd { margin: 0; font-family: var(--mono); color: var(--ink); text-align: right; word-break: break-all; }
+.flt-livebox {
+  margin-top: 16px; padding: 13px 15px;
+  background: rgba(77, 216, 230, .05); border: 1px solid rgba(77, 216, 230, .28); border-radius: 4px;
+}
+.flt-live-head { display: flex; align-items: center; gap: 8px; font: 11px var(--mono); color: var(--cyan); }
+.flt-live-pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: flt-blink 2.2s ease-in-out infinite; }
+.flt-live-stats { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; font: 11.5px var(--mono); color: var(--muted); }
+.flt-live-stats b { color: var(--ink); font-weight: 600; }
+.flt-altbar { height: 3px; margin-top: 12px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.flt-altbar i { display: block; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--amber)); }
+.flt-detail-meta { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 14px; font: 11.5px var(--mono); color: var(--muted); }
+.flt-detail-meta b { color: var(--ink); font-weight: 500; }
+.flt-codeshare { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+.flt-codeshare-head { font: 11px var(--mono); color: var(--amber); }
+.flt-codeshare-list { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 11.5px; color: var(--muted); }
+.flt-codeshare-list b { font-family: var(--mono); color: var(--ink); font-weight: 500; }
+
+/* ---------- 原始 JSON ---------- */
+.flt-json-wrap { margin-top: 16px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.flt-json-head {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 14px; background: #0f141e; border-bottom: 1px solid var(--line);
+  font: 11px var(--mono); color: var(--muted);
+}
+.flt-json-head button {
+  font: 11px var(--mono); color: var(--amber);
+  background: transparent; border: 1px solid var(--line); border-radius: 3px; padding: 3px 9px; cursor: pointer;
+}
+.flt-json {
+  max-height: 420px; overflow: auto; margin: 0; padding: 14px 16px;
+  font: 11.5px/1.65 var(--mono); color: var(--ink); background: var(--bg-elev);
+}
+
+/* ---------- 接口说明 ---------- */
+.flt-about p { max-width: 76ch; font-size: 12.5px; line-height: 1.95; color: var(--muted); margin-bottom: 8px; }
+.flt-about code { margin-right: 3px; }
+
+@media (max-width: 900px) {
+  .flt-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flt-quick-note { margin-left: 0; flex: 1 1 100%; }
+}
+@media (max-width: 760px) {
+  /* 窄屏先给数据：压缩上方留白 + 7 个字段收起，需要时再展开 */
+  .flt.page { padding-top: 26px; }
+  .flt .page-head { margin-bottom: 20px; }
+  .flt-controls { padding: 14px; }
+  .flt-quick-note { display: none; }
+  .flt-fields-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 12px var(--mono); color: var(--amber);
+    background: transparent; border: 1px solid var(--amber-dim);
+    border-radius: 3px; padding: 6px 12px;
+  }
+  .flt-fields-toggle span { font-size: 15px; line-height: 1; }
+  .flt-fields:not(.open) { display: none; }
+  .flt-fields.open { margin-top: 14px; }
+  .flt-board thead { display: none; }
+  .flt-board, .flt-board tbody, .flt-detail-row { display: block; }
+  .flt-row {
+    position: relative; display: grid; grid-template-columns: 1fr; gap: 9px;
+    padding: 14px; margin-bottom: 10px;
+    background: var(--bg-elev); border-bottom: 1px solid var(--line);
+  }
+  .flt-row td {
+    display: block; padding: 0; border: 0; background: transparent !important;
+    min-width: 0; max-width: 100%; overflow-wrap: anywhere;
+  }
+  .flt-row td[data-label]::before {
+    content: attr(data-label); display: block; margin-bottom: 3px;
+    font: 10px var(--mono); color: var(--muted); letter-spacing: .06em;
+  }
+  .flt-row td:first-child { grid-column: 1 / -1; padding-right: 34px; }
+  .flt-route { max-width: 300px; }
+  .flt-row td:last-child { position: absolute; top: 12px; right: 12px; }
+  .flt-row.airborne td:first-child { box-shadow: none; border-left: 2px solid var(--cyan); padding-left: 9px; }
+  .flt-detail-row td { display: block; padding: 0 10px 10px !important; }
+  .flt-detail-grid { grid-template-columns: 1fr; }
+  .flt-summary b { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flt-signal.busy, .flt-live-pulse { animation: none; }
+  .flt-row td, .flt-quick button, .flt-expand { transition: none; }
+}

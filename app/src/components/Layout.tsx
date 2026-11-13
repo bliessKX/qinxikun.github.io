@@ -6,6 +6,7 @@ const NAV = [
   { to: '/', label: 'home' },
   { to: '/blog', label: 'blog' },
   { to: '/tools', label: 'tools' },
+  { to: '/flights', label: 'flights' },
   { to: '/knowledge', label: 'knowledge' },
   { to: '/lab', label: 'lab' },
   { to: '/projects', label: 'projects' },
@@ -39,6 +40,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div>NICE.BLOG 2.0 · Interactive Developer Platform</div>
         <div className="f-links">
           <Link to="/stats">访问统计</Link>
+          <Link to="/flights">航班动态</Link>
           {GUESTBOOK_ENABLED && <Link to="/guestbook">留言板</Link>}
           <a href="./tools/json.html">JSON 工具</a>
           <a href="./tools/commands.html">命令速查</a>
