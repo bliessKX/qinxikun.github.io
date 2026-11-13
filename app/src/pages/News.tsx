@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRise } from '../App'
 import {
-  QUOTA_LIMIT, consumeQuota, currentUser, remainingQuota, signOut, verifyGithub,
-  type GithubUser,
+  QUOTA_LIMIT, GithubRateLimitError, consumeQuota, currentUser, githubRateLimit,
+  remainingQuota, signOut, verifyGithub,
+  type GithubRateLimit, type GithubUser,
 } from '../lib/github-auth'
 import {
   NewsError, hostOf, imageUrl, loadNewsSample, publishedLabel,
@@ -12,6 +13,23 @@ import {
 
 const INITIAL: NewsQuery = {
   query: '', topic: 'news', timeRange: 'week', depth: 'advanced', maxResults: 8,
+}
+
+/** 限流恢复倒计时：只重渲染自己，不带动整页每秒刷新。 */
+function Countdown({ until }: { until: number }) {
+  const [now, setNow] = useState(Date.now())
+  useEffect(() => {
+    if (!until) return
+    const t = window.setInterval(() => setNow(Date.now()), 1000)
+    return () => window.clearInterval(t)
+  }, [until])
+  if (!until) return <span>一小时内会恢复</span>
+  const left = Math.max(0, until - now)
+  if (left <= 0) return <span>窗口已重置，点「核验并登录」重试</span>
+  const mm = Math.floor(left / 60000)
+  const ss = String(Math.floor((left % 60000) / 1000)).padStart(2, '0')
+  const at = new Date(until).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+  return <span>{mm} 分 {ss} 秒后（{at}）可再用</span>
 }
 
 /* ------------------------------------------------------------- 结果条目 */
@@ -55,6 +73,8 @@ export default function News() {
   const [user, setUser] = useState<GithubUser | null>(() => currentUser())
   const [loginDraft, setLoginDraft] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [rate, setRate] = useState<GithubRateLimit | null>(null)
+  const [rateLimitError, setRateLimitError] = useState<{ text: string; resetAt: number } | null>(null)
   const [loggingIn, setLoggingIn] = useState(false)
   const [quotaTick, setQuotaTick] = useState(0)
   const [keyOpen, setKeyOpen] = useState(false)
@@ -75,6 +95,13 @@ export default function News() {
     booted.current = true
     setResult(loadNewsSample())
   }, [])
+  useEffect(() => {
+    let alive = true
+    const read = () => { githubRateLimit().then((r) => { if (alive && r) setRate(r) }) }
+    read()
+    const t = window.setInterval(read, 120000) // /rate_limit 不计入配额，两分钟刷新一次
+    return () => { alive = false; window.clearInterval(t) }
+  }, [])
 
   const remaining = user ? remainingQuota(user.login) : 0
   void quotaTick // 触发重渲染以刷新剩余额度
@@ -88,12 +115,18 @@ export default function News() {
   }
 
   const doLogin = async () => {
-    setLoggingIn(true); setLoginError('')
+    setLoggingIn(true); setLoginError(''); setRateLimitError(null)
     try {
       const u = await verifyGithub(loginDraft)
       setUser(u); setQuotaTick((t) => t + 1); setLoginDraft('')
-    } catch (e) { setLoginError((e as Error).message) }
-    finally { setLoggingIn(false) }
+    } catch (e) {
+      if (e instanceof GithubRateLimitError) {
+        setRateLimitError({ text: e.message, resetAt: e.resetAt })
+        setLoginError(e.message)
+      } else {
+        setLoginError((e as Error).message)
+      }
+    } finally { setLoggingIn(false) }
   }
 
   const run = async () => {
@@ -145,14 +178,28 @@ export default function News() {
               {loggingIn ? '核验中…' : '核验并登录'}
             </button>
           </div>
-          {loginError && <div className="news-gate-err" role="alert">{loginError}</div>}
+          {loginError && (
+            <div className="news-gate-err" role="alert">
+              {loginError}{rateLimitError && <> · <Countdown until={rateLimitError.resetAt} /></>}
+            </div>
+          )}
+          {rate && (
+            <div className="news-ratelimit">
+              {rate.remaining > 0 ? (
+                <>GitHub 接口剩余 <b>{rate.remaining}</b> / {rate.limit} 次 · 窗口 {new Date(rate.resetAt).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })} 重置</>
+              ) : (
+                <><span className="warn">REST 接口限流中 · </span><Countdown until={rate.resetAt} /><span className="muted"> · 头像核验不受影响，可直接登录</span></>
+              )}
+            </div>
+          )}
           <button type="button" className="news-link" onClick={useSample}>先看示例结果 →</button>
         </section>
       ) : (
         <section className="news-account">
           {user.avatar_url && <img src={user.avatar_url} alt="" className="news-avatar" />}
           <div className="news-account-name">
-            <b>@{user.login}</b><span>{user.name}</span>
+            <b>@{user.login}</b>
+            <span>核验于 {new Date(user.verifiedAt).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })}</span>
           </div>
           <div className="news-quota">剩余 <b>{remaining}</b> / {QUOTA_LIMIT} 次</div>
           <button type="button" className="btn ghost" onClick={() => setKeyOpen((v) => !v)}>
@@ -286,7 +333,7 @@ export default function News() {
       <section className="section news-about">
         <h3>检索说明</h3>
         <p>结果由 Tavily 提供，新闻范围走 <code>news</code> 索引，按相关度排列；深度检索会附带一段综述。图集来自响应的 <code>images</code> 字段，加载不到的图片自动略过。</p>
-        <p>每个 GitHub 账号 1000 次检索额度，额度记录在本机；账号核验使用 GitHub 公开资料。数据源 <code>app/src/lib/news.ts</code>，鉴权 <code>app/src/lib/github-auth.ts</code>。</p>
+        <p>每个 GitHub 账号 1000 次检索额度，额度记录在本机；账号核验走 GitHub 公开头像端点，不消耗 REST 配额，因此限流时仍可直接登录。数据源 <code>app/src/lib/news.ts</code>，鉴权 <code>app/src/lib/github-auth.ts</code>。</p>
       </section>
     </div>
   )
