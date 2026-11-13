@@ -55,3 +55,5 @@
 **分类建议更正**：此前写「选 General、勿用 Announcements」是错的。giscus 官方推荐 **Announcements 类型**分类 —— 仅维护者/giscus 能创建 discussion，访客仍可在已有帖下回复，正好配合本站 `mapping=specific`（固定一个留言簿）防乱开帖。`isGiscusConfigured()` 增加对 `category` 非空校验，避免只填 ID 导致脚本参数缺失。
 
 **配置完成**：最终选定 `General`，`categoryId = DIC_kwDOUiLIzc4DLAwS`，`repoId = R_kgDOUiLIzQ`，均已写入 `app/.env` 与 `.env.example`。因本站用 `mapping=specific` 固定单个 discussion，分类开放也不会乱开帖。`npm run build` 产物已确认包含该 categoryId。
+
+**1.0 旧站联动**：根 `index.html` 右侧「工具」栏下方新增「往来 · 留言板」入口（`./2.0/#/guestbook`），新增 `.rail-subtitle` / `.guestbook-link` 样式。旧站是纯静态 HTML、读不到 Vite env，故兜底关闭时该入口仍可见，点击落到 2.0 的 OFFLINE 提示页（非 404）。

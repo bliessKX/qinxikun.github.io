@@ -148,6 +148,15 @@ img{display:block;max-width:100%}
   margin-top:3px;letter-spacing:.02em;font-weight:400;line-height:1.5;
 }
 
+/* ---------- 工具栏下方：留言入口 ---------- */
+.rail-subtitle{
+  font-size:12px;letter-spacing:.16em;color:var(--muted);
+  text-transform:uppercase;margin:22px 0 10px;
+}
+.guestbook-link{border-color:rgba(156,59,42,.4);background:#fdf7f4}
+.guestbook-link:hover{border-color:var(--accent);background:#fbece7}
+.guestbook-link .t-name{color:var(--accent)}
+
 /* ---------- 右侧内容 ---------- */
 .main{padding:42px 44px 80px;max-width:760px}
 .page-head{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:32px}
@@ -313,6 +322,12 @@ footer{
         <span class="t-desc">每个工具一个独立页面</span>
       </a></li>
     </ul>
+
+    <div class="rail-subtitle">往来</div>
+    <a class="tool-link guestbook-link" href="./2.0/#/guestbook">
+      <span class="t-name">留言板 <span aria-hidden="true">↗</span></span>
+      <span class="t-desc">用 GitHub 账号留个言</span>
+    </a>
   </aside>
 </div>
 

@@ -66,6 +66,11 @@ push `main` → GitHub Actions 构建（含旧站面守卫：CNAME/404/旧工具
 
 ## 功能变更
 
+### 2026年11月13日
+
+- 2.0 主站新增 `#/guestbook` 留言板：GitHub Discussions + Giscus 承载，零自建服务器 / 数据库 / 后端；`VITE_GUESTBOOK_ENABLED=off` 可整体降级回纯静态版本（详见 `docs/2.0/CHANGELOG.md`）。
+- 1.0 旧站右侧「工具」栏下方新增「往来 · 留言板」入口，指向 `./2.0/#/guestbook`；朱红描边与工具卡片区分。
+
 ### 2026年11月10日
 
 - 新增笔记《Java 后端做 Agent 智能体选型实战：Spring AI Alibaba 与 Spring AI + LangChain4j/LangGraph 对比》—— 从 Java 微服务视角对比两条智能体路线，涵盖企业微信群聊助手（Spring AI Alibaba 快速落地）与道路交通桥梁查询智能体（Spring AI + LangGraph 复杂编排）两个真实场景，以及身份越权、敏感数据脱敏、数据时效性、工具降级等落地坑位。笔记总数增至 11 篇。
