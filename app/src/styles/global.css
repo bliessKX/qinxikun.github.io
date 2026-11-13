@@ -1459,8 +1459,8 @@ button { font-family: inherit; cursor: pointer; }
 .gm-chain { color: var(--amber); }
 .gm-target { font-style: normal; color: var(--muted); }
 
-/* ---- 星露谷 · 农场模拟 ---- */
-.sd { display: flex; flex-direction: column; gap: 16px; }
+/* ---- 星露谷 · 农场模拟 v2 ---- */
+.sd { display: flex; flex-direction: column; gap: 13px; max-width: 640px; margin: 0 auto; }
 .sd-bar {
   display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
   font-family: var(--mono); font-size: 12.5px; color: var(--muted);
@@ -1469,38 +1469,151 @@ button { font-family: inherit; cursor: pointer; }
 .sd-bar b { color: var(--ink); font-weight: 600; }
 .sd-bar .sd-season { color: var(--amber); font-weight: 700; }
 .sd-bar-ops { margin-left: auto; display: flex; gap: 8px; }
-.sd-bar button, .sd-toolsel button, .sd-seedsel button {
+.sd-bar button, .sd-toolsel button, .sd-seedsel button, .sd-quest {
   font-family: var(--mono); font-size: 12px; color: var(--ink);
   background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 6px 12px; cursor: pointer;
   transition: border-color .15s, color .15s, background .15s;
 }
 .sd-bar button:hover, .sd-toolsel button:hover, .sd-seedsel button:hover { border-color: var(--amber); color: var(--amber); }
-.sd-toolsel, .sd-seedsel { display: flex; gap: 8px; flex-wrap: wrap; }
+.sd-toolsel, .sd-seedsel { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 .sd-toolsel button.on, .sd-seedsel button.on { border-color: var(--amber); color: var(--amber); background: var(--bg-hover); }
+.sd-toolsel .sd-key { display: inline-block; min-width: 14px; text-align: center; color: var(--amber); font-size: 10px; border: 1px solid var(--amber-dim); border-radius: 3px; margin-right: 3px; }
 .sd-seedsel { align-items: center; }
 .sd-seedsel .sd-label { font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-right: 4px; }
-.sd-map {
-  display: grid; gap: 2px; width: min(560px, 96vw); margin: 0 auto;
-  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px;
-  touch-action: manipulation;
+.sd-quest { align-self: stretch; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--cyan); border: 1px dashed var(--amber-dim) !important; border-radius: 4px; padding: 6px 10px; }
+
+.sd-field-wrap {
+  position: relative; width: min(560px, 92vw); margin: 0 auto; overflow: auto;
+  border: 1px solid var(--line); border-radius: var(--radius); background: #0c0f0c;
+  box-shadow: inset 0 8px 30px rgba(0,0,0,.45);
 }
+.sd-field { position: relative; margin: 0 auto; }
+.sd-field * { box-sizing: border-box; }
+
 .sd-tile {
-  aspect-ratio: 1 / 1; min-width: 0;
-  display: grid; place-items: center;
-  font-size: clamp(14px, 3.2vw, 22px); line-height: 1;
-  border: 1px solid rgba(232, 227, 216, .08); border-radius: 4px;
-  cursor: pointer; user-select: none; position: relative;
-  transition: box-shadow .12s;
+  position: absolute; display: grid; place-items: center; overflow: hidden;
+  font-size: clamp(16px, 3.4vw, 24px); line-height: 1;
+  border: 1px solid rgba(0,0,0,.35); cursor: pointer; user-select: none;
+  background-repeat: repeat; transition: filter .12s;
 }
-.sd-tile:hover { box-shadow: 0 0 0 1px var(--amber-dim) inset; }
-.sd-tile.grass  { background: #1f3a24; }
-.sd-tile.soil   { background: #5a3d24; }
-.sd-tile.watered { background: #3a2c44; box-shadow: inset 0 0 0 2px rgba(77, 216, 230, .35); }
-.sd-tile.mature .sd-crop { filter: drop-shadow(0 0 6px rgba(240, 168, 50, .55)); }
-.sd-tile .sd-badge { position: absolute; top: 1px; right: 2px; font-size: 9px; opacity: .85; }
+.sd-tile .sd-crop { filter: drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
+.sd-tile:hover { filter: brightness(1.12); }
+.sd-tile.grass {
+  background-color: #3a6b34;
+  background-image:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,.10) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 62%, rgba(0,0,0,.18) 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 84%, rgba(120,180,90,.55) 0 2px, transparent 3px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 22px 22px, 30px 30px, 18px 18px, 60px 60px;
+}
+.sd-tile.soil {
+  background-color: #6b4a2b;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.30) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.06) 0 1px, transparent 1px 12px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: auto, auto, 60px 60px;
+}
+.sd-tile.watered {
+  background-color: #4a3320;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.32) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 50% 38%, rgba(90,170,210,.30), transparent 62%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 0 2px rgba(77,216,230,.30);
+}
+.sd-tile.water {
+  background-color: #1c4f74;
+  background-image:
+    repeating-linear-gradient(115deg, rgba(255,255,255,.10) 0 6px, transparent 6px 16px),
+    radial-gradient(circle at 30% 30%, rgba(120,200,255,.25), transparent 60%);
+  animation: sd-water 5s linear infinite;
+}
+@keyframes sd-water { 0% { background-position: 0 0, 0 0; } 100% { background-position: 0 0, 60px 30px; } }
+.sd-tile.mature .sd-crop { filter: drop-shadow(0 0 6px rgba(240,168,50,.6)); }
+.sd-tile.weed .sd-crop { animation: sd-weed 2.4s ease-in-out infinite; }
+@keyframes sd-weed { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+.sd-tile .sd-badge { position: absolute; top: 1px; right: 2px; font-size: 10px; opacity: .85; }
+
+.sd-cave, .sd-npc { position: absolute; display: grid; place-items: center; font-size: 26px; cursor: pointer; user-select: none; z-index: 5; }
+.sd-cave { background: radial-gradient(circle at 50% 38%, #2c2c36, #0a0a10); border: 1px solid #000; box-shadow: inset 0 0 14px #000; }
+.sd-cave i, .sd-npc i { position: absolute; bottom: 1px; right: 2px; font-style: normal; font-family: var(--mono); font-size: 9px; background: var(--amber); color: #1a1208; border-radius: 3px; padding: 0 3px; }
+.sd-npc { z-index: 6; }
+
+/* 像素农夫（纯 CSS，零外部资源） */
+.sd-char { position: absolute; z-index: 8; display: grid; place-items: center; pointer-events: none; transition: left .19s ease, top .19s ease; }
+.sd-char .sd-char-shadow { position: absolute; bottom: 3px; width: 58%; height: 9px; background: rgba(0,0,0,.35); border-radius: 50%; filter: blur(2px); }
+.sd-char.walking { animation: sd-bob .26s steps(2) infinite; }
+@keyframes sd-bob { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
+.sd-char.face-left .sd-farmer { transform: scaleX(-1); }
+.sd-char.face-right .sd-farmer { transform: scaleX(1); }
+
+.sd-farmer { position: relative; width: 62%; height: 80%; }
+.f-hat  { position: absolute; top: 0;   left: 15%; width: 70%; height: 18%; background: #c9802e; border-radius: 6px 6px 2px 2px; box-shadow: 0 2px 0 #8a531a; }
+.f-head { position: absolute; top: 16%; left: 28%; width: 44%; height: 26%; background: #f0c9a0; border-radius: 4px; }
+.f-body { position: absolute; top: 40%; left: 24%; width: 52%; height: 34%; background: #3f7d4f; border-radius: 5px; }
+.f-arm  { position: absolute; top: 42%; width: 14%; height: 28%; background: #356b43; border-radius: 4px; }
+.f-arm-l { left: 12%; } .f-arm-r { right: 12%; }
+.f-leg  { position: absolute; top: 72%; width: 18%; height: 22%; background: #3a4a6b; border-radius: 0 0 4px 4px; transform-origin: top center; }
+.f-leg-l { left: 30%; } .f-leg-r { right: 30%; }
+.sd-char.walking .f-leg-l { animation: legL .26s infinite alternate; }
+.sd-char.walking .f-leg-r { animation: legR .26s infinite alternate; }
+@keyframes legL { from { transform: rotate(15deg); } to { transform: rotate(-15deg); } }
+@keyframes legR { from { transform: rotate(-15deg); } to { transform: rotate(15deg); } }
+.sd-farmer.is-npc .f-hat { background: #7a4ea8; box-shadow: 0 2px 0 #4e2f70; }
+.sd-farmer.is-npc .f-body { background: #9b59b6; }
+.sd-farmer.is-npc .f-arm { background: #8043a0; }
+
+/* 动作特效 */
+.sd-fx { position: absolute; width: 12px; height: 12px; pointer-events: none; z-index: 9; transform: translate(-50%, -50%); }
+.sd-fx-dust  { background: radial-gradient(circle, #caa86a, rgba(202,168,106,0)); border-radius: 50%; animation: fx-dust .6s ease-out forwards; }
+@keyframes fx-dust  { 0% { transform: translate(-50%,-50%) scale(.4); opacity:.9; } 100% { transform: translate(-50%,-130%) scale(1.9); opacity: 0; } }
+.sd-fx-water { background: radial-gradient(circle, #7fd6ff, rgba(127,214,255,0)); border-radius: 50%; animation: fx-water .6s ease-out forwards; }
+@keyframes fx-water { 0% { transform: translate(-50%,-30%) scale(.5); opacity:.9; } 50% { opacity: 1; } 100% { transform: translate(-50%,50%) scale(1.3); opacity: 0; } }
+.sd-fx-seed  { background: radial-gradient(circle, #7bd66a, rgba(123,214,106,0)); border-radius: 50%; animation: fx-seed .5s ease-out forwards; }
+@keyframes fx-seed  { 0% { transform: translate(-50%,-50%) scale(1); opacity: 1; } 100% { transform: translate(-50%,-170%) scale(.3); opacity: 0; } }
+.sd-fx-pop   { background: radial-gradient(circle, #ffd86a, rgba(255,216,106,0)); border-radius: 50%; animation: fx-pop .6s ease-out forwards; }
+@keyframes fx-pop   { 0% { transform: translate(-50%,0) scale(.4); opacity: 1; } 100% { transform: translate(-50%,-210%) scale(1.7); opacity: 0; } }
+
+/* 弹窗：钓鱼 / 矿洞 / 对话 */
+.sd-modal { position: fixed; inset: 0; background: rgba(8,10,8,.72); display: grid; place-items: center; z-index: 50; backdrop-filter: blur(2px); }
+.sd-fish, .sd-mine, .sd-talk { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; width: min(420px, 92vw); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.sd-fish-head { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 13px; color: var(--ink); margin-bottom: 8px; }
+.sd-fish-head .mono { margin-left: auto; color: var(--muted); }
+.sd-x { margin-left: 6px; background: transparent; border: 1px solid var(--line); color: var(--muted); border-radius: 4px; cursor: pointer; padding: 2px 7px; }
+.sd-fish-tip { font-size: 12px; color: var(--muted); margin: 0 0 10px; }
+.sd-fish-track { position: relative; height: 200px; background: linear-gradient(#0a2a3a, #0d3d52); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; cursor: pointer; user-select: none; touch-action: none; }
+.sd-fish-bar { position: absolute; left: 0; right: 0; background: linear-gradient(rgba(120,230,160,.35), rgba(80,200,140,.55)); border-top: 2px solid #6fe0a0; border-bottom: 2px solid #6fe0a0; }
+.sd-fish-fish { position: absolute; left: 50%; transform: translateX(-50%); font-size: 26px; }
+.sd-fish-prog { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(0deg, rgba(240,168,50,.65), rgba(240,168,50,.15)); border-top: 2px solid var(--amber); }
+.sd-fish-foot { margin-top: 8px; text-align: center; color: var(--cyan); font-family: var(--mono); font-size: 12px; }
+
+.sd-mine-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.sd-node { aspect-ratio: 1 / 1; font-size: 22px; border: 1px solid var(--line); border-radius: 6px; background: #2a2a30; cursor: pointer; display: grid; place-items: center; transition: transform .1s, background .2s; }
+.sd-node:hover { transform: translateY(-2px); }
+.sd-node.stone  { background: #4a4a52; }
+.sd-node.copper { background: #6b4a2b; box-shadow: inset 0 0 0 2px #b87333; }
+.sd-node.iron   { background: #3a3f47; box-shadow: inset 0 0 0 2px #9aa4ad; }
+.sd-node.gold   { background: #5a4a1a; box-shadow: inset 0 0 0 2px #ffd24a; }
+.sd-node.geode  { background: #2a3a4a; box-shadow: inset 0 0 0 2px #7fe0ff; }
+.sd-node.ladder { background: #1f3a1f; box-shadow: inset 0 0 0 2px #6fe06f; }
+.sd-node.broken { background: #15151a; cursor: default; opacity: .4; }
+.sd-node.swing { animation: node-swing .42s ease; }
+@keyframes node-swing { 0%,100% { transform: translate(0,0); } 25% { transform: translate(-3px,1px) rotate(-3deg); } 75% { transform: translate(3px,-1px) rotate(3deg); } }
+
+.sd-talk { display: flex; gap: 14px; align-items: flex-start; }
+.sd-talk-npc { width: 64px; height: 64px; flex: none; background: #1a1f1a; border: 1px solid var(--line); border-radius: 10px; display: grid; place-items: center; }
+.sd-talk-npc .sd-farmer { width: 46px; height: 54px; }
+.sd-talk-body { flex: 1; }
+.sd-talk-name { font-family: var(--mono); font-size: 12px; color: var(--amber); margin-bottom: 6px; }
+.sd-talk-body p { font-size: 13.5px; line-height: 1.6; color: var(--ink); margin: 0 0 12px; }
+.sd-talk-body button { font-family: var(--mono); font-size: 12px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 6px 14px; cursor: pointer; }
+.sd-talk-body button:hover { border-color: var(--amber); color: var(--amber); }
+
 .sd-inv { display: flex; gap: 12px; flex-wrap: wrap; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
 .sd-inv b { color: var(--ink); }
-.sd-msg { font-size: 12px; color: var(--cyan); min-height: 16px; }
+.sd-msg { font-size: 12px; color: var(--cyan); min-height: 16px; text-align: center; }
 
 /* ---- Phaser / 自绘 canvas 类游戏 ---- */
 .shooter-host, .sling-cv, .runner-host, .balloon-stage {

@@ -16,7 +16,7 @@ export interface GameMeta {
 }
 
 export const GAMES: GameMeta[] = [
-  { id: 'stardew', name: '星露谷 · 农场', desc: '纯前端农场模拟：网格 Tilemap 上翻地、播种、浇水、收获，四季轮回、背包金币，进度存本地。', stack: '原生 JS + CSS', cat: '模拟', glyph: '🌾' },
+  { id: 'stardew', name: '星露谷 · 农场', desc: '纯前端农场模拟：操控像素农夫在网格田里走动，翻地 / 播种 / 浇水 / 收获，每天除草推进任务，与村民对话、水边钓鱼、矿洞挖矿，四季轮回、背包金币，进度存本地。', stack: '原生 JS + CSS', cat: '模拟', glyph: '🌾' },
   { id: 'happy', name: '开心消消乐', desc: '动物图片版三消：交换相邻动物凑成三个相同即消除，连锁下落翻倍计分，卡死自动重排。', stack: '原生 JS + CSS', cat: '逻辑', glyph: '🐾' },
   { id: 'shooter', name: '星河突击', desc: '太空射击：驾驶战机迎击俯冲的敌机编队，击落得分，被击中扣命，撑过一波又一波。', stack: 'Phaser 3', cat: '街机', glyph: '▲' },
   { id: 'slingshot', name: '弹弓堡垒', desc: '愤怒的小鸟式物理弹射：拉开弹弓轰塌木架，把据守的目标全部击落，三关难度递进。', stack: 'Matter.js', cat: '物理', glyph: '➤' },
