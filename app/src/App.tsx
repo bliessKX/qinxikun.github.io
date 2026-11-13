@@ -18,6 +18,8 @@ import { trackVisit } from './lib/analytics'
 const Stats = lazy(() => import('./pages/Stats'))
 /* 航班工具按需加载：不访问 /flights 就不下发数据层与样本数据 */
 const Flights = lazy(() => import('./pages/Flights'))
+/* 新闻检索按需加载：不访问 /news 就不下发检索与鉴权数据层 */
+const News = lazy(() => import('./pages/News'))
 
 /** 入场编排：给 .rise 元素做一次 IntersectionObserver 淡入 */
 export function useRise() {
@@ -75,6 +77,11 @@ export default function App() {
         <Route path="/flights" element={
           <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/flights · 载入航显屏…</p></div></div>}>
             <Flights />
+          </Suspense>
+        } />
+        <Route path="/news" element={
+          <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/news · 载入检索台…</p></div></div>}>
+            <News />
           </Suspense>
         } />
         <Route path="*" element={<NotFound />} />

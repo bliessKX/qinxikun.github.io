@@ -120,7 +120,7 @@ export default function Flights() {
   const [copied, setCopied] = useState(false)
   const [keyOpen, setKeyOpen] = useState(false)
   const [fieldsOpen, setFieldsOpen] = useState(false)
-  const [keyDraft, setKeyDraft] = useState(getKey)
+  const [keyDraft, setKeyDraft] = useState('')
   const booted = useRef(false)
 
   useEffect(() => { document.title = 'Flights — NICE.BLOG 2.0' }, [])
@@ -204,13 +204,18 @@ export default function Flights() {
       {keyOpen && (
         <div className="flt-keypanel">
           <label className="flt-keyfield">
-            <span>access_key</span>
-            <input type="password" value={keyDraft} spellCheck={false}
-              onChange={(e) => setKeyDraft(e.target.value)} aria-label="access_key" />
+            <span>自定义 access_key</span>
+            <input type="password" value={keyDraft} spellCheck={false} placeholder="留空使用内置 Key"
+              onChange={(e) => setKeyDraft(e.target.value)} aria-label="自定义 access_key" />
           </label>
-          <button type="button" className="btn" onClick={() => { setKey(keyDraft); setKeyOpen(false); run(true) }}>保存并查询</button>
-          <button type="button" className="btn ghost" onClick={() => { resetKey(); setKeyDraft(getKey()); setKeyOpen(false); run(true) }}>恢复默认</button>
-          <p>Key 只存在本机 localStorage，换 Key 后会重新查询。</p>
+          <button type="button" className="btn" onClick={() => {
+            if (keyDraft.trim()) setKey(keyDraft); else resetKey()
+            setKeyDraft(''); setKeyOpen(false); run(true)
+          }}>保存并查询</button>
+          <button type="button" className="btn ghost" onClick={() => {
+            resetKey(); setKeyDraft(''); setKeyOpen(false); run(true)
+          }}>清除自定义</button>
+          <p>留空即用内置 Key；填入只存本机 localStorage，可随时清除。</p>
         </div>
       )}
 

@@ -1,0 +1,75 @@
+{
+  "query": "新加坡",
+  "answer": "这些来源指向同一件事：新加坡是位于马来半岛南端、扼守马六甲海峡出口的城邦国家，1965 年独立，以转口贸易、炼油、电子制造与金融服务业为经济支柱。多份资料同时提到它面积约 735 平方公里、人口约 611 万，以及「花园城市」的绿化规划。",
+  "images": [
+    "https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Singapore.svg",
+    "https://images.trvl-media.com/place/6047873/15d3ae30-ef33-406e-971f-9520c03f1089.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Marina_Bay_Sands_at_night.jpg/640px-Marina_Bay_Sands_at_night.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Singapore_skyline.jpg/640px-Singapore_skyline.jpg"
+  ],
+  "results": [
+    {
+      "url": "https://zh.wikipedia.org/zh-hans/%E6%96%B0%E5%8A%A0%E5%9D%A1",
+      "title": "新加坡 - 维基百科，自由的百科全书",
+      "content": "在 1965 年独立以前，新加坡为英国海峡殖民地的首都，是英国当时于东南亚最主要的海军基地。随着 1869 年苏伊士运河开通，全球贸易迅速成长，新加坡成为世界主要贸易据点，新加坡港也成为世界最繁忙的港口之一。电子产业是制造业支柱，被称为亚洲半导体桥头堡；石化产业则让它成为全球三大石油贸易和炼油中心之一。因本地市场狭小而高度依赖国际贸易，是世界首个出台「国家单一窗口」政策的国家。",
+      "score": 0.86442494,
+      "published_date": "Mon, 09 Nov 2026 08:30:00 GMT",
+      "favicon": "https://zh.wikipedia.org/favicon.ico",
+      "images": ["https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Singapore.svg"],
+      "id": "b1d7fe-01"
+    },
+    {
+      "url": "https://www.fmprc.gov.cn/web/gjhdq_676201/gj_676203/yz_676205/1206_677076",
+      "title": "新加坡国家概况 - 中华人民共和国外交部",
+      "content": "【简况】热带城市国家。位于马来半岛南端、马六甲海峡出入口，北隔柔佛海峡与马来西亚相邻，南隔新加坡海峡与印度尼西亚相望。由新加坡岛及附近 63 个小岛组成，属东 8 时区，没有夏令时，与北京没有时差。【经济】属外贸驱动型经济，以电子、石油化工、金融、航运、服务业为主，高度依赖中、美、日、欧和周边市场，外贸总额是 GDP 的三倍。2025 年国内生产总值同比增长 5%。",
+      "score": 0.77390057,
+      "published_date": "Tue, 10 Nov 2026 02:15:00 GMT",
+      "favicon": "https://www.fmprc.gov.cn/favicon.ico",
+      "images": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Singapore_skyline.jpg/640px-Singapore_skyline.jpg"],
+      "id": "4174e5-04"
+    },
+    {
+      "url": "https://www.britannica.com/place/Singapore",
+      "title": "Singapore | Facts, Geography, History, & Points of Interest | Britannica",
+      "content": "Singapore is a city-state located at the southern tip of the Malay Peninsula, approximately 85 miles north of the Equator. It dominates the Strait of Malacca, which connects the Indian Ocean to the South China Sea. This strategic location has made it the largest port in Southeast Asia and a major global commercial center. Once a British colony and now a member of the Commonwealth, it became independent on August 9, 1965.",
+      "score": 0.78530854,
+      "published_date": "Fri, 06 Nov 2026 14:00:00 GMT",
+      "favicon": "https://www.britannica.com/favicon.ico",
+      "images": [],
+      "id": "89f9ef-03"
+    },
+    {
+      "url": "https://www.mfa.gov.sg/Overseas-Mission/Washington/About-Singapore",
+      "title": "About Singapore | Ministry of Foreign Affairs",
+      "content": "Singapore is a sunny, tropical island in Southeast Asia, off the southern tip of the Malay Peninsula. The city-state is 710 square kilometres and inhabited by five million people from four major communities. Since its independence in 9 August 1965, the country has adopted a parliamentary democracy system. Ideally positioned in Southeast Asia, it is a thriving metropolis with world-class infrastructure and an integrated island-wide transport network.",
+      "score": 0.76942694,
+      "published_date": "Fri, 07 Nov 2026 09:20:00 GMT",
+      "favicon": "https://www.mfa.gov.sg/favicon.ico",
+      "images": [],
+      "id": "27079c-05"
+    },
+    {
+      "url": "https://www.usnews.com/news/best-countries/singapore",
+      "title": "Singapore 2026: Official Rankings and Country Data",
+      "content": "One of Asia's four economic tigers, Singapore has seen impressive growth in recent years as efficient manufacturing and production practices have made way for free-market innovation in the booming electronics and pharmaceutical industries. Gross domestic product per capita is high and unemployment is low, making Singapore one of the wealthiest nations in the world. Singapore is densely populated, with most citizens living in urban high-rises.",
+      "score": 0.7282654,
+      "published_date": "Wed, 11 Nov 2026 18:45:00 GMT",
+      "favicon": "https://www.usnews.com/favicon.ico",
+      "images": [],
+      "id": "556c6a-07"
+    },
+    {
+      "url": "https://www.tripadvisor.com/Tourism-g294265-Singapore-Vacations.html",
+      "title": "Singapore: All You Must Know Before You Go (2026)",
+      "content": "Singapore is a modern and affluent city in South-East Asia. It is great for those who love food, shopping and a warm climate. A nature lover's paradise that combines beautiful gardens, animal parks, and many green spots and all of this in a comfortable urban setting reachable by the subway (MRT) or a bus. For longer layovers, travelers suggest leaving the airport to visit the city's famous sites.",
+      "score": 0.66486675,
+      "published_date": "Sat, 08 Nov 2026 11:05:00 GMT",
+      "favicon": "https://www.tripadvisor.com/favicon.ico",
+      "images": [],
+      "id": "006f85-08"
+    }
+  ],
+  "response_time": 2.48,
+  "usage": { "credits": 2 },
+  "request_id": "03280d3d-3a87-4d8c-9139-a80652a11899"
+}
