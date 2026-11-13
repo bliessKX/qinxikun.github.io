@@ -9,6 +9,7 @@ import Knowledge from './pages/Knowledge'
 import Lab from './pages/Lab'
 import Projects from './pages/Projects'
 import About from './pages/About'
+import Guestbook from './pages/Guestbook'
 import NotFound from './pages/NotFound'
 import articles from './data/articles.json'
 import { trackVisit } from './lib/analytics'
@@ -63,6 +64,7 @@ export default function App() {
         <Route path="/lab" element={<Lab />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/about" element={<About />} />
+        <Route path="/guestbook" element={<Guestbook />} />
         <Route path="/stats" element={
           <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/stats · 载入看板…</p></div></div>}>
             <Stats />

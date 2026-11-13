@@ -7,7 +7,7 @@
 
 | 项 | 值 |
 |---|---|
-| 仓库 | github.com/qinxikun/qinxikun.github.io |
+| 仓库 | github.com/bliessKX/qinxikun.github.io |
 | 站点 | https://qxkk.dpdns.org（自定义域名，CNAME 文件已确认） |
 | 总体积 | 11 MB（其中音频 9.2 MB 占绝对大头） |
 | 技术形态 | 纯静态 HTML/CSS/JS，零构建、零框架 |

@@ -27,6 +27,28 @@ npm run build    # 构建到 app/dist（public/ 原样透传旧站面）
 push `main` → GitHub Actions 构建（含旧站面守卫：CNAME/404/旧工具页缺失即失败）→ Pages 发布。
 首次启用需在仓库 Settings → Pages 把 Source 切到 **GitHub Actions**。
 
+### 留言板（可选）
+
+`#/guestbook` 由 GitHub Discussions + Giscus 承载，无需自建服务器或数据库。线上地址：`https://qxkk.dpdns.org/2.0/#/guestbook`（2.0 主站挂在 `/2.0/` 下）。
+
+配置分两处：
+
+| 文件 | 用途 | 进仓库 |
+|---|---|---|
+| `app/.env` | 线上默认配置，GitHub Actions 构建时读取 | ✅ |
+| `app/.env.local` | 本地覆盖（优先级更高），可选 | ❌ |
+
+启用步骤：
+
+1. 仓库 Settings → 开启 **Discussions**，安装 [Giscus App](https://github.com/apps/giscus) 并授权到本仓库（改完记得点「保存」）。
+2. 到 [giscus.app](https://giscus.app) 填仓库 `bliessKX/qinxikun.github.io`，在「Discussion 分类」下拉选一个分类（推荐 **Announcements** 类型：仅维护者/giscus 能建帖，访客仍可回复），复制生成的 `categoryId` 与实际分类名。
+3. 把 `categoryId` / `category` 填进 `app/.env`。`repo` 与 `repoId` 已预填。
+4. `npm run build` 本地验证 → push `main`，Actions 自动部署。
+
+> 这 4 个值在 Giscus 前端脚本里本来就是明文，不是密钥，可以提交。若只填 `.env.local`，Actions 读不到，线上会停在「配置引导」页。
+
+**关闭 / 兜底**：把 `app/.env` 的 `VITE_GUESTBOOK_ENABLED` 改成 `off` 再 push，导航、footer 入口与第三方脚本一起消失，站点回到纯静态版本；留言数据留在 GitHub Discussions，不会丢。
+
 ### 架构与审计文档
 
 - `docs/sprint0/` — 项目审计 / 迁移方案 / URL 映射 / 文件变更计划 / 技术决策
