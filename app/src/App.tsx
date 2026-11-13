@@ -22,6 +22,8 @@ const Flights = lazy(() => import('./pages/Flights'))
 const News = lazy(() => import('./pages/News'))
 /* 公共接口台按需加载：不访问 /apis 就不下发接口清单与可视化 */
 const Apis = lazy(() => import('./pages/Apis'))
+/* 游戏大厅按需加载：Phaser/Matter/Three 只在玩对应游戏时才下发 */
+const Games = lazy(() => import('./pages/Games'))
 
 /** 入场编排：给 .rise 元素做一次 IntersectionObserver 淡入 */
 export function useRise() {
@@ -89,6 +91,16 @@ export default function App() {
         <Route path="/apis" element={
           <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/apis · 载入接口台…</p></div></div>}>
             <Apis />
+          </Suspense>
+        } />
+        <Route path="/games" element={
+          <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/games · 开机自检…</p></div></div>}>
+            <Games />
+          </Suspense>
+        } />
+        <Route path="/games/:id" element={
+          <Suspense fallback={<div className="page"><div className="page-head"><p className="mono">/games · 载入卡带…</p></div></div>}>
+            <Games />
           </Suspense>
         } />
         <Route path="*" element={<NotFound />} />

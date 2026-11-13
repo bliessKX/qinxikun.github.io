@@ -13,6 +13,7 @@ const TOOLS: ToolItem[] = [
   { id: 'flights', name: '实时航班动态', desc: 'AviationStack 实时航班：航显屏式列表、代码共享折叠、延误与空中遥测、原始 JSON。', href: '#/flights', tags: ['API', '实时'], arrow: '→' },
   { id: 'news', name: '新闻检索台', desc: 'Tavily 新闻检索：相关度排序、综述、图集与来源摘要，GitHub 账号核验后可用。', href: '#/news', tags: ['Tavily', '检索'], arrow: '→' },
   { id: 'apis', name: '公共接口台', desc: 'public-apis 实测免 Key 接口：天气预报与图标、每日天文图、汇率、图书检索等，点一个就发请求。', href: '#/apis', tags: ['API', '实测'], arrow: '→' },
+  { id: 'games', name: '街机大厅', desc: '六款浏览器游戏：连连看、消消乐、Phaser 太空射击、Matter 弹弓物理、Three.js 3D 跑酷、摄像头体感打气球。', href: '#/games', tags: ['游戏', '摸鱼'], arrow: '→' },
   { id: 'json', name: 'JSON 解析与格式化', desc: '格式化 / 校验 / 修复 / 压缩 / 键排序 / 树形视图，5 档示例数据，全本地运行。', href: './tools/json.html', tags: ['JSON', '高频'] },
   { id: 'commands', name: '常用命令速查', desc: 'Git / SVN / Linux / Docker / MySQL / Redis 等 9 类 119 条，搜索 + 整组复制。', href: './tools/commands.html', tags: ['终端', '高频'] },
   { id: 'wheel', name: '今天吃什么', desc: '按时段自动推荐早/中/晚餐，8 种菜系切换的 Canvas 转盘。', href: './tools/what-to-eat.html', tags: ['摸鱼'] },

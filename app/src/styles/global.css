@@ -1351,3 +1351,164 @@ button { font-family: inherit; cursor: pointer; }
   .api-loading i { animation: none; }
   .api-cat li > button { transition: none; }
 }
+
+/* ============================================================
+   /games 街机大厅 + 六款游戏 —— 沿用 CRT 琥珀终端色板
+   ============================================================ */
+
+/* ---- 大厅卡片 ---- */
+.gm-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+}
+.gm-card {
+  display: flex; align-items: center; gap: 18px;
+  padding: 20px 22px; color: var(--ink); text-decoration: none;
+  border: 1px solid var(--line); background: var(--bg-elev);
+  border-radius: var(--radius); transition: border-color .2s, transform .2s, background .2s;
+}
+.gm-card:hover { border-color: var(--amber); background: var(--bg-hover); transform: translateY(-2px); }
+.gm-glyph {
+  flex: 0 0 56px; height: 56px; display: grid; place-items: center;
+  font-family: var(--mono); font-size: 26px; color: var(--amber);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg);
+}
+.gm-body { flex: 1; min-width: 0; }
+.gm-name { font-weight: 700; font-size: 16px; letter-spacing: .5px; }
+.gm-desc { color: var(--muted); font-size: 13px; line-height: 1.6; margin-top: 5px; }
+.gm-meta { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.gm-play {
+  font-family: var(--mono); font-size: 11px; color: var(--amber);
+  align-self: stretch; display: flex; align-items: flex-end;
+}
+
+/* ---- 游戏页外壳与公共 HUD ---- */
+.game-top { margin-bottom: 16px; }
+.game-top h1 {
+  font-family: var(--mono); font-size: 26px; letter-spacing: 1px;
+  display: flex; align-items: center; gap: 10px; margin: 0 0 8px;
+}
+.game-glyph { color: var(--amber); font-size: 20px; }
+.game-back {
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+  text-decoration: none; display: inline-block; margin-bottom: 8px;
+}
+.game-back:hover { color: var(--amber); }
+.game-sub { color: var(--muted); font-size: 13px; line-height: 1.7; margin: 0; max-width: 680px; }
+
+.gm-hud {
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  padding: 10px 14px; margin-bottom: 14px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elev);
+}
+.gm-hud b { color: var(--ink); font-weight: 600; }
+.gm-hud-ops { margin-left: auto; display: flex; gap: 8px; }
+.gm-hud button, .gm-over button {
+  font-family: var(--mono); font-size: 12px; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: 4px; padding: 5px 12px; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.gm-hud button:hover:not(:disabled), .gm-over button:hover { border-color: var(--amber); color: var(--amber); }
+.gm-hud button:disabled { opacity: .45; cursor: not-allowed; }
+.gm-msg {
+  font-size: 12px; color: var(--cyan); margin-bottom: 12px;
+  animation: gm-blink 1.2s ease infinite;
+}
+@keyframes gm-blink { 50% { opacity: .55; } }
+.gm-tip { font-size: 11.5px; margin-top: 14px; }
+.gm-over {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+  background: rgba(11, 14, 20, .86); backdrop-filter: blur(2px);
+  border-radius: var(--radius); text-align: center; padding: 20px;
+}
+.gm-over-title {
+  font-family: var(--mono); font-size: 30px; letter-spacing: 4px; color: var(--amber);
+  text-shadow: 0 0 18px rgba(240, 168, 50, .35);
+}
+.gm-over-ops { display: flex; gap: 10px; margin-top: 6px; }
+
+/* ---- 连连看 ---- */
+.llk-board {
+  display: grid; gap: 5px;
+  max-width: 860px; margin: 0 auto;
+  background: var(--bg); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 10px;
+}
+.llk-tile {
+  aspect-ratio: 1 / 1; min-width: 0;
+  display: grid; place-items: center;
+  font-family: var(--mono); font-size: clamp(12px, 2.1vw, 17px); font-weight: 700;
+  background: var(--bg-elev); border: 1px solid var(--line); border-radius: 4px;
+  color: var(--ink); cursor: pointer; padding: 0;
+  transition: transform .12s, border-color .12s, box-shadow .12s;
+}
+.llk-tile.on:hover { border-color: var(--amber-dim); }
+.llk-tile.pick {
+  border-color: var(--amber); color: var(--amber);
+  transform: scale(1.08); box-shadow: 0 0 12px rgba(240, 168, 50, .3);
+}
+.llk-tile.bad { border-color: var(--red); color: var(--red); animation: gm-shake .3s; }
+@keyframes gm-shake {
+  25% { transform: translateX(-3px); } 50% { transform: translateX(3px); } 75% { transform: translateX(-2px); }
+}
+.llk-tile:disabled { background: transparent; border-color: transparent; cursor: default; }
+/* 图案分色（10 色循环） */
+.llk-tile.s-a { color: var(--amber); } .llk-tile.s-b { color: var(--cyan); }
+.llk-tile.s-c { color: var(--green); } .llk-tile.s-d { color: var(--red); }
+.llk-tile.s-e { color: #c9a7f5; } .llk-tile.s-f { color: #7fd4c1; }
+.llk-tile.s-g { color: #e8d44d; } .llk-tile.s-h { color: #9db8e8; }
+.llk-tile.s-j { color: #e89db8; } .llk-tile.s-k { color: #b8e89d; }
+
+/* ---- 消消乐 ---- */
+.m3-board {
+  position: relative; width: min(480px, 92vw); aspect-ratio: 1 / 1;
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; touch-action: manipulation;
+}
+.m3-tile {
+  position: absolute; top: 0; left: 0; width: 12.5%; aspect-ratio: 1;
+  border-radius: 5px; cursor: pointer;
+  border: 1px solid rgba(232, 227, 216, .12);
+  transition: transform .18s ease, opacity .18s, scale .18s;
+}
+.m3-tile.pick { box-shadow: 0 0 0 2px var(--ink) inset, 0 0 10px rgba(240,168,50,.4); z-index: 2; }
+.m3-tile.pop { animation: m3-pop .2s ease forwards; z-index: 3; }
+@keyframes m3-pop {
+  40% { scale: 1.18; filter: brightness(1.8); }
+  100% { scale: 0; opacity: 0; }
+}
+.m3-board.busy .m3-tile { cursor: wait; }
+.m3-tile.c0 { background: #f0a832; } .m3-tile.c1 { background: #4dd8e6; }
+.m3-tile.c2 { background: #7bc96f; } .m3-tile.c3 { background: #e06c60; }
+.m3-tile.c4 { background: #c9a7f5; } .m3-tile.c5 { background: #e8d44d; }
+.m3 .gm-over { position: absolute; }
+.gm-chain { color: var(--amber); }
+.gm-target { font-style: normal; color: var(--muted); }
+
+/* ---- Phaser / 自绘 canvas 类游戏 ---- */
+.shooter-host, .sling-cv, .runner-host, .balloon-stage {
+  display: block; margin: 0 auto;
+  max-width: 100%; border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--bg);
+}
+.shooter-host { width: 720px; }
+.shooter-host canvas { display: block; max-width: 100%; }
+.sling-cv { width: min(720px, 100%); aspect-ratio: 720 / 480; touch-action: none; cursor: grab; }
+.sling-cv:active { cursor: grabbing; }
+.runner-host { position: relative; width: 100%; max-width: 860px; height: 420px; }
+.runner-host canvas { display: block; width: 100% !important; }
+.runner-mask { position: absolute; }
+
+/* ---- 体感打气球 ---- */
+.balloon-video { display: none; }
+.balloon-stage { position: relative; width: min(640px, 100%); aspect-ratio: 640 / 480; }
+.balloon-cv { width: 100%; height: 100%; display: block; }
+
+@media (max-width: 720px) {
+  .gm-grid { grid-template-columns: 1fr; }
+  .gm-play { display: none; }
+  .gm-over-title { font-size: 22px; }
+}
