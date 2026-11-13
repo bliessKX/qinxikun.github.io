@@ -241,8 +241,19 @@ export default function Apis() {
   const [rawOpen, setRawOpen] = useState(false)
   const lastKey = useRef('')
   const cityDraftRef = useRef(CITIES[0].name)
+  const [cityOpen, setCityOpen] = useState(false)
+  const cityComboRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { document.title = 'APIs — NICE.BLOG 2.0' }, [])
+
+  useEffect(() => {
+    if (!cityOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (cityComboRef.current && !cityComboRef.current.contains(e.target as Node)) setCityOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [cityOpen])
 
   const selected = APIS.find((a) => a.id === selectedId) || APIS[0]
 
@@ -299,18 +310,44 @@ export default function Apis() {
 
       <div className="api-toolbar">
         <label>城市
-          <input
-            value={cityDraft}
-            list="api-city-presets"
-            spellCheck={false}
-            onChange={(e) => { setCityDraft(e.target.value); cityDraftRef.current = e.target.value }}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); applyCity() } }}
-            onBlur={() => applyCity()}
-            placeholder="预设可选，或输入任意城市"
-            aria-label="城市名，支持任意输入" />
-          <datalist id="api-city-presets">
-            {CITIES.map((c) => <option key={c.name} value={c.name} />)}
-          </datalist>
+          <div className="api-city-combo" ref={cityComboRef}>
+            <input
+              value={cityDraft}
+              spellCheck={false}
+              onChange={(e) => { setCityDraft(e.target.value); cityDraftRef.current = e.target.value }}
+              onFocus={() => setCityOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); applyCity(); setCityOpen(false) }
+                if (e.key === 'Escape') setCityOpen(false)
+              }}
+              onBlur={() => applyCity()}
+              placeholder="预设可选，或输入任意城市"
+              aria-label="城市名，支持任意输入"
+              aria-expanded={cityOpen}
+              role="combobox"
+              autoComplete="off" />
+            <button
+              type="button"
+              className={`api-city-toggle${cityOpen ? ' on' : ''}`}
+              onClick={() => setCityOpen((o) => !o)}
+              aria-label="展开预设城市"
+              tabIndex={-1}>{cityOpen ? '▴' : '▾'}</button>
+            {cityOpen && (
+              <ul className="api-city-menu" role="listbox">
+                {CITIES.map((c) => (
+                  <li key={c.name} role="option" aria-selected={c.name === cityDraft}>
+                    <button
+                      type="button"
+                      className={`api-city-item${c.name === cityDraft ? ' on' : ''}`}
+                      onClick={() => {
+                        setCityDraft(c.name); cityDraftRef.current = c.name
+                        setCityOpen(false); applyCity()
+                      }}>{c.name}</button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </label>
         <label>关键词
           <input value={q} onChange={(e) => setQ(e.target.value)}
