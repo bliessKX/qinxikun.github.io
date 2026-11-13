@@ -1281,7 +1281,17 @@ button { font-family: inherit; cursor: pointer; }
   display: grid; place-items: center; height: 180px; margin-bottom: 14px;
   border: 1px dashed var(--line); border-radius: 4px; color: var(--muted); font-size: 12.5px;
 }
-.api-image h3 { font: 600 16px var(--sans); color: var(--ink); margin-bottom: 8px; }
+.api-image-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+.api-image h3 { font: 600 16px var(--sans); color: var(--ink); margin-bottom: 0; }
+.api-image-tag {
+  font-size: 10.5px; color: var(--green);
+  border: 1px solid rgba(123, 201, 111, .4); border-radius: 3px; padding: 1px 7px;
+}
+.api-image-src {
+  display: block; font-size: 11px; color: var(--cyan);
+  margin-bottom: 12px; word-break: break-all;
+}
+.api-image-src:hover { text-decoration: underline; }
 .api-image p { max-width: 72ch; font-size: 13px; line-height: 1.85; color: var(--ink); opacity: .8; }
 .api-text { padding: 30px 24px; }
 .api-text > span { font: 11px var(--mono); color: var(--amber); }

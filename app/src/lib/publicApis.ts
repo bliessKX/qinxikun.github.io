@@ -32,7 +32,7 @@ export interface ApiDef {
   auth: string
   cors: string
   build: (ctx: ApiCtx) => string
-  extract?: (data: unknown) => { imageUrl?: string; title?: string; text?: string }
+  extract?: (data: unknown) => { imageUrl?: string; title?: string; text?: string; statusLabel?: string }
   hint?: string
 }
 export const CATEGORIES = ['天气', '图片与动物', '趣味', '数据'] as const
@@ -83,7 +83,17 @@ export const APIS: ApiDef[] = [
     desc: 'Stanford Dogs 数据集里的一张随机狗图。',
     kind: 'photo', auth: 'No', cors: 'Yes',
     build: () => 'https://dog.ceo/api/breeds/image/random',
-    extract: (d) => ({ imageUrl: (d as { message?: string }).message, title: '今日一狗' }),
+    extract: (d) => {
+      const x = d as { message?: string; status?: string }
+      // 图片地址里藏着品种名：/breeds/otterhound/n02091635_4325.jpg
+      const m = x.message?.match(/\/breeds\/([^/]+)\//)
+      const breed = m ? decodeURIComponent(m[1]).replace(/-/g, ' ') : ''
+      return {
+        imageUrl: x.message,
+        title: breed ? `今日一狗 · ${breed}` : '今日一狗',
+        statusLabel: x.status ? `status: ${x.status}` : undefined,
+      }
+    },
   },
   {
     id: 'thecatapi', name: 'TheCatAPI', category: '图片与动物',
@@ -154,6 +164,8 @@ export interface ApiResult {
   imageUrl?: string
   title?: string
   text?: string
+  /** 接口自身的状态字段（如 Dog CEO 的 status: success） */
+  statusLabel?: string
   error?: string
 }
 

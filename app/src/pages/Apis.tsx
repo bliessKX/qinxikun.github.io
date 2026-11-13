@@ -178,7 +178,15 @@ function ImageView({ result }: { result: ApiResult }) {
       ) : (
         <div className="api-image-fallback">这张图加载不到，点「重新请求」换一张。</div>
       )}
-      {result.title && <h3>{result.title}</h3>}
+      <div className="api-image-head">
+        {result.title && <h3>{result.title}</h3>}
+        {result.statusLabel && <span className="api-image-tag mono">{result.statusLabel}</span>}
+      </div>
+      {result.imageUrl && (
+        <a className="api-image-src mono" href={result.imageUrl} target="_blank" rel="noopener noreferrer">
+          {result.imageUrl} ↗
+        </a>
+      )}
       {result.text && <p>{result.text.length > 280 ? result.text.slice(0, 280) + '…' : result.text}</p>}
     </div>
   )
