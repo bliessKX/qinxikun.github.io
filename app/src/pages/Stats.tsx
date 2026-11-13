@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
-  Alert, Button, Card, ConfigProvider, Dropdown, Empty, Popconfirm, Progress,
+  Button, Card, ConfigProvider, Dropdown, Empty, Popconfirm, Progress,
   Segmented, Statistic, Table, Tag, Tooltip, theme,
 } from 'antd'
 import { App as AntApp } from 'antd'
@@ -185,18 +185,8 @@ function StatsBody() {
     <div className="page stats">
       <div className="page-head">
         <h1><span className="slash">/</span>stats</h1>
-        <p>站点访问看板 —— 浏览量、独立访客、时段分布与页面热度。纯前端实现，数据不出浏览器。</p>
+        <p>站点访问看板 —— 浏览量、独立访客、时段分布与页面热度。</p>
       </div>
-
-      <Alert
-        className="stats-alert"
-        type={source === 'demo' ? 'warning' : 'info'}
-        showIcon
-        message={source === 'demo' ? '演示数据' : '本设备真实记录'}
-        description={source === 'demo'
-          ? '静态站没有中心化计数端，无法采集全站访客。当前图表为确定性生成的模拟数据（非真实访问量），用于展示看板形态。切到「本设备记录」可查看本机埋点。'
-          : '以下数据来自本浏览器 localStorage 埋点，仅统计这台设备的访问行为，不代表站点整体流量。'}
-      />
 
       <div className="stats-ctl">
         <Segmented
@@ -228,7 +218,7 @@ function StatsBody() {
             <Button size="small">导出 ▾</Button>
           </Dropdown>
           {source === 'live' && (
-            <Popconfirm title="清空本设备的访问记录？" description="此操作不可撤销，演示数据不受影响。"
+            <Popconfirm title="清空本设备的访问记录？" description="此操作不可撤销。"
               onConfirm={doClear} okText="清空" cancelText="取消" okButtonProps={{ danger: true }}>
               <Button size="small" danger>清空</Button>
             </Popconfirm>
@@ -237,7 +227,7 @@ function StatsBody() {
       </div>
 
       {source === 'live' && s.total === 0 ? (
-        <Card className="stats-card"><Empty description="这台设备还没有访问记录，先去逛几页再回来，或切到演示数据看看看板形态。" /></Card>
+        <Card className="stats-card"><Empty description="这台设备还没有访问记录，先去逛几页再回来看看。" /></Card>
       ) : (
         <>
           <div className="stats-kpis">

@@ -424,7 +424,6 @@ button { font-family: inherit; cursor: pointer; }
 /* ============================================================
    /stats 访问统计看板 —— antd 组件融入 CRT 琥珀终端色板
    ============================================================ */
-.stats-alert { margin-bottom: 18px; }
 .stats .stats-card {
   background: var(--bg-elev);
   border: 1px solid var(--line);
