@@ -17,10 +17,10 @@ const PIG_R = 15
 interface LevelSpec { woods: [number, number, number, number][]; pigs: [number, number][] }
 
 const LEVELS: LevelSpec[] = [
-  /* 第一关：两柱一梁 + 单猪 */
+  /* 第一关：两柱一梁 + 单猪（猪坐在横梁上表面 y=308-12-15=281） */
   {
     woods: [[420, 380, 24, 120], [540, 380, 24, 120], [480, 308, 160, 24]],
-    pigs: [[480, 360]],
+    pigs: [[480, 281]],
   },
   /* 第二关：双层塔 */
   {
@@ -28,7 +28,7 @@ const LEVELS: LevelSpec[] = [
       [400, 380, 22, 120], [500, 380, 22, 120], [450, 308, 130, 22],
       [418, 250, 22, 110], [482, 250, 22, 110], [450, 185, 100, 22],
     ],
-    pigs: [[450, 355], [450, 158]],
+    pigs: [[450, 425], [450, 158]],
   },
   /* 第三关：前挡板 + 三猪堡垒 */
   {
@@ -37,7 +37,7 @@ const LEVELS: LevelSpec[] = [
       [470, 380, 24, 120], [590, 380, 24, 120], [530, 308, 150, 24],
       [500, 250, 22, 110], [560, 250, 22, 110], [530, 185, 100, 22],
     ],
-    pigs: [[470, 360], [530, 280], [530, 158]],
+    pigs: [[470, 425], [530, 280], [530, 158]],
   },
 ]
 
@@ -123,10 +123,12 @@ export default function Slingshot() {
         const pig = bodyA.label === 'pig' ? bodyA : bodyB.label === 'pig' ? bodyB : null
         if (!pig || !s.engine) continue
         const other = pig === bodyA ? bodyB : bodyA
+        /* 地面/围墙不算击杀来源，否则猪自由落体或弹跳时会被误判为砸死 */
+        if (other.label === 'ground' || other.label === 'wall') continue
         const v = Math.hypot(
           (bodyA.velocity.x - bodyB.velocity.x), (bodyA.velocity.y - bodyB.velocity.y))
         const hardHit = other.label === 'bird' ? v > 4 : v > 7
-        const crushed = Math.abs(pig.velocity.x) + Math.abs(pig.velocity.y) > 5
+        const crushed = other.label === 'wood' && (Math.abs(pig.velocity.x) + Math.abs(pig.velocity.y) > 5)
         if (hardHit || crushed) {
           Matter.Composite.remove(s.engine.world, pig)
           s.pigsLeft -= 1
@@ -171,11 +173,16 @@ export default function Slingshot() {
               setMsg('弹丸用尽，重试本关')
             } else {
               s.birds -= 1; setBirds(s.birds)
+              /* 收走上一发，避免弹丸堆积在新一发的飞行路径上 */
+              Matter.Composite.remove(s.engine!.world, b)
               const bird = Matter.Bodies.circle(SLING.x, SLING.y, BIRD_R, { label: 'bird', density: 0.004, frictionAir: 0.008, restitution: 0.4 })
               Matter.Body.setStatic(bird, true)
               s.bird = bird
-              s.launched = false; s.dragging = false
+              s.launched = false; s.dragging = false; s.settleTimer = 0
               Matter.Composite.add(s.engine!.world, bird)
+              /* 关键：状态必须回到 aim，否则 onDown 会因 status==='flying' 拒绝拖拽，第二发发射不了 */
+              setStatus('aim')
+              setMsg(`剩 ${s.birds} 发，继续瞄准`)
             }
           }
         }
