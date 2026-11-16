@@ -272,17 +272,26 @@ export default function Balloon() {
     setPhase('playing')
   }
 
-  /* 鼠标兜底模式：指针移动即飞针目标 */
+  /* 鼠标 / 触屏兜底模式：指针或手指移动即飞针目标（摄像头模式优先） */
   useEffect(() => {
     const cv = canvasRef.current
     if (!cv) return
-    const handler = (e: PointerEvent) => {
+    const toXY = (cx: number, cy: number) => {
       const rect = cv.getBoundingClientRect()
-      st.current.face.x = (e.clientX - rect.left) * (W / rect.width)
-      st.current.face.y = (e.clientY - rect.top) * (H / rect.height)
+      st.current.face.x = (cx - rect.left) * (W / rect.width)
+      st.current.face.y = (cy - rect.top) * (H / rect.height)
     }
+    const handler = (e: PointerEvent) => toXY(e.clientX, e.clientY)
+    const tstart = (e: TouchEvent) => { e.preventDefault(); toXY(e.touches[0].clientX, e.touches[0].clientY) }
+    const tmove = (e: TouchEvent) => { e.preventDefault(); toXY(e.touches[0].clientX, e.touches[0].clientY) }
     cv.addEventListener('pointermove', handler)
-    return () => cv.removeEventListener('pointermove', handler)
+    cv.addEventListener('touchstart', tstart, { passive: false })
+    cv.addEventListener('touchmove', tmove, { passive: false })
+    return () => {
+      cv.removeEventListener('pointermove', handler)
+      cv.removeEventListener('touchstart', tstart)
+      cv.removeEventListener('touchmove', tmove)
+    }
   }, [])
 
   /* 静态首帧预览 */

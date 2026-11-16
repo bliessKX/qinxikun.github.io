@@ -101,6 +101,11 @@ export default function Happy() {
   const [over, setOver] = useState<'' | 'win' | 'lose'>('')
   const [msg, setMsg] = useState('')
   const busyRef = useRef(false)
+  const overRef = useRef(over); overRef.current = over
+  const tilesRef = useRef(tiles); tilesRef.current = tiles
+  const movesRef = useRef(moves); movesRef.current = moves
+  const boardRef = useRef<HTMLDivElement>(null)
+  const swipedAt = useRef(0)
 
   useEffect(() => { document.title = '开心消消乐 — NICE.BLOG 2.0' }, [])
 
@@ -150,25 +155,23 @@ export default function Happy() {
     return gained
   }, [])
 
-  const clickTile = (t: Tile) => {
-    if (busyRef.current || over) return
-    if (!picked) { setPicked(t); return }
-    if (picked.id === t.id) { setPicked(null); return }
-    if (!adjacent(picked, t)) { setPicked(t); return }
-    const a = picked, b = t
-    const swapped = tiles.map((x) =>
+  /** 无状态依赖的交换：点选与滑动共用（经 ref 读最新盘面，不会读到过期状态） */
+  const trySwap = (a: Tile, b: Tile) => {
+    if (busyRef.current || overRef.current) return
+    const revert = tilesRef.current.map((x) => ({ ...x }))
+    const swapped = tilesRef.current.map((x) =>
       x.id === a.id ? { ...x, row: b.row, col: b.col } : x.id === b.id ? { ...x, row: a.row, col: a.col } : x)
     setPicked(null)
     if (findMatches(swapped).size === 0) {
       busyRef.current = true; setBusy(true); setTiles(swapped)
       void (async () => {
         await sleep(160)
-        setTiles(tiles.map((x) => ({ ...x })))
+        setTiles(revert)
         busyRef.current = false; setBusy(false)
       })()
       return
     }
-    const nextMoves = moves - 1
+    const nextMoves = movesRef.current - 1
     setMoves(nextMoves)
     busyRef.current = true; setBusy(true); setTiles(swapped)
     void (async () => {
@@ -179,6 +182,47 @@ export default function Happy() {
       else if (nextMoves <= 0) setOver('lose')
     })()
   }
+  const trySwapRef = useRef(trySwap); trySwapRef.current = trySwap
+
+  const clickTile = (t: Tile) => {
+    if (busyRef.current || overRef.current) return
+    if (!picked) { setPicked(t); return }
+    if (picked.id === t.id) { setPicked(null); return }
+    if (!adjacent(picked, t)) { setPicked(t); return }
+    trySwap(picked, t)
+  }
+  const clickRef = useRef(clickTile); clickRef.current = clickTile
+
+  /* 触屏滑动交换：在棋盘上朝相邻动物滑过去即交换；轻点仍走 onClick 选中 */
+  useEffect(() => {
+    const el = boardRef.current
+    if (!el) return
+    const tileAt = (cx: number, cy: number): Tile | null => {
+      const r = el.getBoundingClientRect()
+      const col = Math.floor(((cx - r.left) / r.width) * COLS)
+      const row = Math.floor(((cy - r.top) / r.height) * ROWS)
+      return tilesRef.current.find((t) => t.row === row && t.col === col) ?? null
+    }
+    let sx = 0, sy = 0, start: Tile | null = null
+    const ts = (e: TouchEvent) => {
+      const t0 = e.touches[0]
+      sx = t0.clientX; sy = t0.clientY
+      start = tileAt(sx, sy)
+    }
+    const te = (e: TouchEvent) => {
+      if (!start) return
+      const t1 = e.changedTouches[0]
+      const dx = t1.clientX - sx, dy = t1.clientY - sy
+      const from = start; start = null
+      if (Math.hypot(dx, dy) < 18) return /* 轻点交给 onClick */
+      const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? [0, 1] : [0, -1]) : (dy > 0 ? [1, 0] : [-1, 0])
+      const to = tilesRef.current.find((t) => t.row === from.row + dir[0] && t.col === from.col + dir[1])
+      if (to) { swipedAt.current = Date.now(); trySwapRef.current(from, to) }
+    }
+    el.addEventListener('touchstart', ts, { passive: true })
+    el.addEventListener('touchend', te, { passive: true })
+    return () => { el.removeEventListener('touchstart', ts); el.removeEventListener('touchend', te) }
+  }, [])
 
   const restart = () => {
     busyRef.current = false; setBusy(false)
@@ -198,13 +242,13 @@ export default function Happy() {
       </div>
       {msg && <div className="gm-msg mono">{msg}</div>}
 
-      <div className={`happy-board${busy ? ' busy' : ''}`}>
+      <div ref={boardRef} className={`happy-board${busy ? ' busy' : ''}`}>
         {tiles.map((t) => (
           <div
             key={t.id}
             className={`happy-tile${popping.has(t.id) ? ' pop' : ''}${picked && picked.id === t.id ? ' pick' : ''}`}
             style={{ transform: `translate(${t.col * 100}%, ${t.row * 100}%)` }}
-            onClick={() => clickTile(t)}
+            onClick={() => { if (Date.now() - swipedAt.current < 400) return; clickTile(t) }}
             role="button" aria-label={`动物 ${ANIMALS[t.kind]}`}
           >
             <span className="happy-emoji">{ANIMALS[t.kind]}</span>

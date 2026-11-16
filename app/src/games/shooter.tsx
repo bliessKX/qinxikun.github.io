@@ -207,13 +207,18 @@ class ShooterScene extends Phaser.Scene {
 
     if (!this.running) { this.player.setVelocityX(0); return }
 
-    /* 玩家操控 */
+    /* 玩家操控：触屏拖动 > 键盘 */
     const kb = this.input.keyboard!
     const left = this.cursors.left.isDown || kb.addKey('A').isDown
     const right = this.cursors.right.isDown || kb.addKey('D').isDown
-    if (left) this.player.setVelocityX(this.player.body.velocity.x - delta * 2)
-    if (right) this.player.setVelocityX(this.player.body.velocity.x + delta * 2)
-    if (!left && !right) this.player.setVelocityX(0)
+    const ptr = this.input.activePointer
+    if (ptr.isDown && ptr.worldX >= 0 && ptr.worldX <= W) {
+      /* 手指按住哪里，战机就飞向哪里（同时保留按住自动开火） */
+      const targetX = Phaser.Math.Clamp(ptr.worldX, 24, W - 24)
+      this.player.setVelocityX(Phaser.Math.Clamp((targetX - this.player.x) * 9, -420, 420))
+    } else if (left) this.player.setVelocityX(this.player.body.velocity.x - delta * 2)
+    else if (right) this.player.setVelocityX(this.player.body.velocity.x + delta * 2)
+    else this.player.setVelocityX(0)
     this.player.x = Phaser.Math.Clamp(this.player.x, 24, W - 24)
 
     /* 射击 */

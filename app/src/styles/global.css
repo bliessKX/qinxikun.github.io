@@ -1486,6 +1486,7 @@ button { font-family: inherit; cursor: pointer; }
   100% { scale: 0; opacity: 0; }
 }
 .happy-board.busy .happy-tile { cursor: wait; }
+.happy-board { touch-action: none; }
 .happy .gm-over { position: absolute; }
 .gm-chain { color: var(--amber); }
 .gm-target { font-style: normal; color: var(--muted); }
@@ -1653,17 +1654,54 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--bg);
 }
 .shooter-host { width: 720px; }
-.shooter-host canvas { display: block; max-width: 100%; }
+.shooter-host canvas { display: block; max-width: 100%; touch-action: none; }
 .sling-cv { width: min(720px, 100%); aspect-ratio: 720 / 480; touch-action: none; cursor: grab; }
 .sling-cv:active { cursor: grabbing; }
 .runner-host { position: relative; width: 100%; max-width: 860px; height: 420px; }
-.runner-host canvas { display: block; width: 100% !important; }
+.runner-host canvas { display: block; width: 100% !important; touch-action: none; }
 .runner-mask { position: absolute; }
 
 /* ---- 体感打气球 ---- */
 .balloon-video { display: none; }
 .balloon-stage { position: relative; width: min(640px, 100%); aspect-ratio: 640 / 480; }
-.balloon-cv { width: 100%; height: 100%; display: block; }
+.balloon-cv { width: 100%; height: 100%; display: block; touch-action: none; }
+
+/* ---- 星露谷 · 触屏虚拟按键（仅触控设备显示） ---- */
+.sd-pad { display: none; position: fixed; right: 12px; bottom: 12px; z-index: 60; }
+.sd-dpad {
+  display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px);
+  gap: 4px; opacity: .92;
+}
+.sd-pad-btn {
+  font: 15px var(--mono); color: var(--ink);
+  background: rgba(12, 15, 12, .82); border: 1px solid var(--line); border-radius: 10px;
+  touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer;
+  transition: background .1s, border-color .1s;
+}
+.sd-pad-btn:active { background: rgba(240, 168, 50, .25); border-color: var(--amber); color: var(--amber); }
+.sd-pad-u { grid-area: 1 / 2; }
+.sd-pad-l { grid-area: 2 / 1; }
+.sd-pad-r { grid-area: 2 / 3; }
+.sd-pad-d { grid-area: 3 / 2; }
+.sd-act {
+  position: absolute; right: 116px; bottom: 4px;
+  width: 62px; height: 62px; border-radius: 50%;
+  font: 24px var(--mono); color: var(--ink);
+  background: rgba(12, 15, 12, .82); border: 1px solid var(--line);
+  touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer;
+  transition: background .1s, border-color .1s;
+}
+.sd-act:active { background: rgba(77, 216, 230, .25); border-color: var(--cyan); }
+@media (pointer: coarse) {
+  .sd-pad { display: block; }
+}
+/* 手机端把农场整图缩进视口，避免横向滚动 */
+@media (max-width: 620px) {
+  .sd-field { zoom: .62; }
+}
+@media (max-width: 400px) {
+  .sd-field { zoom: .52; }
+}
 
 @media (max-width: 720px) {
   .gm-grid { grid-template-columns: 1fr; }

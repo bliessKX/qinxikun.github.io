@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import type { PointerEvent as RPointerEvent } from 'react'
 
 /* 星露谷 · 农场模拟（纯前端 v2）—— 原生 JS + CSS + localStorage。
  * 相对 v1 的升级：
@@ -441,16 +442,33 @@ export default function Stardew() {
     setTalkIdx((i) => i + 1)
   }
 
+  /* 走一格（键盘与虚拟方向键共用）；freeTile 只依赖地面类型，闭包过期无副作用 */
+  const step = (dr: number, dc: number) => {
+    if (modeRef.current !== 'farm' || busy.current) return
+    const nr = gxRef.current + dr, nc = gyRef.current + dc
+    if (!freeTile(nr, nc)) return
+    setFace(dr > 0 ? 'down' : dr < 0 ? 'up' : dc > 0 ? 'right' : 'left')
+    busy.current = true; setWalking(true); setGx(nr); setGy(nc)
+    window.setTimeout(() => { setWalking(false); busy.current = false }, 190)
+  }
+
+  /* 虚拟方向键按住连走（触屏用）：按下走一格，随后每 200ms 重复 */
+  const holdProps = (dr: number, dc: number) => {
+    let iv = 0
+    return {
+      onPointerDown: (e: RPointerEvent<HTMLButtonElement>) => {
+        e.preventDefault()
+        step(dr, dc)
+        iv = window.setInterval(() => step(dr, dc), 200)
+      },
+      onPointerUp: () => window.clearInterval(iv),
+      onPointerLeave: () => window.clearInterval(iv),
+      onPointerCancel: () => window.clearInterval(iv),
+    }
+  }
+
   /* 键盘：走动 / 选工具 / 交互 */
   useEffect(() => {
-    const step = (dr: number, dc: number) => {
-      if (modeRef.current !== 'farm' || busy.current) return
-      const nr = gxRef.current + dr, nc = gyRef.current + dc
-      if (!freeTile(nr, nc)) return
-      setFace(dr > 0 ? 'down' : dr < 0 ? 'up' : dc > 0 ? 'right' : 'left')
-      busy.current = true; setWalking(true); setGx(nr); setGy(nc)
-      window.setTimeout(() => { setWalking(false); busy.current = false }, 190)
-    }
     const onKey = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase()
       if (k === 'escape') { setMode('farm'); return }
@@ -468,6 +486,7 @@ export default function Stardew() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tiles, applyTool, openFish, openMine, openTalk, advanceTalk])
 
   const invList = Object.entries(inv).filter(([, n]) => n > 0)
@@ -551,6 +570,23 @@ export default function Stardew() {
             <span key={f.id} className={`sd-fx sd-fx-${f.kind}`} style={{ left: f.x, top: f.y }} />
           ))}
         </div>
+      </div>
+
+      {/* 触屏虚拟按键：方向键按住连走，🔧 等同空格（水边钓鱼 / 当前格使用工具） */}
+      <div className="sd-pad">
+        <div className="sd-dpad">
+          <button type="button" className="sd-pad-btn sd-pad-u" {...holdProps(-1, 0)} aria-label="向上走">▲</button>
+          <button type="button" className="sd-pad-btn sd-pad-l" {...holdProps(0, -1)} aria-label="向左走">◀</button>
+          <button type="button" className="sd-pad-btn sd-pad-r" {...holdProps(0, 1)} aria-label="向右走">▶</button>
+          <button type="button" className="sd-pad-btn sd-pad-d" {...holdProps(1, 0)} aria-label="向下走">▼</button>
+        </div>
+        <button type="button" className="sd-act" aria-label="使用工具"
+          onPointerDown={(e) => {
+            e.preventDefault()
+            if (modeRef.current !== 'farm') return
+            if (near(POND_R0, POND_C0)) openFish()
+            else applyTool(gxRef.current, gyRef.current)
+          }}>🔧</button>
       </div>
 
       <div className="sd-msg mono">{msg || 'WASD 走动 · 点击格子走过去操作 · E 对话 · F 钓鱼 · M 进矿洞'}</div>
