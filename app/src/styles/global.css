@@ -1515,7 +1515,7 @@ button { font-family: inherit; cursor: pointer; }
 .sd-quest { align-self: stretch; text-align: center; font-family: var(--mono); font-size: 12px; color: var(--cyan); border: 1px dashed var(--amber-dim) !important; border-radius: 4px; padding: 6px 10px; }
 
 .sd-field-wrap {
-  position: relative; width: min(560px, 92vw); margin: 0 auto; overflow: auto;
+  position: relative; width: min(1500px, 97vw); margin: 0 auto; overflow: hidden;
   border: 1px solid var(--line); border-radius: var(--radius); background: #0c0f0c;
   box-shadow: inset 0 8px 30px rgba(0,0,0,.45);
 }
@@ -1524,7 +1524,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .sd-tile {
   position: absolute; display: grid; place-items: center; overflow: hidden;
-  font-size: clamp(16px, 3.4vw, 24px); line-height: 1;
+  font-size: clamp(14px, 2.4vw, 26px); line-height: 1;
   border: 1px solid rgba(0,0,0,.35); cursor: pointer; user-select: none;
   background-repeat: repeat; transition: filter .12s;
 }
@@ -1617,6 +1617,21 @@ button { font-family: inherit; cursor: pointer; }
 .sd-house { position: absolute; display: grid; place-items: center; font-size: 28px; cursor: pointer; user-select: none; z-index: 5;
   background: linear-gradient(180deg, #3a3f52, #23273a); border: 1px solid #000; border-radius: 6px; box-shadow: inset 0 0 12px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06); }
 .sd-house i { position: absolute; bottom: 1px; right: 2px; font-style: normal; font-family: var(--mono); font-size: 9px; background: var(--amber); color: #1a1208; border-radius: 3px; padding: 0 3px; }
+.sd-house.is-mine { box-shadow: inset 0 0 12px rgba(0,0,0,.6), 0 0 0 2px rgba(240,168,50,.55); }
+
+/* ---- 村民名牌（专属配色） ---- */
+.sd-npc em { position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); font: 700 9px/1.4 var(--mono); font-style: normal; color: #fff; background: var(--npc, #9b59b6); padding: 0 4px; border-radius: 3px; white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+
+/* ---- 家畜围栏 + 鸡鸭鹅 ---- */
+.sd-pen { position: absolute; z-index: 2; pointer-events: none; border: 3px solid #9a754a; border-radius: 8px; background: repeating-linear-gradient(90deg, rgba(154,117,74,.14) 0 2px, transparent 2px 16px); box-shadow: inset 0 0 16px rgba(101,67,33,.3); }
+.sd-animal { position: absolute; display: grid; place-items: center; cursor: pointer; user-select: none; z-index: 5; font-size: clamp(16px, 2.2vw, 26px); transition: transform .18s ease; }
+.sd-animal:hover { transform: scale(1.18); }
+.sd-animal > span { filter: drop-shadow(0 2px 2px rgba(0,0,0,.35)); animation: sd-animal-idle 3.5s ease-in-out infinite; }
+@keyframes sd-animal-idle { 0%,100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-2px) rotate(3deg); } }
+.sd-animal.fed::after { content: '✓'; position: absolute; top: 0; right: 2px; font: 700 10px var(--mono); color: #7bc96f; text-shadow: 0 0 4px #000; }
+.sd-animal i { position: absolute; bottom: 0; right: 1px; font-size: 11px; font-style: normal; }
+.sd-sell { font: 700 11px var(--mono); color: #1a1208; background: var(--amber); border: 0; border-radius: 4px; padding: 2px 9px; cursor: pointer; margin-left: auto; }
+.sd-sell:hover { filter: brightness(1.12); }
 
 /* ---- 体力条 ---- */
 .sd-enge { display: inline-flex; align-items: center; gap: 6px; }
