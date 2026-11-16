@@ -1568,6 +1568,95 @@ button { font-family: inherit; cursor: pointer; }
 @keyframes sd-weed { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
 .sd-tile .sd-badge { position: absolute; top: 1px; right: 2px; font-size: 10px; opacity: .85; }
 
+/* ---- 四季色调 ---- */
+.sd-field.season-1 { filter: saturate(1.15) brightness(1.03) hue-rotate(-8deg); }
+.sd-field.season-2 { filter: sepia(.22) saturate(1.1) hue-rotate(-18deg); }
+.sd-field.season-3 { filter: saturate(.55) brightness(1.18); }
+.sd-field.season-3 .sd-tile.grass { background-color: #dfe6ee; }
+.sd-field.season-3 .sd-tile.grass::after { opacity: .5; }
+.sd-field.season-3 .sd-tile.soil { background-color: #9aa4b2; }
+
+/* ---- 天气层 ---- */
+.sd-weather-layer { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 20; border-radius: inherit; }
+.sd-w-sun { position: absolute; top: 6px; right: 12px; font-size: 26px; filter: drop-shadow(0 0 8px rgba(255,220,120,.8)); animation: sd-sunspin 26s linear infinite; }
+@keyframes sd-sunspin { to { transform: rotate(360deg); } }
+.sd-w-cloud { position: absolute; left: -60px; font-size: 24px; opacity: .8; animation: sd-clouddrift linear infinite; }
+@keyframes sd-clouddrift { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 120px)); } }
+.sd-w-rain, .sd-w-snow { position: absolute; inset: 0; pointer-events: none; }
+.sd-w-rain {
+  background: repeating-linear-gradient(112deg, transparent 0 14px, rgba(160,205,255,.35) 14px 15px);
+  background-size: 100% 46px; animation: sd-rainfall .5s linear infinite;
+}
+.sd-w-rain2 { background: repeating-linear-gradient(108deg, transparent 0 22px, rgba(140,190,240,.28) 22px 23px); background-size: 100% 64px; animation-duration: .72s; }
+@keyframes sd-rainfall { from { background-position: 0 0; } to { background-position: -14px 46px; } }
+.sd-w-bolt {
+  position: absolute; inset: 0; background: rgba(255,255,220,.85); opacity: 0;
+  animation: sd-bolt 6.5s steps(1) infinite;
+}
+@keyframes sd-bolt { 0%, 88%, 100% { opacity: 0; } 89% { opacity: .85; } 90% { opacity: 0; } 91% { opacity: .6; } 92% { opacity: 0; } }
+.sd-w-snow {
+  background:
+    radial-gradient(circle at 20% 0, rgba(255,255,255,.9) 0 2px, transparent 2px),
+    radial-gradient(circle at 60% 0, rgba(255,255,255,.75) 0 3px, transparent 3px),
+    radial-gradient(circle at 85% 0, rgba(255,255,255,.9) 0 2px, transparent 2px);
+  background-size: 90px 130px; animation: sd-snowfall 7s linear infinite;
+}
+.sd-w-snow2 { background:
+    radial-gradient(circle at 40% 0, rgba(255,255,255,.6) 0 2px, transparent 2px),
+    radial-gradient(circle at 75% 0, rgba(255,255,255,.85) 0 3px, transparent 3px);
+  background-size: 70px 170px; animation-duration: 10.5s; }
+@keyframes sd-snowfall { from { background-position: 0 0, 0 0; } to { background-position: 22px 130px, -18px 170px; } }
+
+/* ---- 桥 / 树 / 房子 ---- */
+.sd-bridge { position: absolute; z-index: 4; background: linear-gradient(180deg, #a5764a, #8a5f38 55%, #6f4c2c); box-shadow: inset 0 -3px 0 rgba(0,0,0,.35), inset 0 2px 0 rgba(255,235,200,.25); pointer-events: none; }
+.sd-bridge::after { content: ''; position: absolute; inset: 4px 6px; border: 1px dashed rgba(60,38,18,.4); border-radius: 3px; }
+.sd-tile.tree .sd-crop, .sd-tile.tree { overflow: visible; }
+.sd-tree { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); font-size: 26px; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0,0,0,.4)); z-index: 3; }
+.sd-tree[data-size='1'] { font-size: 20px; opacity: .85; }
+.sd-tree[data-size='2'] { font-size: 23px; }
+.sd-house { position: absolute; display: grid; place-items: center; font-size: 28px; cursor: pointer; user-select: none; z-index: 5;
+  background: linear-gradient(180deg, #3a3f52, #23273a); border: 1px solid #000; border-radius: 6px; box-shadow: inset 0 0 12px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06); }
+.sd-house i { position: absolute; bottom: 1px; right: 2px; font-style: normal; font-family: var(--mono); font-size: 9px; background: var(--amber); color: #1a1208; border-radius: 3px; padding: 0 3px; }
+
+/* ---- 体力条 ---- */
+.sd-enge { display: inline-flex; align-items: center; gap: 6px; }
+.sd-enge-bar { display: inline-block; width: 74px; height: 7px; background: rgba(255,255,255,.08); border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); }
+.sd-enge-bar > i { display: block; height: 100%; background: linear-gradient(90deg, #58c96b, #a8d858); transition: width .25s ease; }
+
+/* ---- 建造 / 铁匠面板 ---- */
+.sd-build { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; width: min(560px, 94vw); max-height: 84vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.sd-build-sec { margin-top: 12px; }
+.sd-build-sec > b { font-size: 13px; color: var(--ink); }
+.sd-build-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 9px 10px; margin-top: 8px; background: rgba(255,255,255,.04); border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; color: var(--ink); }
+.sd-build-item .mono { color: var(--muted); font-size: 12px; }
+.sd-build-item button { margin-left: auto; }
+.sd-build-foot { margin-top: 12px; font-size: 11.5px; color: var(--muted); }
+
+/* ---- 矿洞 2.0（10×8 大地图） ---- */
+.sd-mine2 { background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; width: fit-content; max-width: 96vw; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.sd-mine-grid { position: relative; margin: 10px auto 0; background: radial-gradient(circle at 50% 30%, #2e2a3a, #17141f); border: 2px solid #0b0912; border-radius: 8px; overflow: hidden; }
+.sd-mtile { position: absolute; display: grid; place-items: center; cursor: pointer; font-size: 20px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.35); transition: filter .15s ease; }
+.sd-mtile:hover { filter: brightness(1.25); }
+.mt-floor { background: #3a3444; }
+.mt-wall  { background: linear-gradient(180deg, #241f2e, #17131f); box-shadow: inset 0 2px 0 rgba(255,255,255,.05); cursor: default; }
+.mt-exit  { background: #4a3f2a; }
+.mt-ladder { background: #4a3f2a; }
+.mt-rock   { background: #4a4658; }
+.mt-copper { background: #5a4436; }
+.mt-iron   { background: #45485c; }
+.mt-gold   { background: #5f5330; }
+.mt-geode  { background: #3c4a5f; }
+.sd-mtile.cracked::after { content: ''; position: absolute; inset: 0; background:
+  linear-gradient(45deg, transparent 46%, rgba(0,0,0,.55) 46% 54%, transparent 54%),
+  linear-gradient(-30deg, transparent 60%, rgba(0,0,0,.4) 60% 66%, transparent 66%); }
+.sd-mtile.swing { animation: sd-smack .3s ease; }
+@keyframes sd-smack { 0% { transform: scale(1); } 40% { transform: scale(.88) rotate(-3deg); } 100% { transform: scale(1); } }
+.sd-mhp { position: absolute; top: 1px; left: 3px; font-size: 8px; color: rgba(255,255,255,.5); letter-spacing: 1px; }
+.sd-micon { filter: drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
+.sd-mplayer { position: absolute; width: 22px; height: 22px; margin: 12px 0 0 12px; border-radius: 6px; background: linear-gradient(180deg, #f0a832, #c9802e); box-shadow: 0 0 10px rgba(240,168,50,.55), 0 3px 0 rgba(0,0,0,.4); z-index: 6; transition: left .14s ease, top .14s ease; pointer-events: none; }
+
+.sd-tile .sd-badge { position: absolute; top: 1px; right: 2px; font-size: 10px; opacity: .85; }
+
 .sd-cave, .sd-npc { position: absolute; display: grid; place-items: center; font-size: 26px; cursor: pointer; user-select: none; z-index: 5; }
 .sd-cave { background: radial-gradient(circle at 50% 38%, #2c2c36, #0a0a10); border: 1px solid #000; box-shadow: inset 0 0 14px #000; }
 .sd-cave i, .sd-npc i { position: absolute; bottom: 1px; right: 2px; font-style: normal; font-family: var(--mono); font-size: 9px; background: var(--amber); color: #1a1208; border-radius: 3px; padding: 0 3px; }

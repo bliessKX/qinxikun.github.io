@@ -75,7 +75,14 @@ export default function Mines() {
   }
 
   const onCell = (r: number, c: number) => {
-    if (state || !board) return
+    if (state) return
+    /* 首局：点击任意格直接生成保证安全的首翻棋盘并翻开 */
+    if (!board) {
+      const fresh = genBoard(r, c)
+      openCell(fresh, r, c)
+      setBoard(fresh)
+      return
+    }
     let b = board.map((row) => row.map((x) => ({ ...x })))
     const cell = b[r][c]
     /* 长按/旗子模式：插旗 */
@@ -85,9 +92,6 @@ export default function Mines() {
       setBoard(b); return
     }
     if (cell.flag || cell.open) return
-    if (!board) return
-    /* 首次点击生成安全棋盘 */
-    if (b.flat().every((x) => !x.open && !x.mine)) b = genBoard(r, c)
     if (b[r][c].mine) {
       b.flat().forEach((x) => { if (x.mine) x.open = true })
       setBoard(b); setState('lose'); return
