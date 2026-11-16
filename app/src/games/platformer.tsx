@@ -52,6 +52,7 @@ class PlatformerScene extends Phaser.Scene {
   touchRight = false
   touchJump = false
   jumpCd = 0
+  hurtCd = 0
 
   constructor() { super('platformer') }
 
@@ -146,12 +147,16 @@ class PlatformerScene extends Phaser.Scene {
   }
 
   hurt() {
-    if (this.lives <= 0) return
+    if (this.lives <= 0 || this.hurtCd > 0) return
+    this.hurtCd = 800
     this.lives -= 1
     bridge.onLives(this.lives)
     this.cameras.main.shake(120, 0.008)
+    this.cameras.main.flash(120, 160, 40, 40)
+    this.player.setTint(0xff6a5a)
+    this.time.delayedCall(300, () => this.player?.clearTint())
+    if (this.lives <= 0) { bridge.onDead(); this.scene.restart(); return }
     this.player.setPosition(40, 320).setVelocity(0, 0)
-    if (this.lives <= 0) { bridge.onDead(); this.scene.restart() }
   }
 
   pass() {
@@ -162,11 +167,14 @@ class PlatformerScene extends Phaser.Scene {
 
   update(_t: number, delta: number) {
     this.jumpCd = Math.max(0, this.jumpCd - delta)
+    this.hurtCd = Math.max(0, this.hurtCd - delta)
     const kb = this.input.keyboard!
     const left = this.touchLeft || kb.addKey('A').isDown || this.input.keyboard!.addKey('LEFT').isDown
     const right = this.touchRight || kb.addKey('D').isDown || this.input.keyboard!.addKey('RIGHT').isDown
     this.player.setVelocityX(left && !right ? -190 : right && !left ? 190 : 0)
     if (this.touchJump || kb.addKey('SPACE').isDown || kb.addKey('UP').isDown || kb.addKey('W').isDown) this.tryJump()
+    /* 掉下平台 = 坠落死亡，损命重生（玩家半高12px，贴世界底边时 y≈408） */
+    if (this.player.y > H - 16 && this.lives > 0) this.hurt()
   }
 }
 

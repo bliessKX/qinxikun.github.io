@@ -31,7 +31,7 @@ export const GAMES: GameMeta[] = [
   { id: 'slingshot', name: '弹弓堡垒', desc: '愤怒的小鸟式物理弹射：拉开弹弓轰塌木架，把据守的目标全部击落，三关难度递进。', stack: 'Matter.js', cat: '物理', glyph: '➤' },
   { id: 'stack3d', name: '3D 物理叠塔', desc: '吊臂来回摆动，看准时机放下方块；落点偏移的部分被真实刚体切成碎块掉落，塔越叠越窄，考验手稳。', stack: 'Rapier + Three.js', cat: '物理', glyph: '🗼' },
   { id: 'runner3d', name: '数据流跑酷', desc: '3D 无尽跑酷：在三条数据轨道间左右切换，躲避迎面而来的防火墙方块，越跑越快。', stack: 'Three.js', cat: '3D', glyph: '◱' },
-  { id: 'racer3d', name: '3D 赛车', desc: '高速路上车流滚滚：左右滑动换道躲避，速度渐增看你能跑多远，撞车即终点。', stack: 'Three.js', cat: '3D', glyph: '🏎️' },
+  { id: 'racer3d', name: '3D 赛车', desc: '地平线之夜：弯道漂移甩出流光尾迹，氮气冲刺，五款跑车任选，三视角切换。', stack: 'Three.js', cat: '3D', glyph: '🏎️' },
   { id: 'balloon', name: '体感打气球', desc: '打开摄像头，用头部的移动控制飞针去顶飘起来的气球；没有摄像头时手指滑动同样能玩。', stack: 'MediaPipe + Canvas', cat: '体感', glyph: '◎' },
   /* ---- 开源精选（sausi-7/games，MIT License，iframe 原样内嵌） ---- */
   { id: 'og-pacman', embed: 'pacman', open: true, name: '吃豆人', desc: '经典街机：在迷宫里吃掉全部豆子，躲开四只幽灵，吃到能量豆可以反杀。', stack: 'Phaser 3 · 开源', cat: '街机', glyph: '🟡' },

@@ -1661,6 +1661,55 @@ button { font-family: inherit; cursor: pointer; }
 .runner-host canvas { display: block; width: 100% !important; touch-action: none; }
 .runner-mask { position: absolute; }
 
+/* ---- 3D 赛车 · 车库 / 氮气 / 触屏 ---- */
+.racer3d { position: relative; }
+.racer3d .runner-host { border-radius: var(--radius); overflow: hidden; }
+.rc-select-mask { inset: 0; z-index: 8; background: linear-gradient(180deg, rgba(8, 11, 18, .78), rgba(8, 11, 18, .92)); backdrop-filter: blur(4px); overflow-y: auto; }
+.rc-select { width: 100%; max-width: 780px; margin: 0 auto; padding: 18px 14px 22px; }
+.rc-select-title { font-size: 15px; letter-spacing: .22em; color: var(--amber); text-align: center; margin-bottom: 14px; }
+.rc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.rc-card {
+  display: block; width: 100%; text-align: left; padding: 0; overflow: hidden;
+  background: #10141d; border: 1.5px solid var(--line); border-radius: 10px;
+  cursor: pointer; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.rc-card img { display: block; width: 100%; aspect-ratio: 1280 / 676; object-fit: cover; }
+.rc-card-info { padding: 9px 11px 11px; }
+.rc-card-info b { display: block; color: var(--ink); font-size: 14.5px; }
+.rc-card-info i { display: block; font-style: normal; color: var(--muted); font-size: 11.5px; margin: 3px 0 7px; }
+.rc-stats { display: grid; gap: 4px; }
+.rc-stats span { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); }
+.rc-stats i { display: block; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--cyan), var(--amber)); min-width: 6px; }
+.rc-card:hover, .rc-card.on { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber) inset, 0 6px 18px rgba(0, 0, 0, .4); transform: translateY(-2px); }
+.rc-tip { margin-top: 12px; text-align: center; font-size: 11.5px; color: var(--muted); }
+.rc-nitro-wrap {
+  display: flex; align-items: center; gap: 8px; max-width: 860px; margin: 8px auto 0;
+}
+.rc-nitro-label { font-size: 11px; color: var(--cyan); letter-spacing: .1em; }
+.rc-nitro { flex: 1; height: 8px; border: 1px solid var(--line); border-radius: 4px; background: #10141d; overflow: hidden; }
+.rc-nitro i { display: block; height: 100%; background: linear-gradient(90deg, #2f7fe0, #66d8ff); transition: width .12s linear; }
+.rc-speed { font-size: 15px; }
+.rc-speed b { font-size: 19px; color: var(--amber); }
+.rc-drift { color: #66d8ff; font-weight: 800; font-size: 12.5px; letter-spacing: .14em; animation: rcBlink .5s steps(2) infinite; }
+@keyframes rcBlink { 50% { opacity: .25; } }
+.rc-new { color: var(--amber); font-weight: 700; margin-left: 6px; }
+.rc-again { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+.rc-start { pointer-events: none; }
+.rc-touch { display: none; justify-content: space-between; align-items: center; gap: 10px; max-width: 860px; margin: 10px auto 0; }
+.rc-steer { display: flex; gap: 12px; }
+.rc-btn {
+  width: 74px; height: 60px; border-radius: 12px; border: 1.5px solid var(--line);
+  background: rgba(16, 20, 29, .85); color: var(--ink); font-size: 21px; font-weight: 700;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.rc-btn:active { border-color: var(--amber); color: var(--amber); }
+.rc-n2o { width: 92px; color: #66d8ff; border-color: #2f7fe0; font-size: 15px; letter-spacing: .08em; }
+.rc-n2o:active { color: #fff; border-color: #66d8ff; background: rgba(47, 127, 224, .3); }
+@media (pointer: coarse) {
+  .rc-touch { display: flex; }
+  .racer3d .runner-host { height: min(420px, 52vh); }
+}
+
 /* ---- 体感打气球 ---- */
 .balloon-video { display: none; }
 .balloon-stage { position: relative; width: min(640px, 100%); aspect-ratio: 640 / 480; }
