@@ -1703,6 +1703,98 @@ button { font-family: inherit; cursor: pointer; }
   .sd-field { zoom: .52; }
 }
 
+/* ---- 贪吃蛇 / 2048 ---- */
+.snake-stage, .g2048-stage, .fishing-host-wrap, .stack-host-wrap { position: relative; }
+.snake-cv, .g2048-cv {
+  display: block; margin: 0 auto; max-width: 100%;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  touch-action: none;
+}
+.g2048-cv { touch-action: none; }
+
+/* ---- 扫雷 ---- */
+.mines { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.mines-grid {
+  position: relative;
+  display: grid; grid-template-columns: repeat(9, 34px); grid-auto-rows: 34px; gap: 3px;
+  padding: 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-elev);
+}
+.mines-cell {
+  font: 13px var(--mono); color: var(--ink);
+  background: #1a2233; border: 1px solid var(--line); border-radius: 4px;
+  cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  display: grid; place-items: center; padding: 0;
+  transition: background .1s;
+}
+.mines-cell:hover:not(:disabled) { background: #222d44; }
+.mines-cell.open { background: var(--bg); cursor: default; }
+.mines-cell.flag { background: #26354d; }
+.mines-cell.boom { background: rgba(224, 108, 96, .3); border-color: var(--red, #e06c60); }
+.mines-veil {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(11, 14, 20, .55); border-radius: var(--radius);
+  font-size: 12px; color: var(--muted); pointer-events: none;
+}
+.mines-over { position: static; margin-top: 4px; }
+
+/* ---- 平台跳跃 ---- */
+.pf-host { width: 720px; max-width: 100%; margin: 0 auto; }
+.pf-host canvas { display: block; max-width: 100%; touch-action: none; }
+.pf-pad { display: none; gap: 18px; justify-content: space-between; margin: 10px auto 0; width: min(92vw, 420px); }
+.pf-dpad { display: flex; gap: 12px; }
+.pf-btn {
+  font: 15px var(--mono); color: var(--ink);
+  background: rgba(12, 15, 12, .82); border: 1px solid var(--line); border-radius: 12px;
+  padding: 14px 18px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer;
+}
+.pf-btn:active { background: rgba(240, 168, 50, .25); border-color: var(--amber); color: var(--amber); }
+.pf-j { border-radius: 50%; width: 74px; height: 74px; font-size: 17px; }
+@media (pointer: coarse) {
+  .pf-pad { display: flex; }
+}
+
+/* ---- 钓鱼模拟器 ---- */
+.fishing-host { width: 720px; max-width: 100%; margin: 0 auto; }
+.fishing-host canvas { display: block; max-width: 100%; touch-action: none; }
+.fish-card {
+  display: flex; align-items: center; gap: 14px;
+  width: min(420px, 92vw); margin: -8px auto 0; padding: 12px 16px;
+  background: var(--bg-elev); border: 1px solid var(--amber); border-radius: var(--radius);
+  box-shadow: 0 8px 26px rgba(240, 168, 50, .18);
+  animation: fish-in .3s ease;
+}
+@keyframes fish-in { from { transform: translateY(10px); opacity: 0 } to { transform: none; opacity: 1 } }
+.fish-card-emoji { font-size: 34px; }
+.fish-card b { font-size: 15px; }
+.fish-new {
+  font: 700 10px var(--mono); color: #0b0e14; background: var(--amber);
+  border-radius: 3px; padding: 2px 5px; margin-left: 8px; font-style: normal;
+}
+.fish-dex {
+  width: min(560px, 94vw); max-height: 84vh; overflow: auto;
+  background: var(--bg-elev); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px;
+}
+.fish-dex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
+.fish-dex-item {
+  display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
+  border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+  background: var(--bg); opacity: .55;
+}
+.fish-dex-item.got { opacity: 1; }
+.fish-dex-item b { font-size: 13.5px; }
+.fish-dex-item i { font-size: 10.5px; font-style: normal; }
+.fish-dex-item .muted { font-size: 10.5px; }
+.fish-dex-emoji { font-size: 22px; }
+.fish-rain { font-size: 10px; color: var(--cyan); }
+
+/* ---- 3D 叠塔 ---- */
+.stack3d { position: relative; }
+.stack-host { width: min(720px, 100%); height: 460px; margin: 0 auto; position: relative; }
+.stack-host canvas { display: block; touch-action: none; }
+.stack-tip { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; }
+.runner-mask.stack-tip { position: static; }
+
 @media (max-width: 720px) {
   .gm-grid { grid-template-columns: 1fr; }
   .gm-play { display: none; }

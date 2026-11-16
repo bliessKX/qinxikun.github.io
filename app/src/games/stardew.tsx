@@ -30,7 +30,7 @@ const CROPS: Record<CropId, { name: string; emoji: string; stages: string[]; sel
   strawberry: { name: '草莓',   emoji: '🍓', stages: ['🌱', '🌿', '🌸', '🍓'], sell: 80 },
   pumpkin:    { name: '南瓜',   emoji: '🎃', stages: ['🌱', '🌿', '🌾', '🎃'],  sell: 120 },
 }
-type ToolId = 'hoe' | 'water' | 'seed' | 'harvest' | 'weed' | 'clear'
+type ToolId = 'hoe' | 'water' | 'seed' | 'harvest' | 'weed' | 'clear' | 'net' | 'sieve'
 const TOOLS: { id: ToolId; name: string; icon: string; key: string }[] = [
   { id: 'hoe',     name: '锄头', icon: '⛏️', key: '1' },
   { id: 'water',   name: '水壶', icon: '💧', key: '2' },
@@ -38,6 +38,8 @@ const TOOLS: { id: ToolId; name: string; icon: string; key: string }[] = [
   { id: 'harvest', name: '收获', icon: '🌾', key: '4' },
   { id: 'weed',    name: '除草', icon: '🍂', key: '5' },
   { id: 'clear',   name: '铲除', icon: '❌', key: '6' },
+  { id: 'net',     name: '捕虫网', icon: '🦋', key: '7' },
+  { id: 'sieve',   name: '捕虾篓', icon: '🦐', key: '8' },
 ]
 
 type MineType = 'stone' | 'copper' | 'iron' | 'gold' | 'geode' | 'ladder'
@@ -50,7 +52,7 @@ const MINE_LOOT: Record<Exclude<MineType, 'ladder'>, { name: string; gold: numbe
 }
 
 interface Crop { id: CropId; stage: number; wateredToday: boolean }
-interface Tile { ground: Ground; watered: boolean; crop: Crop | null; weed: boolean }
+interface Tile { ground: Ground; watered: boolean; crop: Crop | null; weed: boolean; butterfly?: boolean }
 interface MineNode { type: MineType; broken: boolean }
 interface Mine { level: number; nodes: MineNode[] }
 interface Save {
@@ -314,6 +316,24 @@ export default function Stardew() {
       }
       return next
     })
+    spawnButterflies(2)
+  }, [])
+
+  /* 白天草地飞来蝴蝶（捉虫网捕捉） */
+  const spawnButterflies = useCallback((n: number) => {
+    setTiles((prev) => {
+      const flats: [number, number][] = []
+      prev.forEach((row, r) => row.forEach((t, c) => {
+        if (t.ground === 'grass' && !t.crop && !t.weed && !t.butterfly) flats.push([r, c])
+      }))
+      if (!flats.length) return prev
+      const next = prev.map((row) => row.map((t) => ({ ...t })))
+      for (let i = 0; i < n && flats.length; i++) {
+        const [r, c] = flats.splice(Math.floor(Math.random() * flats.length), 1)[0]
+        next[r][c].butterfly = true
+      }
+      return next
+    })
   }, [])
 
   const applyTool = useCallback((r: number, c: number) => {
@@ -351,6 +371,23 @@ export default function Stardew() {
         else if (t.ground === 'soil') { updateTile(r, c, (x) => ({ ...x, ground: 'grass', watered: false })); flash('恢复成草地') }
         else flash('没什么可铲的')
         break
+      case 'net':
+        if (t.butterfly) {
+          updateTile(r, c, (x) => ({ ...x, butterfly: false })); addFx(r, c, 'pop')
+          setGold((g) => g + 8); setInv((p) => ({ ...p, 'bug:butterfly': (p['bug:butterfly'] ?? 0) + 1 }))
+          flash('捉到蝴蝶 +8💰')
+        } else flash('这里没有蝴蝶（白天草地会飞来）')
+        break
+      case 'sieve': {
+        const nearWater = [[r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]].some(([rr, cc]) => tiles[rr]?.[cc]?.ground === 'water')
+        if (!nearWater) { flash('要站在水边才捞得到虾'); break }
+        addFx(r, c, 'water')
+        if (Math.random() < 0.45) {
+          setGold((g) => g + 14); setInv((p) => ({ ...p, 'fish:河虾': (p['fish:河虾'] ?? 0) + 1 }))
+          flash('捞到河虾 +14💰')
+        } else flash('小虾溜走了…再试试')
+        break
+      }
     }
   }, [tiles, seed])
 
@@ -398,6 +435,7 @@ export default function Stardew() {
     if (nd > DAYS_PER_SEASON) { nd = 1; ns = (season + 1) % 4; if (ns === 0) ny++ }
     setDay(nd); setSeason(ns); setYear(ny)
     spawnWeeds(2 + Math.floor(Math.random() * 2))
+    spawnButterflies(1 + Math.floor(Math.random() * 2))
     flash('睡了一觉，新的一天 ☀️')
   }
 
@@ -482,7 +520,7 @@ export default function Stardew() {
       else if (k === 'e') { if (near(NPC.r, NPC.c)) openTalk() }
       else if (k === 'f') { openFish() }
       else if (k === 'm') { if (near(CAVE.r, CAVE.c)) openMine() }
-      else if (['1', '2', '3', '4', '5', '6'].includes(k)) setTool(TOOLS[+k - 1].id)
+      else if (['1', '2', '3', '4', '5', '6', '7', '8'].includes(k)) setTool(TOOLS[+k - 1].id)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -535,7 +573,7 @@ export default function Stardew() {
           {tiles.map((row, r) => row.map((t, c) => {
             const mature = t.crop && t.crop.stage >= CROPS[t.crop.id].stages.length - 1
             const cls = ['sd-tile', t.ground, t.watered ? 'watered' : '', mature ? 'mature' : '', t.weed ? 'weed' : ''].join(' ').trim()
-            const content = t.crop ? CROPS[t.crop.id].stages[t.crop.stage] : t.weed ? '🌿' : ''
+            const content = t.crop ? CROPS[t.crop.id].stages[t.crop.stage] : t.weed ? '🌿' : t.butterfly ? '🦋' : ''
             return (
               <div key={key(r, c)} className={cls}
                 style={{ left: c * TILE, top: r * TILE, width: TILE, height: TILE }}
@@ -596,7 +634,7 @@ export default function Stardew() {
         {invList.length === 0 && <span>空空如也</span>}
         {invList.map(([id, n]) => {
           const [kind, name] = id.split(':')
-          const icon = kind === 'fish' ? '🐟' : kind === 'ore' ? '⛏️' : CROPS[id as CropId]?.emoji ?? '🌾'
+          const icon = kind === 'fish' ? '🐟' : kind === 'ore' ? '⛏️' : kind === 'bug' ? '🦋' : CROPS[id as CropId]?.emoji ?? '🌾'
           return <span key={id}>{icon} {name} ×<b>{n}</b></span>
         })}
       </div>

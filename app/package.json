@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
     "antd": "^5.29.3",
     "matter-js": "^0.20.0",
     "phaser": "^3.90.0",
