@@ -1800,3 +1800,22 @@ button { font-family: inherit; cursor: pointer; }
   .gm-play { display: none; }
   .gm-over-title { font-size: 22px; }
 }
+
+/* ---- 开源精选（iframe 内嵌） ---- */
+.og-frame {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  height: clamp(420px, 68vh, 680px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-elev);
+}
+.og-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+.og-credit { max-width: 960px; margin: 10px auto 0; font-size: 11.5px; color: var(--muted); }
+.og-credit a { color: var(--cyan); text-decoration: none; border-bottom: 1px dashed rgba(77, 216, 230, .4); }
+.og-credit a:hover { color: var(--amber); border-color: var(--amber); }
+.og-tag { color: var(--green); border-color: var(--green); }
+@media (max-width: 620px) {
+  .og-frame { height: clamp(340px, 62vh, 520px); }
+}
