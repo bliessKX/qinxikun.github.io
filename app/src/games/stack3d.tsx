@@ -196,6 +196,11 @@ export default function Stack3D() {
             current.body.setNextKinematicTranslation(isX ? { x: v, y: t.y, z: t.z } : { x: t.x, y: t.y, z: v })
           }
           world.step()
+          /* 吊臂上的方块不在 blocks 里，先同步它的 mesh 跟随刚体（否则看不见吊臂） */
+          if (state.phase === 'moving' && current) {
+            const t = current.body.translation()
+            current.mesh.position.set(t.x, t.y, t.z)
+          }
           /* 同步网格 & 清理坠出视野的碎块 */
           for (let i = blocks.length - 1; i >= 0; i--) {
             const b = blocks[i]

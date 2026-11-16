@@ -13,10 +13,7 @@ export default class MechanicsScene extends Phaser.Scene {
       import.meta.url.lastIndexOf("/")
     );
     this.load.json("levelConfig", `${basePath}/config.json`);
-    this.load.script(
-      "webfont",
-      "https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"
-    );
+    /* 移除无用的 Google webfont 外部脚本：国内网络下加载失败会卡住 preload */
 
     this.load.once("filecomplete-json-levelConfig", () => {
       const cfg = this.cache.json.get("levelConfig");

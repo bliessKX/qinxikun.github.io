@@ -45,6 +45,7 @@ class PlatformerScene extends Phaser.Scene {
   coins!: Phaser.Physics.Arcade.StaticGroup
   spikes!: Phaser.Physics.Arcade.StaticGroup
   flagBox!: Phaser.Physics.Arcade.StaticGroup
+  colliders: Phaser.Physics.Arcade.Collider[] = []
   level = 0
   score = 0
   lives = 3
@@ -88,6 +89,9 @@ class PlatformerScene extends Phaser.Scene {
   loadLevel(idx: number) {
     this.level = idx
     const L = LEVELS[idx]
+    /* 先移除上一关注册的碰撞/重叠，否则每过一关就叠加一套，玩家会被多次处理而卡住 */
+    this.colliders.forEach((c) => c.destroy())
+    this.colliders = []
     this.plats?.destroy(true)
     this.coins?.destroy(true)
     this.spikes?.destroy(true)
@@ -102,16 +106,16 @@ class PlatformerScene extends Phaser.Scene {
     for (const [x, y] of L.coins) this.coins.create(x, y, 'coin')
     for (const [x, y] of L.spikes) this.spikes.create(x, y, 'spike')
     this.flagBox.create(L.flag[0], L.flag[1], 'flag')
-    this.physics.add.collider(this.player, this.plats)
-    this.physics.add.overlap(this.player, this.coins, (_p, c) => {
+    this.colliders.push(this.physics.add.collider(this.player, this.plats))
+    this.colliders.push(this.physics.add.overlap(this.player, this.coins, (_p, c) => {
       const coin = c as Phaser.Physics.Arcade.Sprite
       coin.destroy()
       this.score += 10
       bridge.onScore(this.score)
       this.tweens.add({ targets: this.add.text(coin.x, coin.y - 6, '+10', { fontFamily: 'Consolas', fontSize: '13px', color: '#f0d048' }), y: coin.y - 30, alpha: 0, duration: 500, onComplete: (t) => (t.targets[0] as Phaser.GameObjects.Text).destroy() })
-    })
-    this.physics.add.overlap(this.player, this.spikes, () => this.hurt())
-    this.physics.add.overlap(this.player, this.flagBox, () => this.pass())
+    }))
+    this.colliders.push(this.physics.add.overlap(this.player, this.spikes, () => this.hurt()))
+    this.colliders.push(this.physics.add.overlap(this.player, this.flagBox, () => this.pass()))
     bridge.onLevel(idx + 1)
   }
 
@@ -159,10 +163,17 @@ class PlatformerScene extends Phaser.Scene {
     this.player.setPosition(40, 320).setVelocity(0, 0)
   }
 
+  passing = false
   pass() {
-    if (this.level >= LEVELS.length - 1) { bridge.onWin(); this.scene.restart(); return }
-    this.loadLevel(this.level + 1)
-    this.player.setPosition(40, 320).setVelocity(0, 0)
+    if (this.passing) return
+    this.passing = true
+    /* 延迟到下一帧再重建关卡：overlap 回调里直接销毁物理对象会打断引擎迭代 */
+    this.time.delayedCall(0, () => {
+      if (this.level >= LEVELS.length - 1) { bridge.onWin(); this.scene.restart(); return }
+      this.loadLevel(this.level + 1)
+      this.player.setPosition(40, 320).setVelocity(0, 0)
+      this.passing = false
+    })
   }
 
   update(_t: number, delta: number) {
